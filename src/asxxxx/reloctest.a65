@@ -1,8 +1,0 @@
-;   Test testmc framework's handling of relocatable objects.
-
-            .radix h
-
-            .globl  reloctest
-reloctest:  .str    "@[reloctest]@"
-
-ident:      .str    "reloctest.a65"
