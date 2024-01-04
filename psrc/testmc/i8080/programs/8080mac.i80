@@ -1,0 +1,12 @@
+;   Setup for .MAC files
+;   XXX document this better
+;   XXX /opt/asl/bin/asl -x -i . 8080PRE.MAC  2>&1 | less
+
+	    cpu 8080
+
+.8080       macro       ; ignore directive
+            endm
+
+defl        macro   arg,{INTLABEL}
+__LABEL__   set     arg
+            endm
