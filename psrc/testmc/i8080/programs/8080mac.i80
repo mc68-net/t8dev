@@ -1,0 +1,26 @@
+;   Setup to make ASL build M80 .MAC files.
+;
+;   XXX This doesn't actually work since the macro syntax used by M80
+;   is slightly different: it uses `&paramname` instead of just `paramname`
+;   to substitute macro arguments. It's not clear how we might get around
+;   this, except perhaps by pre-processing the file with sed. (There are
+;   also probably many other things to be fixed.)
+;
+;   Test builds with `/opt/asl/bin/asl -x -i . 8080PRE.MAC  2>&1 | less`.
+;   (Add a `-l` option to see the listing output to stdout as well.)
+;
+
+            macexp_dft on
+
+            ;   ASL, for some reason, must have a CPU set before macros
+            ;   can be called, or an error will be generated.
+            cpu     8080
+
+;   CPU selection
+.8080       macro
+            cpu     8080
+            endm
+
+defl        macro   arg,{INTLABEL}
+__LABEL__   set     arg
+            endm

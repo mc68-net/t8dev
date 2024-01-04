@@ -1,0 +1,240 @@
+''' "Native" tests of the CPU simulator. (I.e., machine-language CPU test
+    programs that run on the simulator itself.
+'''
+
+from    io  import StringIO
+from    pathlib  import Path
+import  pytest
+import  re
+
+from    binary.memimage  import MemImage
+from    testmc  import LB, MB, tmc_tid
+from    testmc.i8080 import  Machine
+from    testmc.i8080.opcodes   import Instructions as I
+
+####################################################################
+#   .COM file and CP/M Handling
+
+TESTDATA_DIR = Path(__file__).parent
+TPA_ADDR = 0x100
+def load_com(m, filename):
+    print(f'Loading {filename}')
+    with open(Path(TESTDATA_DIR, filename), 'rb') as f:
+        #   XXX Should be able to load directly from file, w/o memimage!
+        #   (As well as _load_asl(), etc., need _load_bin(startaddr).
+        prog = MemImage()
+        prog.addrec(TPA_ADDR, f.read())
+        prog.entrypoint = TPA_ADDR
+        m.load_memimage(prog, setPC=True)
+    m.pc = TPA_ADDR
+
+def emu_cpm(m, outstream=None):
+    ''' Emulate, within the test framework, a CPM call. Returns:
+        - `True`: the call was successfully handled, and the test should
+          continue running.
+        - `False`: the call was not handled, and the test should examine
+          the machine state and take appropriate action.
+
+        Output is always written to `stdout`. The output will be duplicated
+        on `outstream` if given; this is useful for collecting the output
+        to examine in a test or write to a file.
+
+        This handles calls to the following addresses, which must be set
+        in the `stopat` list for `Machine.stepto()`:
+        - ``CALL $0000``: Writes a message indicating warm start, but
+          returns `False`. (The caller should normally exit the loop and
+          then decide whether it should pass or fail the test.)
+        - ``CALL $0005``: CP/M BDOS function call. This currently handles
+          only printing (which is done to stdout), otherwise an exception
+          is raised.
+    '''
+    def pr(*args, **kwargs):
+        print(*args, **kwargs)
+        if outstream:
+            print(*args, file=outstream, flush=True, **kwargs)
+
+    if m.pc == 0x0000:
+        pr('■CP/M WARM START via $0000')
+        return False
+
+    if m.pc == 0x0005:      # BDOS call
+        if m.c == 0x02:     # write character in E to console
+            pr(f"{chr(m.e)}", end='')
+        elif m.c == 0x09:   # write $-terminated string at DE to console
+            terminator = m.mem.find(b'$', m.de)
+            pr(m.bytes(m.de, terminator-m.de).decode('ASCII'), end='')
+        else:
+            assert 0, 'Unknown BDOS call ${:02X} at {}'.format(m.c, m.regs)
+        #   Ensure we return from the successful CP/M BDOS call.
+        if m.byte(0x0005) != I.RET:
+            m.deposit(0x0005, I.RET)
+        return True
+
+    return False
+
+def test_emu_cpm(m):
+    BDOS = 0x0005; code = 0x100; data = 0x200
+    m.pc = code; m.deposit(code, [
+        I.LDci,  0x09,
+        I.LXId,  LB(data), MB(data),
+        I.CALL,  LB(BDOS), MB(BDOS),
+        I.LXId,  LB(data+2), MB(data+2),
+        I.CALL,  LB(BDOS), MB(BDOS),
+        I.CALL,  0, 0,
+    ])
+    m.deposit(data, b'1$23\r\n$')
+    output = StringIO()
+
+    while True:
+        m.stepto(stopat=[0x0000, 0x0005])
+        if not emu_cpm(m, output): break
+    assert re.match('^123\r\n', output.getvalue())
+
+####################################################################
+#   Tests
+
+def test_8080pre(m):
+    allok = 0x0327      # prints '8080 Preliminary tests complete' and exits
+    load_com(m, 'programs/8080PRE.COM')
+    #   The first few tests jump to $0000 on failure, so we set that
+    #   to an instruction that will abort the simulator.
+    m.deposit(0, I.HLT)
+    m.stepto(stopat=[allok], trace=0)
+    assert allok == m.pc
+
+@pytest.mark.skip('Takes 5-10 hours to run')
+def test_8080exer(m):
+    load_com(m, 'programs/8080EX1.COM')
+    while True:
+        m.stepto(stopat=[0x0000, 0x0005], maxsteps=1e11, trace=0)
+        if emu_cpm(m): continue
+        raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
+current_results = '''
+#   Commit c464fee   2024.04.22 00:16:18 +0900
+#   Commit 734162e   2024.04.21 18:45:14 +0900
+8080 instruction exerciser (KR580VM80A CPU)
+dad <b,d,h,sp>................  OK
+aluop nn......................  ERROR **** crc expected:9e922f9e found:bb8cb53b
+aluop <b,c,d,e,h,l,m,a>.......  ERROR **** crc expected:cf762c86 found:3aa103c5
+<daa,cma,stc,cmc>.............  ERROR **** crc expected:bb3f030c found:dfb7ac82
+<inr,dcr> a...................  ERROR **** crc expected:adb6460e found:dd329f16
+<inr,dcr> b...................  ERROR **** crc expected:83ed1345 found:f369ca5d
+<inx,dcx> b...................  OK
+<inr,dcr> c...................  ERROR **** crc expected:e5f6721b found:8cd3ff9f
+<inr,dcr> d...................  ERROR **** crc expected:15b5579a found:7c90da1e
+<inx,dcx> d...................  OK
+<inr,dcr> e...................  ERROR **** crc expected:cf2ab396 found:a60f3e12
+<inr,dcr> h...................  ERROR **** crc expected:12b2952c found:7b9718a8
+<inx,dcx> h...................  OK
+<inr,dcr> l...................  ERROR **** crc expected:ff57d356 found:96725ed2
+<inr,dcr> m...................  ERROR **** crc expected:92e963bd found:fbccee39
+<inx,dcx> sp..................  OK
+lhld nnnn.....................  OK
+shld nnnn.....................  OK
+lxi <b,d,h,sp>,nnnn...........  OK
+ldax <b,d>....................  OK
+mvi <b,c,d,e,h,l,m,a>,nn......  OK
+mov <bcdehla>,<bcdehla>.......  OK
+sta nnnn / lda nnnn...........  OK
+<rlc,rrc,ral,rar>.............  OK
+stax <b,d>....................  OK
+
+#   Commit 7710ddc   2024-04-21 12:45:13 +0900
+8080 instruction exerciser (KR580VM80A CPU)
+dad <b,d,h,sp>................  OK
+aluop nn......................  ERROR **** crc expected:9e922f9e found:52877038
+aluop <b,c,d,e,h,l,m,a>.......  ERROR **** crc expected:cf762c86 found:469e3369
+<daa,cma,stc,cmc>.............  ERROR **** crc expected:bb3f030c found:dfb7ac82
+<inr,dcr> a...................  ERROR **** crc expected:adb6460e found:dd329f16
+<inr,dcr> b...................  ERROR **** crc expected:83ed1345 found:f369ca5d
+<inx,dcx> b...................  OK
+<inr,dcr> c...................  ERROR **** crc expected:e5f6721b found:8cd3ff9f
+<inr,dcr> d...................  ERROR **** crc expected:15b5579a found:7c90da1e
+<inx,dcx> d...................  OK
+<inr,dcr> e...................  ERROR **** crc expected:cf2ab396 found:a60f3e12
+<inr,dcr> h...................  ERROR **** crc expected:12b2952c found:7b9718a8
+<inx,dcx> h...................  OK
+<inr,dcr> l...................  ERROR **** crc expected:ff57d356 found:96725ed2
+<inr,dcr> m...................  ERROR **** crc expected:92e963bd found:fbccee39
+<inx,dcx> sp..................  OK
+lhld nnnn.....................  OK
+shld nnnn.....................  OK
+lxi <b,d,h,sp>,nnnn...........  OK
+ldax <b,d>....................  OK
+mvi <b,c,d,e,h,l,m,a>,nn......  OK
+mov <bcdehla>,<bcdehla>.......  OK
+sta nnnn / lda nnnn...........  OK
+<rlc,rrc,ral,rar>.............  OK
+stax <b,d>....................  OK
+
+#   Commit ??????? (earlier)
+#   Current results as of this commit:
+dad <b,d,h,sp>................ OK
+aluop nn...................... ERROR **** crc expected: 9e922f9e found: 52877038
+aluop <b,c,d,e,h,l,m,a>....... ERROR **** crc expected: cf762c86 found: 469e3369
+<daa,cma,stc,cmc>............. ERROR **** crc expected: bb3f030c found: dfb7ac82
+<inr,dcr> a................... ERROR **** crc expected: adb6460e found: 03656f73
+<inr,dcr> b................... ERROR **** crc expected: 83ed1345 found: 4a0ddbdf
+<inx,dcx> b................... ERROR **** crc expected: f79287cd found: a3220053
+<inr,dcr> c................... ERROR **** crc expected: e5f6721b found: ebbc234b
+<inr,dcr> d................... ERROR **** crc expected: 15b5579a found: 1bff06ca
+<inx,dcx> d................... ERROR **** crc expected: 7f4e2501 found: 192347fd
+<inr,dcr> e................... ERROR **** crc expected: cf2ab396 found: c5b5eb43
+<inr,dcr> h................... ERROR **** crc expected: 12b2952c found: 578b9ea8
+<inx,dcx> h................... ERROR **** crc expected: 9f2b23c0 found: 9475b01d
+<inr,dcr> l................... ERROR **** crc expected: ff57d356 found: 3508df15
+<inr,dcr> m................... ERROR **** crc expected: 92e963bd found: fbccee39
+<inx,dcx> sp.................. ERROR **** crc expected: d5702fab found: d7c21c72
+lhld nnnn..................... OK
+shld nnnn..................... OK
+lxi <b,d,h,sp>,nnnn........... OK
+ldax <b,d>.................... OK
+mvi <b,c,d,e,h,l,m,a>,nn...... OK
+mov <bcdehla>,<bcdehla>....... OK
+sta nnnn / lda nnnn........... OK
+<rlc,rrc,ral,rar>............. OK
+stax <b,d>.................... OK
+
+'''
+
+def test_microcosm_diag(m):
+    load_com(m, 'programs/TEST.COM')
+    CPUOK = 0x6B7   # address at which "CPU ok" message is finished printing
+    PARTIAL = None
+    while True:
+        m.stepto(stopat=[0x0000, 0x0005, CPUOK, PARTIAL], trace=0)
+        if m.pc == PARTIAL: return      # stop in middle of program?
+        if m.pc == CPUOK:   return      # we printed success message
+        if emu_cpm(m):      continue    # we handled a BDOS call
+        #   We exited for some reason other than success.
+        raise RuntimeError(f'bad exit at ${m.pc:02X}')
+
+@pytest.mark.skip('12-24h, requires DCR always to set H=1')
+def test_supersoft(m):
+    DEBUG_LOG = 'log.supersoft'
+    CPUOK = 0xFFFF
+    PARTIAL = 0xFFFF
+    stops = [0x0000, 0x0005, CPUOK, PARTIAL]
+
+    load_com(m, 'programs/CPUTEST.COM') # Supersoft Diagnostics II v1.2
+    if DEBUG_LOG:
+        DEBUG_LOG = open(DEBUG_LOG, 'w')
+        m.deposit(0x0C78, 1)    # Z80 test
+        m.deposit(0x3B6F, 1)    # 8080/8085 test
+    while True:
+        #   5e7 > ~0h04, when it was failing early
+        #   5e8 ~= 1h12 and timed out on cjs laptop
+        m.stepto(stopat=stops, maxsteps=int(1e11), trace=0)
+        if m.pc == PARTIAL: return      # stop in middle of program?
+        if m.pc == CPUOK:   return      # we printed success message
+        if emu_cpm(m, DEBUG_LOG): continue    # we handled a BDOS call
+        #   We exited for some reason other than success.
+        if DEBUG_LOG: DEBUG_LOG.close()
+        raise RuntimeError(f'bad exit at ${m.pc:02X}')
+current_failure = '''   (dec b, expected H=1 got H=0)
+    INSTRUCTION SEQUENCE WAS 050000H
+    REGISTER f CONTAINS 46H
+    BUT SHOULD CONTAIN 56H
+    REGISTER VALUE BEFORE INSTRUCTION SEQUENCE WAS 02H
+    TEST NUMBER  0011H
+'''

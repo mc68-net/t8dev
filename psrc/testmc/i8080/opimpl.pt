@@ -1,0 +1,269 @@
+''' i8080/opimpl: Machine and Instruction Tests
+
+    We currently do not have full coverage here; for that we rely on
+    running native 8080 test programs (see nativetest.pt). The tests here
+    do cover the core functionality, particularly routines that are
+    parametrized by register and the like, and some areas of difficulty.
+'''
+
+from    collections.abc  import Sequence
+from    random  import  randrange
+import  pytest
+
+from    testmc.i8080.opcodes   import Instructions as I
+from    testmc.i8080.opcodes   import *
+from    testmc.i8080.opimpl    import *
+from    testmc.i8080           import Machine
+from    testmc                 import LB, MB, tmc_tid
+
+R = Machine.Registers
+
+####################################################################
+#   Test Support Routines
+
+def mop(ops, regs=R(), step=True):
+    ''' Create a `Machine`, insert `ops` (an int or sequence of ints) into
+        memory and set the PC to point to it, set the Machine's registers
+        to `regs`, execute the opcode, and return the Machine.
+    '''
+    m = Machine()
+    addr = randrange(0x03, 0x2FF)
+    m.pc = addr
+    if not isinstance(ops, Sequence):  ops = [ops]
+    m.mem[addr:addr+len(ops)] = ops
+    m.setregs(regs)
+    print(f'{m.hexdump(addr, 4)}   {m.regs}')
+    if step: m._step()
+    return m
+
+def test_mexec():
+    m = mop([0x40, 0x41], step=False)
+    assert b'\x40\x41' == m.mem[m.pc:m.pc+2]
+
+    m = mop(0x7F); assert 0x7F == m.mem[m.pc-1]
+
+####################################################################
+#   CPU Simulation Support Functions
+
+def test_iszero():
+    assert (True,          False,      False) \
+        == (iszero(0), iszero(1), iszero(-1))
+
+def test_isneg():
+    assert (   False,    False,       False,        True,        True) \
+        == (isneg(0), isneg(1), isneg(0x7F), isneg(0x80), isneg(0xFF))
+
+@pytest.mark.parametrize('even, val', [
+    (1, 0b00000000),
+    (0, 0b00000001),
+    (0, 0b10000000),
+    (0, 0b00010000),
+    (1, 0b10000001),
+    (1, 0b00100010),
+    (1, 0b11111111),
+    (0, 0b01111111),
+    (0, 0b11111110),
+    (0, 0b11011111),
+])
+def test_parity(even, val):
+    assert even == parity(val)
+
+#   XXX Push/pop really should be tested through the instructions, so we
+#   don't have to worry about our internal APIs.
+
+def test_pushpop():
+    m = Machine()
+    m.sp = 0x1000
+
+    pushbyte(m, 0xEE)
+    assert (m.sp,   m.mem[0x1000], m.mem[0x0FFF], m.mem[0x0FFE]) \
+        == (0x0FFF,          0x00,          0xEE,          0x00)
+
+    v = popbyte(m)
+    assert (m.sp, v) == (0x1000, 0xEE)
+
+    pushword(m, 0x1234)
+    assert (m.sp,   m.mem[0x1000], m.mem[0x0FFF], m.mem[0x0FFE], m.mem[0x0FFD])\
+        == (0x0FFE,          0x00,          0x12,          0x34,          0x00)
+
+    m.sp = 0x124
+    m.mem[0x125] = 0xAB
+    m.mem[0x124] = 0xCD
+    val = popword(m)
+    assert (0x126, 0xABCD) == (m.sp, val)
+
+####################################################################
+#   Jumps and Calls
+
+@pytest.mark.parametrize('a, b, r', [
+    (0x00, 0x00, R(a=0x00, S=0, Z=1, H=0, P=1, C=0)),
+    (0x7F, 0x02, R(a=0x81, S=1, Z=0, H=1, P=1, C=0)),
+    (0xFF, 0x02, R(a=0x01, S=0, Z=0, H=1, P=0, C=1)),
+])
+def test_add(a, b, r):
+    assert r == mop(I.ADDb, R(a=a, b=b)).regs
+
+@pytest.mark.parametrize('op, regs, taken', [
+    (I.JP,   R(),    True ),
+    (I.JPz,  R(Z=0), False), (I.JPz,  R(Z=1), True ),
+    (I.JPnz, R(Z=0), True ), (I.JPnz, R(Z=1), False),
+    (I.JPp,  R(S=1), False), (I.JPp,  R(S=0), True ),
+    (I.JPm,  R(S=1), True ), (I.JPm,  R(S=0), False),
+    (I.JPc,  R(C=0), False), (I.JPc,  R(C=1), True ),
+    (I.JPnc, R(C=0), True ), (I.JPnc, R(C=1), False),
+    (I.JPpo, R(P=1), False), (I.JPpo, R(P=0), True ),
+    (I.JPpe, R(P=1), True ), (I.JPpe, R(P=0), False),
+])
+def test_jp(op, regs, taken):
+    print(f'op=${op:02X} regs={regs} taken={taken}')
+    m = mop([op, 0x01, 0x04], regs)
+    if taken:   assert 0x0401 == m.pc
+    else:       assert 0x0401 != m.pc
+
+@pytest.mark.parametrize('op, regs, taken', [
+    (I.RET,   R(),    True ),
+    (I.RETz,  R(Z=0), False), (I.RETz,  R(Z=1), True ),
+    (I.RETnz, R(Z=0), True ), (I.RETnz, R(Z=1), False),
+    (I.RETp,  R(S=1), False), (I.RETp,  R(S=0), True ),
+    (I.RETm,  R(S=1), True ), (I.RETm,  R(S=0), False),
+    (I.RETc,  R(C=0), False), (I.RETc,  R(C=1), True ),
+    (I.RETnc, R(C=0), True ), (I.RETnc, R(C=1), False),
+    (I.RETpe, R(P=0), False), (I.RETpe, R(P=1), True ),
+    (I.RETpo, R(P=0), True ), (I.RETpo, R(P=1), False),
+
+])
+def test_jp(op, regs, taken):
+    print(f'op=${op:02X} regs={regs} taken={taken}')
+    m = mop(op, regs, step=False)
+    oldpc = m.pc
+    m.sp = 0x7FFE; m.deposit(0x7FFE, [0x01, 0x04])
+    m._step()
+    if taken:
+        assert (0x8000, 0x0401) == (m.sp, m.pc)
+    else:
+        assert (0x7FFE, oldpc+1) == (m.sp, m.pc)
+
+####################################################################
+#   Register Moves (Load/Store)
+
+@pytest.mark.parametrize('opcode, outregs', [
+    (I.MOVba, R(a=0x40, bc=0x4052, de=0x6162)),
+    (I.MOVca, R(a=0x40, bc=0x5140, de=0x6162)),
+    (I.MOVda, R(a=0x40, bc=0x5152, de=0x4062)),
+])
+def test_mov(opcode, outregs):
+    assert outregs == mop(opcode, R(a=0x40, bc=0x5152, de=0x6162)).regs
+
+@pytest.mark.parametrize('opcode, val, dest', [
+    (I.MOVmb, 0x51, 0x1234),
+    (I.MOVmc, 0x52, 0xFFFE),
+])
+def test_movm(opcode, val, dest):
+    assert val == mop(opcode, R(bc=0x5152, hl=dest)).byte(dest)
+
+def test_lxi():
+    assert R(bc=0xCDEF) \
+        == mop([I.LXIb, 0xEF, 0xCD], R(a=0x40, bc=0x5152, de=0x6162)).regs
+
+####################################################################
+#   Logic
+
+@pytest.mark.parametrize('op, input, expected', [
+    #   On entry, all flags set except those explicitly overridden.
+    #   C is expected to be 0 unless explicitly overridden.
+
+    (I.ORb,     R(a=0x03, b=0x40),          R(a=0x43, S=0,Z=0,H=0,P=0)),
+    (I.ORb,     R(a=0x0F, b=0xCC, S=0,P=0), R(a=0xCF, S=1,Z=0,H=0,P=1)),
+    ([I.ORi,0xCC],      R(a=0x0F, S=0,P=0), R(a=0xCF, S=1,Z=0,H=0,P=1)),
+    (I.XORa,    R(a=0x5F, Z=0),             R(a=0x00, S=0,Z=1,H=0,P=1)),
+    ([I.XORi,0x38],     R(a=0x5F),          R(a=0x67, S=0,Z=0,H=0,P=0)),
+
+    #   AND is a bit tricky because on 8080 because the behaviour is diverse:
+    #   • Z80:      H=1 always: (Zilog Z80 CPU User Manual, p.158)
+    #   • 8085:     H=1 always: ([pm85], p.1-12, PDF P.22)
+    #   • 8080 ANA: H=OR of bits 3 of inputs (ibid.)
+    #   • 8080 ANI: • as ANA ([pm85] ibid.)
+    #               • H=0    ([um80] p.4-9)
+    #   References:
+    #   • [pm85] 8080/8085 Assembly Language Programming Manual, p.1-12 P.22
+    #   • [um80] Intel 8080 Microcomputer Systems User's Manual (98-153B)
+    #   • https://retrocomputing.stackexchange.com/q/29899/7208
+
+    #   8080 version; not correct for 8085/Z80
+    (I.ANDb,    R(a=0xC0, b=0xA0, S=0),     R(a=0x80, S=1,Z=0,H=0,P=0)),
+    (I.ANDb,    R(a=0x30, b=0x50),          R(a=0x10, S=0,Z=0,H=0,P=0)),
+    (I.ANDb,    R(a=0x30, b=0x58),          R(a=0x10, S=0,Z=0,H=1,P=0)),
+    (I.ANDb,    R(a=0x38, b=0x50),          R(a=0x10, S=0,Z=0,H=1,P=0)),
+    (I.ANDb,    R(a=0x38, b=0x58),          R(a=0x18, S=0,Z=0,H=1,P=1)),
+    (I.ANDm,    R(a=0xF0, hl=0x9000),       R(a=0x00, S=0,Z=1,H=0,P=1)),
+    #   We treat ANDi per the 8085 manual [pm85] until we get a answer to
+    #   https://retrocomputing.stackexchange.com/q/29899/7208
+    ([I.ANDi,0xC3],     R(a=0xF0),          R(a=0xC0, S=1,Z=0,H=0,P=1)),
+])
+def test_logic(op, input, expected):
+    #   On entry, all flags set except those explicitly overridden.
+    #   Output flags all expected to be clear except those explicitly specified.
+    input    = R(f=0xFF).clone(**input.valued())
+    expected = R(f=0x00).clone(**expected.valued())
+    m = mop(op, input)
+    if isinstance(op, Sequence):
+        print(f'op=${op[0]:02X} in: {input}  (immediate=${op[1]:02X})')
+    else:
+        print(f'op=${op:02X} in: {input}')
+    print(f' expected: {expected}')
+    print(f'   output: {m.regs}')
+    assert expected == m.regs
+
+
+####################################################################
+#   Increment/Decrement
+
+def test_inx():
+    assert R(bc=0x5153) == mop(I.INXbc, R(bc=0x5152)).regs
+    assert R(hl=0x0000) == mop(I.INXhl, R(hl=0xFFFF)).regs
+
+@pytest.mark.parametrize('op, input, expected', [
+    #   On entry, all flags set except those explicitly overridden.
+    #   Output flags are expected to unchanged unless explicitly set otherwise.
+
+    (I.INCc, R(bc=0x00FF, Z=0,H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1,C=0)),
+    (I.INCc, R(bc=0x000F,     H=0    ), R(bc=0x0010, S=0,Z=0,H=1,P=0,C=0)),
+
+    #   For DEC, the half-carry bit is a half-not-borrow bit, at least on 8085.
+    (I.DECc, R(bc=0x0000, S=1,H=1,P=0), R(bc=0x00FF, S=1,Z=0,H=0,P=1,C=0)),
+    (I.DECc, R(bc=0x0010,     H=1    ), R(bc=0x000F, S=0,Z=0,H=0,P=1,C=0)),
+    (I.DECc, R(bc=0x0001,     H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1,C=0)),
+    (I.DECc, R(bc=0x0002,     H=0    ), R(bc=0x0001, S=0,Z=0,H=1,P=0,C=0)),
+    (I.DECc, R(bc=0x007F,     H=0    ), R(bc=0x007E, S=0,Z=0,H=1,P=1,C=0)),
+
+    #   No flags affected on 16-bit increment/decrement.
+    (I.INXbc, R(bc=0xFFFF, Z=0),        R(bc=0x0000, Z=0)),
+    (I.INXbc, R(bc=0x0000),             R(bc=0x0001)),
+    (I.INXbc, R(bc=0x00FF),             R(bc=0x0100)),
+
+    (I.DCXbc, R(bc=0x0000, S=0),        R(bc=0xFFFF)),
+    (I.DCXbc, R(bc=0x0001, Z=0),        R(bc=0x0000)),
+    (I.DCXbc, R(bc=0x8000),             R(bc=0x7FFF)),
+
+])
+def test_inc_dec(op, input, expected):
+    #   On entry, all flags set except those explicitly overridden.
+    input    = R(f=0xFF).clone(**input.valued())
+    #   Output flags are expected to unchanged unless explicitly set otherwise.
+    expected = R(f=input.f).clone(**expected.valued())
+    m = mop(op, input)
+    print(f'op=${op:02X} in: {input}')
+    print(f' expected: {expected}')
+    print(f'   output: {m.regs}')
+    assert expected == m.regs
+
+####################################################################
+#   Arithemtic
+
+####################################################################
+#   Misc.
+
+@pytest.mark.filterwarnings(r'ignore:EI \(\$FB\) at ')
+def test_di_ei():
+    m = mop(I.DI)   #   Expected to do nothing.
+    m = mop(I.EI)   #   Generates a warning.

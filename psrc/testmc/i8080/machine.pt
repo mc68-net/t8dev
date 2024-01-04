@@ -1,0 +1,27 @@
+from    testmc.i8080  import *
+from    testmc  import LB, MB
+import  pytest
+
+@pytest.fixture
+def m():
+    return Machine()
+
+R = Machine.Registers
+
+####################################################################
+
+def test_super_init(m):
+    assert 0 == len(m.symtab)
+
+def test_mem(m):
+    assert 65536 == len(m.mem)
+    assert 0 == m.mem[0]
+    assert 0 == m.mem[65535]
+
+def test_regs(m):
+    r0 = R(pc=0, a=0, bc=0, de=0, hl=0, sp=0xE000,
+            S=0, Z=0, H=0, P=0, C=0)
+    assert r0 == m.regs
+
+def test_narrow_regs():
+    assert R(b=1, c=2) == R(bc=0x0102)
