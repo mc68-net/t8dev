@@ -44,6 +44,7 @@ ISA = ntup('ISA', 'cpu, stdinc')
 ISAMAP = {
     '.a65': ISA('6502', 'mos65/std.a65'),
     '.a68': ISA('6800', 'mc68/std.a68'),
+    '.i80': ISA('8080', 'i80/std.i80'),
 }
 
 #   XXX this should have a unit test
