@@ -158,11 +158,11 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
     *)      die "Bad arg to Test: $1";;
 esac; done
 
-#   If b8tool appears to be a submodule, use the parent virtualenv.
+#   If t8dev appears to be a submodule, use the parent virtualenv.
 [[ -d $basedir/../.build/virtualenv/ ]] \
     && projdir=$(cd "$basedir/.." && pwd -P) \
     || projdir="$basedir"
-. "$projdir"/b8tool/pactivate -q -B "$projdir"
+. "$projdir"/t8dev/pactivate -q -B "$projdir"
 
 ttdir="$projdir/.build/cmtconv-test"
 #   We remove all temporary files and results from previous runs to avoid
