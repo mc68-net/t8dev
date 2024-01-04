@@ -311,10 +311,10 @@ def aslauto(paths):
 
         ``.pt`` files will be loaded as Python modules and the final value
         of the following global variables will be used to build sources:
-        * ``object_files``: a source file with extension ``.a*`` will be
-          found for each object file in the list and used to build that
-          object file with `asl1()`. If multiple source files match or no
-          matching source file can be found and error will be generated.
+        * ``object_files``: Any one file with the same path and basename
+          with any extension other than ``.pt`` is considered to be the
+          source file and assembled with `asl1()`. If multiple non-``*.pt``
+          files exist or no other file exists, an error will be generated.
         * ``test_rig``: An object file named for the `.pt` file will be
           generated using using the code in ``test_rig`` by calling
           `asltest()`.
@@ -349,7 +349,10 @@ def aslauto(paths):
                 asl_files.update(of)
 
     for obj in sorted(asl_files):
-        srcs = tuple(path.proj(obj).parent.glob(Path(obj).stem + '.a*'))
+        stem = Path(obj).stem
+        srcs = tuple(path.proj(obj).parent.glob(stem + '.*'))
+        #   Remove .pt file from list of files we're considering.
+        srcs = tuple(p for p in srcs if p.suffix != '.pt')
         prettysrcs = list(map(path.pretty, srcs))   # list prints nicer
         vprint(2, 'build', 'asl obj={} srcs={}'.format(obj, prettysrcs))
         #   In theory we could build several `srcs` with the same name but
