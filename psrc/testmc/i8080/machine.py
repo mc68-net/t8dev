@@ -30,7 +30,7 @@ class Machine(GenericMachine):
     def _getsp(self):   return self.sp
 
     def _step(self):
-        raise NotImpementedException('XXX Write me!')
+        raise NotImplementedError('XXX Write me!')
 
     def pushretaddr(self, word):
         self.sp -= 2
