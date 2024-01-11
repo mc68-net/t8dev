@@ -1,4 +1,8 @@
 from    testmc.generic  import *
+from    testmc.i8080.opcodes  import OPCODES, Instructions
+from    testmc.i8080.opimpl  import (
+            InvalidOpcode, incword, readbyte, signedbyteat,
+            )
 
 class Machine(GenericMachine):
 
@@ -29,8 +33,21 @@ class Machine(GenericMachine):
     def _getpc(self):   return self.pc
     def _getsp(self):   return self.sp
 
+    #   XXX pull up to superclass?
+    InvalidOpcode = InvalidOpcode
+
+    #   XXX pull up to superclass?
+    class NotImplementedError(Exception):
+        ''' Get rid of this once we're more complete. ''' # XXX
+
     def _step(self):
-        raise NotImplementedError('XXX Write me!')
+        opcode = readbyte(self)
+        _, f = OPCODES.get(opcode, (None, None))
+        if not f:
+            raise self.NotImplementedError(
+                'opcode=${:02X} pc=${:04X}'
+                .format(opcode, incword(self.pc, -1)))
+        f(self)
 
     def pushretaddr(self, word):
         self.sp -= 2
