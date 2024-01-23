@@ -1,5 +1,9 @@
-8bitdev
-=======
+t8dev
+=====
+
+__WARNING:__ This documentation is not currently up to date. Currently
+it's best to [contact cjs](#contact-infomation) and get him to help
+you set up the t8dev submodule for your development project.
 
 Contents:
 - File and Directory Organization
@@ -15,27 +19,22 @@ Contents:
   - Playing CMT (Cassette Tape) Images
   - The py65 Monitor
 
+This repo supports development of programs in 8-bit assembly languages (for
+a variety of platforms) and tools to aid this development. It includes a
+Python framework under `pylib/` and build tool `bin/t8dev` that builds and
+tests the assembly code.
 
-This repo is used by cjs for development of programs in 8-bit assembly
-languages (for a variety of platforms) and tools to aid this development.
-It includes:
+Unit tests are written in [pytest] and use Python-based CPU simulators
+such as [py65] for MOS 6502 and `testmc.mc6800` for Motorola 6800.
 
-- A Python framework (under `lib/`) for running unit tests on 6502 machine
-  code in the [py65] 6502 simulator. Unit tests use [pytest] and are in
-  `.pt` files, generally with the same base name as the source file
-  containing the code under test.
-- Scripts (under `tool/`) for downloading and building development tools,
-  including assemblers, binary file and disk image tools, and 8-bit PC
-  simulators.
+The `t8dev.toolset` packages build and install various development tools
+such as [Macroassembler AS][asl], other assemblers, binary file and disk
+image tools, and 8-bit microcomputer emulators.
 
-Run the top-level `./Test` script to see everything go. Adding `-C` as the
-first flag will do a fully clean build, including re-installation of all
-tools, which may be necessary if the third-party tools have been updated.
-
-This currently has been tested only under Linux (Debian 9), but is likely
-to work under MacOS and other Unices. It likely can be made to work under
-Windows as well, if there's demand; contact <cjs@cynic.net> if you're
-interested in getting support for this.
+This currently has been tested only under Linux (mainly Debian), but should
+work under MacOS and other Unices. It likely can be made to work under
+Windows as well, if there's demand; [contact cjs](#contact-infomation) if
+you're interested in getting support for this.
 
 
 File and Directory Organization
@@ -93,7 +92,7 @@ __Simulators and Emulators__:
 
 #### ASL (The Macroassembler AS) Notes
 
-Versions 1.42 builds 205 through at least 218 are broken for 8bitdev due to
+Versions 1.42 builds 205 through at least 218 are broken for t8dev due to
 the "Symbols in Segment NOTHING" section disappearing from the map file.
 See [`t8dev.toolset.asl`](pylib/t8dev/toolset/asl.py) for more
 details.
@@ -210,6 +209,15 @@ Execution:
 - `cycles`: Display number of cycles since last reset.
 
 
+Contact Information
+-------------------
+
+The author of this tool is Curt Sampson; the best ways to contact him are:
+- [Telegram]: `@cjs_cynic`
+- [Discord]: `0cjs`
+- E-mail: <cjs@cynic.net>
+
+
 
 <!-------------------------------------------------------------------->
 [ASxxxx]: http://shop-pdp.net/ashtml/asxxxx.htm
@@ -235,3 +243,6 @@ Execution:
 [py65-cmds]: https://py65.readthedocs.io/en/latest/index.html#command-reference
 [py65-src]: https://github.com/mnaberez/py65
 [vice-mon]: http://vice-emu.sourceforge.net/vice_12.html
+
+[Discord]: https://discord.com/
+[Telegram]: https://telegram.org/
