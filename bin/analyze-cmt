@@ -17,7 +17,7 @@ import  math
 import  statistics
 import  sys, os
 
-#   Configure and use b8tool's Python library path
+#   Configure and use t8dev's Python library path
 B8_HOME = dirname(dirname(abspath(__file__)))
 
 parseint = partial(int, base=0)     # Parse an int recognizing 0xNN etc.

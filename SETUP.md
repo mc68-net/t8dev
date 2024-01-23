@@ -65,17 +65,16 @@ is already tested and working and have our programs here include this
 presumably-tested-and-working source.
 
 XXX There are some cases where we want to run programs that load object
-files built from source files under 8bitdev. One example is
-8bitdev/b8tool/bin/tmc6800, which wants to load
-$BUILD/obj/src/tmc68/bioscode.p along with whatever object file the
-user wants to run. We can't even build 8bitdev/src/tmc68/bioscode.a65
-because it includes `src/tmc68/bios.a68`, which is actually under
-$B8_PROJDIR/8bitdev/, not $B8_PROJDIR/, and so is not in the ASL
-include search path.
+files built from source files under 8bitdev. One example is bin/tmc6800,
+which wants to load $BUILD/obj/src/tmc68/bioscode.p along with whatever
+object file the user wants to run. We can't even build
+8bitdev/src/tmc68/bioscode.a65 because it includes `src/tmc68/bios.a68`,
+which is actually under $B8_PROJDIR/8bitdev/, not $B8_PROJDIR/, and so is
+not in the ASL include search path.
 
 One part of the solution may be to have a way of specifying additional
 include search paths for ASL (and other tools), probably with a -I
-option to b8tool. However, that doesn't deal with the issue that
+option to t8dev. However, that doesn't deal with the issue that
 bin/tmc6800 is looking for the BIOS object file in obj/src/…, not
 obj/8bitdev/src/…. We could hack around this by also adding an option
 to bin/tmc6800 to tell it what BIOS to load (or just allow
@@ -86,12 +85,12 @@ resolving the test issue above could also deal with this.
 
 An issue with trying to run
 
-    $b8tool asl 8bitdev/src/tmc68/bioscode.a65
+    $t8dev asl 8bitdev/src/tmc68/bioscode.a65
 
 XXX Actually, the real issue exposed above is that bin/tmc6800 is part
-of b8tool (it runs b8tool's Python 6800 simulator) but it's got a
+of t8dev (it runs t8dev's Python 6800 simulator) but it's got a
 dependency on code that's part of 8bitdev (src/tmc68/bioscode). Adding
-assembly source to b8tool is awkward and doesn't actually seem entirely
+assembly source to t8dev is awkward and doesn't actually seem entirely
 correct. Possibly the BIOS to load (if any) should be specified in a
 per-project configuration file?
 

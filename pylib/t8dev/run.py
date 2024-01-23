@@ -1,7 +1,7 @@
-' b8tool.run - Run and control subprocesses '
+' t8dev.run - Run and control subprocesses '
 
 import  os, subprocess
-from    b8tool  import path
+from    t8dev  import path
 
 def tool(toolbin, *args, input=None, stdout_path=None, is32bit=False):
     ''' Run `toolbin` with the given `args`. On success this simply
@@ -22,9 +22,9 @@ def tool(toolbin, *args, input=None, stdout_path=None, is32bit=False):
         installed.
     '''
     #   Relative `toolbin` uses explict path to project tool, if available.
-    b8tool = path.tool('bin', toolbin)
-    if os.access(str(b8tool), os.X_OK):
-        toolbin = b8tool
+    t8dev = path.tool('bin', toolbin)
+    if os.access(str(t8dev), os.X_OK):
+        toolbin = t8dev
 
     runargs = (str(toolbin),) + tuple(map(str, args))
     if stdout_path is None:

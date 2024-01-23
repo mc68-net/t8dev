@@ -1,17 +1,17 @@
 #   Nicer assertion error display for various testmc objects.
-#   This is used for internal testing here as well as for projects using b8tool.
+#   This is used for internal testing here as well as for projects using t8dev.
 from    testmc.pytest  import pytest_assertrepr_compare
 
 ############################################################################
 #   The following fixtures are part of the framework for unit testing
-#   assembly language code in projects using b8tool. Typically these will
+#   assembly language code in projects using t8dev. Typically these will
 #   be added to the project by creating a src/conftest.py file containing:
 #
 #       from testmc.conftest import *
 #
 
 import  pytest
-from    b8tool  import path
+from    t8dev  import path
 
 @pytest.fixture
 def m(request):
@@ -28,7 +28,7 @@ def m(request):
         over later loads.
 
         If the module global ``test_rig`` is defined it's assumed that a
-        binary was built with ``b8tool asltest`` and it will be found and
+        binary was built with ``t8dev asltest`` and it will be found and
         loaded based on the path from which the test module was loaded,
         using the portion relative to `B8_PROJDIR` under `path.ptobj()`.
         Symbol values from this load will be preferred over those

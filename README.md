@@ -47,7 +47,7 @@ Files:
 - [`README.md`]: This file.
 - [`Test`]: Installs third-party tools where necessary, builds the code and
   runs the unit tests. (Bash.)
-- [`b8tool/pactivate`]: When sourced in Bash (`. ./pactivate`) activates the
+- [`pactivate`]: When sourced in Bash (`. ./pactivate`) activates the
   Python virtual environment, building a new one (and installing the packages
   listed in [`requirements.txt`], such as py65 and pytest) if necessary. You
   can also directly run programs in the virtual environment without
@@ -95,7 +95,7 @@ __Simulators and Emulators__:
 
 Versions 1.42 builds 205 through at least 218 are broken for 8bitdev due to
 the "Symbols in Segment NOTHING" section disappearing from the map file.
-See [`b8tool.toolset.asl`](b8tool/pylib/b8tool/toolset/asl.py) for more
+See [`t8dev.toolset.asl`](pylib/t8dev/toolset/asl.py) for more
 details.
 
 #### ASxxxx Notes
@@ -144,7 +144,7 @@ Additional Tool Information
 
 ### Playing CMT (Cassette Tape) Images
 
-`b8tool/bin/cmtconv` is used to generate `.wav` files that can be played
+`bin/cmtconv` is used to generate `.wav` files that can be played
 into microcomputers. It can be handy to play these directly from your
 development host, and even more handy to add an separate audio interface
 (usually USB) to dedicate to this. On Linux systems, `pactl list short

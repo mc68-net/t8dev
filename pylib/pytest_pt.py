@@ -67,7 +67,7 @@ def pt_pyimport(self, modname=None, ensuresyspath=True):
     modname = self.purebasename + '_pt'
     path = str(self)
 
-    #   The following somewhat duplicates other code in b8tool, but we want
+    #   The following somewhat duplicates other code in t8dev, but we want
     #   to be able to extract this module and use it separately.
 
     #   If we are configured to use the assertion-rewriting loader

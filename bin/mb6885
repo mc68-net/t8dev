@@ -14,8 +14,8 @@ from    sys  import argv, stdin, stdout, stderr
 B8_HOME = dirname(dirname(abspath(__file__)))
 addsitedir(join(B8_HOME, 'pylib'))
 
-from    b8tool  import path
-from    b8tool.run  import tool
+from    t8dev  import path
+from    t8dev.run  import tool
 
 def binname(fname):
     #   XXX similar to the bin/tmc6800 one; these need to be merged

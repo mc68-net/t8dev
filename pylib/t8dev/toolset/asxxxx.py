@@ -18,7 +18,7 @@
 from    os.path  import abspath, dirname
 import  zipfile
 
-from    b8tool.toolset.setup import *
+from    t8dev.toolset.setup import *
 
 class ASxxxx(Setup):
 

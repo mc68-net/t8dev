@@ -12,7 +12,7 @@
     .. _retroabandon/hitachi-mb688x: https://gitlab.com/retroabandon/hitachi-mb688x
 '''
 
-from    b8tool.toolset.setup  import *
+from    t8dev.toolset.setup  import *
 
 class BM2(Setup):
 

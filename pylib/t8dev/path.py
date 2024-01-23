@@ -1,4 +1,4 @@
-''' b8tool.path - Define path conventions and build paths
+''' t8dev.path - Define path conventions and build paths
 
     Everything is relative to a project directory defined by the
     environment variable ``$B8_PROJDIR``, which must be an absolute path.
@@ -6,8 +6,8 @@
     files have specific locations defined in docstrings below for the
     functions that generate paths underneath these locations.
 
-    The one path not defined here is b8tool's ``pylib/``; that's added
-    to `sys.path` by the b8tool when it starts.
+    The one path not defined here is t8dev's ``pylib/``; that's added
+    to `sys.path` by the t8dev when it starts.
 
     Source code and data may be placed directly in $B8_PROJDIR but more
     often is under ``src/`` (libraries), ``exe/`` (complete executable
@@ -87,10 +87,10 @@ def pretty(path):
         return str(path)
 
 def b8home(*components):
-    ''' The path to the b8tool repo or installation.
+    ''' The path to the t8dev repo or installation.
 
         This assumes that the `__main__` module has figured out where
-        the b8tool installation is (since it needed to do this to make
+        the t8dev installation is (since it needed to do this to make
         this module available in the first place) and has set its global
         `B8_HOME` to that. (If it's not, a NameError pointing at this
         function will be raised.)
@@ -99,7 +99,7 @@ def b8home(*components):
     return Path(B8_HOME, *components)
 
 def pylib(*components):
-    ' The top-level directory of Python libraries supplied by by b8tool. '
+    ' The top-level directory of Python libraries supplied by by t8dev. '
     return b8home('pylib', *components)
 
 def addbin(*components, environ=os.environ):

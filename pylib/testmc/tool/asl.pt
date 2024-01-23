@@ -1,5 +1,5 @@
 from    testmc.tool.asl   import *
-from    b8tool.path  import pylib
+from    t8dev.path  import pylib
 
 from    io   import BytesIO, StringIO
 from    pathlib import Path

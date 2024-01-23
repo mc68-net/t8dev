@@ -13,7 +13,7 @@ import  termios, tty
 B8_HOME = dirname(dirname(abspath(__file__)))
 addsitedir(join(B8_HOME, 'pylib'))
 
-from    b8tool  import path
+from    t8dev  import path
 from    testmc.mc6800  import Machine
 from    testmc.tool.asl  import parse_obj_fromfile
 

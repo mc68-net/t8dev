@@ -40,7 +40,7 @@
 from    pathlib  import Path
 import  abc, hashlib, os, pathlib, requests, shutil, subprocess, sys, traceback
 
-from    b8tool  import path
+from    t8dev  import path
 
 ####################################################################
 #   Globals
@@ -63,7 +63,7 @@ PREFIX_SUBDIRS = ('bin', 'doc', 'include', 'lib', 'man', 'share', 'src')
 #   programs print configuration commands to be viewed or run by the caller
 #   to configure the environment running the tool. (These would be Bash
 #   commands such as ``export PATH=...``.) This should no longer be needed
-#   once b8tool is dealing with finding and running commands, but for the
+#   once t8dev is dealing with finding and running commands, but for the
 #   moment we just consume and ignore printconfig requests.
 
 def printconfig(*s): pass
@@ -117,9 +117,9 @@ def checkrun(cmdargs, exitcode=0, banner=b''):
         runs, the exit code is `exitcode`, and stdout or stderr contains
         the byte string `banner`, return `True`. Othewrise return `False`.
     '''
-    b8tool = path.tool('bin', cmdargs[0])
-    if os.access(str(b8tool), os.X_OK):
-        cmdargs[0] = str(b8tool)
+    t8dev = path.tool('bin', cmdargs[0])
+    if os.access(str(t8dev), os.X_OK):
+        cmdargs[0] = str(t8dev)
 
     stdout = subprocess.PIPE
     stderr = subprocess.STDOUT

@@ -11,7 +11,7 @@
 from    os.path  import abspath, dirname
 import  sys
 
-from    b8tool.toolset.setup  import *
+from    t8dev.toolset.setup  import *
 
 class LinApple(Setup):
     pass

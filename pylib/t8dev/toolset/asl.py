@@ -13,7 +13,7 @@
 from    os.path  import abspath, dirname
 import  shutil, sys
 
-from    b8tool.toolset.setup  import *
+from    t8dev.toolset.setup  import *
 
 class ASL(Setup):
 
