@@ -13,6 +13,6 @@ t8dev command-line programs in `bin/` do the following:
     B8_HOME = dirname(dirname(abspath(__file__)))
     addsitedir(os.path.join(B8_HOME, 'pylib'))
 
-Many functions also expect the environment variable `B8_PROJDIR` to be set
+Many functions also expect the environment variable `T8_PROJDIR` to be set
 to point to the project directory (the build directory and the like reside
 under this). See the `t8dev.path` module for more details.

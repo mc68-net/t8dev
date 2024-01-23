@@ -5,7 +5,7 @@
     The t8dev directory may be placed anywhere; ``t8dev`` uses its own
     path to find its modules. See the `t8dev.path` module documentation
     for information about the project directory structure and how the
-    ``B8_PROJDIR`` environment variable is used. In particular, t8dev will
+    ``T8_PROJDIR`` environment variable is used. In particular, t8dev will
     always use tools from `path.tooldir('bin/')`, if available, in
     preference to any others.
 
@@ -229,7 +229,7 @@ def runasl(objdir, name, sourcecode):
 
         `sourcode` is assumed to have ``include`` statements that bring in
         the "real" source code to be assembled. (These would normally be
-        paths relative to $B8_PROJDIR.) Conveniently, it may also include
+        paths relative to $T8_PROJDIR.) Conveniently, it may also include
         things like test rig setup if the source code is assembling a test
         rig to be unit-tested.
     '''
@@ -274,7 +274,7 @@ def asl1(src):
     runasl(objdir, rsrc.stem, '    include "{}"'.format(rsrc))
 
 def asltest(args):
-    ''' Given a path to a pytest file realtive to B8_PROJDIR, build its
+    ''' Given a path to a pytest file realtive to T8_PROJDIR, build its
         corresponding assembly-lanugage unit test rig using the
         Macroassembler AS. The pytest file will be loaded as a module and
         the string value of its ``test_rig`` global variable will be
@@ -287,7 +287,7 @@ def asltest(args):
 
         All build products will be placed under `path.ptobj()`, with the
         path under that parallel to the pytest file's path and basename
-        relative to $B8_PROJDIR.
+        relative to $T8_PROJDIR.
 
         Note that this simply builds the code under test; it does not
         actually run any tests.
@@ -511,7 +511,7 @@ def pytest(args):
         that pytest usage error messages give "t8dev" as the name of the
         program.
 
-        This sets the pytest ``rootdir`` to $B8_PROJDIR. It does not use an
+        This sets the pytest ``rootdir`` to $T8_PROJDIR. It does not use an
         INI file but instead specifies all configuration it needs as
         command-line options. This does enable the developer to use ini
         files if she wishes, but be warned this can be tricky. For example,
@@ -547,7 +547,7 @@ def parseargs():
              ' (can be specified multiple times)')
     a('--help-commands', action='store_true', help='print available commands')
     a('-P', '--project-dir',
-        help='project directory; overrides B8_PROJDIR env var')
+        help='project directory; overrides T8_PROJDIR env var')
     a('-v', '--verbose', action='count', default=0,
         help='increase verbosity; may be used multiple times')
     a('command', nargs='?',
@@ -581,16 +581,16 @@ if __name__ == '__main__':
     global ARGS; ARGS = parseargs()
 
     if ARGS.project_dir:    # override environment
-        path.B8_PROJDIR = path.strict_resolve(ARGS.project_dir)
-    if path.B8_PROJDIR is None:
-        raise RuntimeError('B8_PROJDIR not set')
+        path.T8_PROJDIR = path.strict_resolve(ARGS.project_dir)
+    if path.T8_PROJDIR is None:
+        raise RuntimeError('T8_PROJDIR not set')
     vprint(1, '========',
         't8dev command={} args={}'.format(ARGS.command, ARGS.args))
     vprint(1, 'projdir', str(path.proj()))
 
     #   Code common to several .pt files (including entire test suites) may
     #   be factored out into .py files that are imported by multiple .pt
-    #   files. We add $B8_PROJDIR to the Python search path so that they
+    #   files. We add $T8_PROJDIR to the Python search path so that they
     #   can `import src.common` or similar, both when imported by asltest().
     #   and when imported by pytest. (Though pytest already provided this.)
     #

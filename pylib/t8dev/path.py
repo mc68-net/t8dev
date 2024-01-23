@@ -1,7 +1,7 @@
 ''' t8dev.path - Define path conventions and build paths
 
     Everything is relative to a project directory defined by the
-    environment variable ``$B8_PROJDIR``, which must be an absolute path.
+    environment variable ``$T8_PROJDIR``, which must be an absolute path.
     Source code may be anywhere in or under the project directory; other
     files have specific locations defined in docstrings below for the
     functions that generate paths underneath these locations.
@@ -9,13 +9,13 @@
     The one path not defined here is t8dev's ``pylib/``; that's added
     to `sys.path` by the t8dev when it starts.
 
-    Source code and data may be placed directly in $B8_PROJDIR but more
+    Source code and data may be placed directly in $T8_PROJDIR but more
     often is under ``src/`` (libraries), ``exe/`` (complete executable
     programs) or other subdirectories.
 
-    Subdirectories under ``$B8_PROJDIR/.build/`` include:
+    Subdirectories under ``$T8_PROJDIR/.build/`` include:
     • ``obj/``: Build output. Paths underneath this will match the path to
-      the source code file relative to `$B8_PROJDIR`, e.g., ``src/foo/bar.a65``
+      the source code file relative to `$T8_PROJDIR`, e.g., ``src/foo/bar.a65``
       will produce output files ``.build/obj/src/foo/bar.*``.
     • ``tool/bin/``: Project-local binaries for tools used by this project.
       Executable files here will always be used if present, otherwise the
@@ -28,7 +28,7 @@ from    platform import python_version
 import  os
 
 def strict_resolve(p):
-    ''' Handle various forms of input for B8_PROJDIR and similar paths.
+    ''' Handle various forms of input for T8_PROJDIR and similar paths.
         - If `None`, we just leave it as `None`.
         - If not a `Path`, we make it one.
         - Do a strict resolve (ensuring that the directory or file exists) in
@@ -44,25 +44,25 @@ def strict_resolve(p):
     else:
         return Path(p).resolve(strict=True)
 
-B8_PROJDIR = strict_resolve(os.environ.get('B8_PROJDIR'))
+T8_PROJDIR = strict_resolve(os.environ.get('T8_PROJDIR'))
 
 
 ####################################################################
 #   Public API for getting/creating paths
 
 def proj(*components):
-    ''' Return absolute `Path` for path `components` relative to `B8_PROJDIR`.
+    ''' Return absolute `Path` for path `components` relative to `T8_PROJDIR`.
 
         Most other path functions eventually call this one.
     '''
-    if B8_PROJDIR:
-        return B8_PROJDIR.joinpath(*components)
+    if T8_PROJDIR:
+        return T8_PROJDIR.joinpath(*components)
     else:
-        raise NameError('B8_PROJDIR not set in environment')
+        raise NameError('T8_PROJDIR not set in environment')
 
 def relproj(path):
-    ''' Return the portion of `path` relative to `B8_PROJDIR`, if it's
-        underneath `B8_PROJDIR`. Otherwise just return `path`. Always
+    ''' Return the portion of `path` relative to `T8_PROJDIR`, if it's
+        underneath `T8_PROJDIR`. Otherwise just return `path`. Always
         returns a `Path` object.
     '''
     try:
@@ -71,8 +71,8 @@ def relproj(path):
         return Path(path)
 
 def pretty(path):
-    ''' If `path` is a path under `B8_PROJDIR`, return, a `str` version of
-        the path relative to `B8_PROJDIR`. Otherwise return `str(path)`.
+    ''' If `path` is a path under `T8_PROJDIR`, return, a `str` version of
+        the path relative to `T8_PROJDIR`. Otherwise return `str(path)`.
         This reduces noise when printing diagnostics while still giving
         complete path information.
 
@@ -80,10 +80,10 @@ def pretty(path):
         fails.
     '''
     try:
-        return str(Path(path).relative_to(B8_PROJDIR))
+        return str(Path(path).relative_to(T8_PROJDIR))
     except (TypeError, ValueError):
-        #   TypeError: B8_PROJDIR (or possibly path) is None
-        #   ValueError: Path(path) is not below B8_PROJDIR
+        #   TypeError: T8_PROJDIR (or possibly path) is None
+        #   ValueError: Path(path) is not below T8_PROJDIR
         return str(path)
 
 def b8home(*components):
@@ -138,7 +138,7 @@ def tool(*components):
     return build('tool/', *components)
 
 def obj(*components):
-    ''' Given components for a project source path relative to `B8_PROJDIR`,
+    ''' Given components for a project source path relative to `T8_PROJDIR`,
         return the corresponding object path, which is the same path under
         ``.build/obj/``.
     '''
@@ -151,7 +151,7 @@ def ptobj(*components):
         also placed here.)
 
         `components` should be for a the Python file source path relative
-        to `B8_PROJDIR`.
+        to `T8_PROJDIR`.
     '''
     return build('ptobj/', *components)
 

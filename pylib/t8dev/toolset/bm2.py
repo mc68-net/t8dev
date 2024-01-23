@@ -3,7 +3,7 @@
 
     - The bm2 homepage_ provides a high-level overview of what the emulator
       is and does, and many screenshots.
-    - ``$B8_PROJDIR/.build/tool/src/bm2/readme.txt`` contains the original
+    - ``$T8_PROJDIR/.build/tool/src/bm2/readme.txt`` contains the original
       documentation, which is reasonably useful.
     - retroabandon/hitachi-mb688x_ has another copy of the source code and
       further notes from reverse-engineering it.

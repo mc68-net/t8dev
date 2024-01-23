@@ -30,7 +30,7 @@ def m(request):
         If the module global ``test_rig`` is defined it's assumed that a
         binary was built with ``t8dev asltest`` and it will be found and
         loaded based on the path from which the test module was loaded,
-        using the portion relative to `B8_PROJDIR` under `path.ptobj()`.
+        using the portion relative to `T8_PROJDIR` under `path.ptobj()`.
         Symbol values from this load will be preferred over those
         previously loaded via ``object_files``.
     '''

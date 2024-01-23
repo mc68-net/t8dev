@@ -8,13 +8,13 @@ To set up a new repo to use t8dev, you need to do the following:
    recommended), but can be any other language that can run programs.
 2. Optional: check that your git submodules have been initialized. See
    `check_submodules()` in `Test`.
-3. Strongly recommended: set variables for `B8_PROJDIR` (usually the root
+3. Strongly recommended: set variables for `T8_PROJDIR` (usually the root
    directory of your repo) and `t8dev` pointing to the `t8dev/bin/t8dev`
    program. These locations are referenced by these names below.
    (Information on the various paths used by `t8dev` is in
-   `…/t8dev/pylib/t8dev/path.py`.) Export `B8_PROJDIR` to an environment
+   `…/t8dev/pylib/t8dev/path.py`.) Export `T8_PROJDIR` to an environment
    variable of that name.
-4. Add `$B8_PROJDIR/requirements.txt` with a list of Python modules used by
+4. Add `$T8_PROJDIR/requirements.txt` with a list of Python modules used by
    t8dev (see the file here for a list) plus any others you want in the
    virtual environment.
 5. Add a top-level `conftest.py` containing `from pytest_pt import *` to
@@ -22,10 +22,10 @@ To set up a new repo to use t8dev, you need to do the following:
    tests. Add an `src/conftest.py` containing `from cjs8bitdev.src.conftest
    import *` to bring in the unit test framework for assembler code. (The
    path here will change when that code is moved to t8dev.)
-6. Source `…/pactivate -B $B8_PROJDIR` to install (if necessary) and set up
+6. Source `…/pactivate -B $T8_PROJDIR` to install (if necessary) and set up
    the Python virtual environment. Do not use the `-b` option to specify a
    different build directory; `t8dev` currently supports only
-   `$B8_PROJDIR/.build/`.
+   `$T8_PROJDIR/.build/`.
 7. Run `$t8dev buildtoolset asl` to build The Macroassembler AS and
    similar commands to have `t8dev` build any other tools you need that it
    knows how to build. (You can also use tools that are in your existing
@@ -35,7 +35,7 @@ To set up a new repo to use t8dev, you need to do the following:
    how this works are yet to be documented.)
 9. Run `$t8dev asl` with parameters for all the files that do not have
    unit test cases. (These are typically top-level files that integrate
-   code from the modules under `$B8_PROJDIR/src/` via `include` statements
+   code from the modules under `$T8_PROJDIR/src/` via `include` statements
    to produce an executable for a particular platform.)
 
 Other Notes
@@ -51,15 +51,15 @@ be resolved to do this:
    is in the Python import search path so they can import common test
    code. This is true when building with 8bitdev/ as the project
    directory, but not with a different project directory. This could be
-   hacked in with `export PYTHONPATH=$B8_PROJDIR/8bitdev/`,
+   hacked in with `export PYTHONPATH=$T8_PROJDIR/8bitdev/`,
    though that may not be the best solution.
 2. The tests specify the object files to be built and loaded using
    paths that implicitly give the source file relative to 8bitdev/,
    e.g. `src/mc68/simple.p` However, here they are relative to
-   $B8_PROJDIR, e.g. `$B8_PROJDIR/8bitdev/src/mc68/simple.a65`. It's
+   $T8_PROJDIR, e.g. `$T8_PROJDIR/8bitdev/src/mc68/simple.a65`. It's
    not clear if it's worth trying to change the system to handle things
    being built from different locations due to different settings of
-   $B8_PROJDIR.
+   $T8_PROJDIR.
 For the moment, at least, we just assume that everything under 8bitdev/
 is already tested and working and have our programs here include this
 presumably-tested-and-working source.
@@ -69,7 +69,7 @@ files built from source files under 8bitdev. One example is bin/tmc6800,
 which wants to load $BUILD/obj/src/tmc68/bioscode.p along with whatever
 object file the user wants to run. We can't even build
 8bitdev/src/tmc68/bioscode.a65 because it includes `src/tmc68/bios.a68`,
-which is actually under $B8_PROJDIR/8bitdev/, not $B8_PROJDIR/, and so is
+which is actually under $T8_PROJDIR/8bitdev/, not $T8_PROJDIR/, and so is
 not in the ASL include search path.
 
 One part of the solution may be to have a way of specifying additional
