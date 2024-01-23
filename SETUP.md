@@ -1,42 +1,52 @@
 t8dev Setup
 ===========
 
-To set up a new repo to use t8dev, you need to do the following:
+To set up a new repo to use t8dev, you need a top-level test script
+(usually called `Test`) that sets up t8dev, does the build, and runs your
+tests. t8dev currently supports only Bash for this script, though it's
+possible (with some work) to use other languages.
 
-1. Create a top-level `Test` script that will call `t8dev` to do the setup
-   and build. This is typically Bash (where `set -eu -o pipefail` is
-   recommended), but can be any other language that can run programs.
-2. Optional: check that your git submodules have been initialized. See
-   `check_submodules()` in `Test`.
-3. Strongly recommended: set variables for `T8_PROJDIR` (usually the root
-   directory of your repo) and `t8dev` pointing to the `t8dev/bin/t8dev`
-   program. These locations are referenced by these names below.
-   (Information on the various paths used by `t8dev` is in
-   `…/t8dev/pylib/t8dev/path.py`.) Export `T8_PROJDIR` to an environment
-   variable of that name.
-4. Add `$T8_PROJDIR/requirements.txt` with a list of Python modules used by
-   t8dev (see the file here for a list) plus any others you want in the
-   virtual environment.
-5. Add a top-level `conftest.py` containing `from pytest_pt import *` to
-   add the plugin that discovers `.pt` files in this repo containing unit
-   tests. Add an `src/conftest.py` containing `from cjs8bitdev.src.conftest
-   import *` to bring in the unit test framework for assembler code. (The
-   path here will change when that code is moved to t8dev.)
-6. Source `…/pactivate -B $T8_PROJDIR` to install (if necessary) and set up
-   the Python virtual environment. Do not use the `-b` option to specify a
-   different build directory; `t8dev` currently supports only
-   `$T8_PROJDIR/.build/`.
-7. Run `$t8dev buildtoolset asl` to build The Macroassembler AS and
-   similar commands to have `t8dev` build any other tools you need that it
-   knows how to build. (You can also use tools that are in your existing
-   system path.)
-8. Run `$t8dev aslauto exe/ src/` or similar to discover and build source
-   files that have `.pt` unit test cases that load them. (The details of
-   how this works are yet to be documented.)
-9. Run `$t8dev asl` with parameters for all the files that do not have
-   unit test cases. (These are typically top-level files that integrate
-   code from the modules under `$T8_PROJDIR/src/` via `include` statements
-   to produce an executable for a particular platform.)
+#### Test Setup
+
+Create `Test` at the top of your project, mark it executable, and start it
+with:
+
+    #!/usr/bin/env bash
+    set -euo pipefail       # optional, but error-checking helps
+
+    export T8_PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
+    . "$T8_PROJDIR"/t8dev/project-setup.bash
+
+This will:
+- Check that $T8_PROJDIR is set.
+- Check that your submodules have been initialised.
+- Process any `-c` (clean build) and `-C` (very clean build) arguments at
+  the front of the arguments list.
+- Create (if necessary) and activate the Python virtual environment.
+
+#### Additional Files
+
+- `$T8_PROJDIR/requirements.txt` should contain a list of Python modules
+  used by your system and t8dev. Typically this will include `requests`,
+  `pytest`, and `py65@git+https://github.com/mnaberez/py65.git`.
+- `$T8_PROJDIR/conftest.py` should contain `from pytest_pt import *` to add
+  the pytest plugin that discovers unit-test `.pt` files in this repo.
+- `src/conftest.py` should contain `from testmc.conftest import *` to bring
+  in the unit test framework for assembler code.
+
+#### Building Tools and Running Tests
+
+- Run `$t8dev buildtoolset asl` to build The Macroassembler AS and similar
+  commands to have `t8dev` build any other tools you need that it knows how
+  to build. (You can also use tools that are in your existing system path.)
+- Run `$t8dev aslauto exe/ src/` or similar to discover and build source
+  files that have `.pt` unit test cases that load them. (The details of how
+  this works are yet to be documented.)
+- Run `$t8dev asl` with parameters for all the files that do not have unit
+  test cases. (These are typically top-level files that integrate code from
+  the modules under `$T8_PROJDIR/src/` via `include` statements to produce
+  an executable for a particular platform.)
+
 
 Other Notes
 -----------
