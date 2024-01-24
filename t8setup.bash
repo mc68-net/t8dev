@@ -1,5 +1,5 @@
 #
-#   project-setup.bash - common setup for projects using t8dev
+#   t8setup.bash - common setup for projects using t8dev
 #
 #   This file should be sourced (`source` or `.`) by the top-level
 #   `Test` script in projects using t8dev. Before sourcing it, the
