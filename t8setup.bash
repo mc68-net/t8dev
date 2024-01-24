@@ -41,10 +41,7 @@ warn() { echo 1>&2 "WARNNG:" "$@"; }
 #   From: https://github.com/0cjs/sedoc, git/submodule.md
 check_submodules() {
     count=$(git submodule status --recursive | sed -n -e '/^[^ ]/p' | wc -l)
-    [ $count -eq 0 ] || {
-        warn "$count Git submodules are not up to date"
-        warn 'Run `git submodule update --init`?'
-    }
+    [ $count -eq 0 ] || warn "$count Git submodules are modified."
 }
 
 ####################################################################
