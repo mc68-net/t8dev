@@ -65,7 +65,7 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
 esac; done
 
 (cd "$T8_PROJDIR" && check_submodules)
-. $T8_PROJDIR/t8dev/pactivate -B "$T8_PROJDIR" -q
+. "$(dirname ${BASH_SOURCE[0]})"/pactivate -B "$T8_PROJDIR" -q
 
 #   XXX This can go away once we switch to `pip -e` installs of t8dev.
 [[ $PATH =~ ^$T8_PROJDIR/bin:|:$T8_PROJDIR/bin:|:$T8_PROJDIR/bin$ ]] \
