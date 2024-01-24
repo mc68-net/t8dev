@@ -4,9 +4,14 @@
 #   This file should be sourced (`source` or `.`) by the top-level
 #   `Test` script in projects using t8dev. Before sourcing it, the
 #   T8_PROJDIR environment variable must be set with the path of
-#   the project using t8dev. This is typically done with:
+#   the project using t8dev. Further, it's helpful to initialise the
+#   submodule if it's not yet been done. All this is typically done
+#   with:
 #
 #       export T8_PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
+#       t8dir=tool/t8dev    # or whatever your submodule path is
+#       [[ -r $T8_PROJDIR/$t8dir/t8setup.bash ]] \
+#           || git submodule update --init "$T8_PROJDIR/$t8dir"
 #
 #   Note that as well as doing setup, this will do some command-line
 #   argument processing for common arguments.
