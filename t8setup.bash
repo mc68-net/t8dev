@@ -39,9 +39,35 @@ die() {
 warn() { echo 1>&2 "WARNNG:" "$@"; }
 
 #   From: https://github.com/0cjs/sedoc, git/submodule.md
-check_submodules() {
+submodules_warn_modified() {
     count=$(git submodule status --recursive | sed -n -e '/^[^ ]/p' | wc -l)
     [ $count -eq 0 ] || warn "$count Git submodules are modified."
+    #   XXX Can we figure out a way to look for submodules that have no
+    #   working copy, and ask for a `git submodule update --init` on those?
+    #   At the moment, the end user needs to figure it out himself.
+}
+
+submodules_pip_install_e() {
+    #   If the parent project has any submodules that have a `pyproject.toml`
+    #   at the top level, we assume that those are Python dependencies that
+    #   should be installed and, further, they should be installed as
+    #   editable because that's why they're submodules instead of just in
+    #   requirements.txt.
+    for submodule in $(git config -f .gitmodules -l \
+        | sed -n -e 's/^submodule\.//' -e 's/.*\.path=//p')
+    do
+        dir="$T8_PROJDIR/$submodule"
+        [[ -r $dir/pyproject.toml ]] || continue
+        #   XXX The `pip inspect` is slowish (almost a second), but not as slow
+        #   as doing the `pip install -e` when it's already been done. Can we
+        #   somehow do this check faster?
+        #   See: https://stackoverflow.com/q/77875816/107294
+        if ! pip inspect | grep -q ".url.: .file://$dir"; then
+            echo "----- Installing submodule $submodule" \
+                'as editable into virtual environment.'
+            pip install -q -e "$dir"
+        fi
+    done
 }
 
 ####################################################################
@@ -66,8 +92,9 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
     *)      break;;
 esac; done
 
-(cd "$T8_PROJDIR" && check_submodules)
+(cd "$T8_PROJDIR" && submodules_warn_modified)
 . "$(dirname ${BASH_SOURCE[0]})"/pactivate -B "$T8_PROJDIR" -q
+submodules_pip_install_e
 
 #   XXX This can go away once we switch to `pip -e` installs of t8dev.
 [[ $PATH =~ ^$T8_PROJDIR/bin:|:$T8_PROJDIR/bin:|:$T8_PROJDIR/bin$ ]] \
