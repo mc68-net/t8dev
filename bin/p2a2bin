@@ -15,7 +15,7 @@ B8_HOME = dirname(dirname(abspath(__file__)))
 addsitedir(join(B8_HOME, 'pylib'))
 
 from    t8dev  import path
-from    testmc.tool.asl  import parse_obj_fromfile
+from    binary.tool.asl  import parse_obj_fromfile
 
 
 def load_image(fname):

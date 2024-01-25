@@ -19,7 +19,7 @@
     dump.
 '''
 
-from    testmc.memimage  import MemImage
+from    binary.memimage  import MemImage
 from    argparse  import ArgumentParser
 
 def dump_memoryimage(mi):

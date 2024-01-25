@@ -2,8 +2,8 @@ from    abc  import abstractmethod, abstractproperty
 from    collections.abc   import Container
 from    itertools  import repeat
 from    testmc.generic.memory  import MemoryAccess
-from    testmc.symtab  import SymTab
-from    testmc.tool  import asl, asxxxx
+from    binary.symtab  import SymTab
+from    binary.tool  import asl, asxxxx
 
 class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
     ''' Superclass for "Machines" that simulate a microprocessor system

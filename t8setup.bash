@@ -93,6 +93,26 @@ submodules_pip_install_e() {
     done
 }
 
+t8_check_r8format_dependency() {
+    #   Ensure that we can import the `binary` package from r8format,
+    #   as we depend on several modules from that package.
+    #   XXX This should use `binary.__version__ or something like that
+    #   when that becomes available.
+    local pyprg='
+import sys
+try:
+    import binary.memimage
+except ModuleNotFoundError as ex:
+    print("{}: {}".format(ex.__class__.__name__, ex.msg), file=sys.stderr)
+    sys.exit(1)
+'
+    python -c "$pyprg" || {
+        echo 1>&2 \
+            'ERROR: r8format package not available. Install or add submodule.'
+        exit 8
+    }
+}
+
 ####################################################################
 #   Main
 
@@ -119,6 +139,7 @@ esac; done
 submodules_init_empty
 submodules_warn_modified
 submodules_pip_install_e
+t8_check_r8format_dependency
 
 #   XXX This can go away once we switch to `pip -e` installs of t8dev.
 [[ $PATH =~ ^$T8_PROJDIR/bin:|:$T8_PROJDIR/bin:|:$T8_PROJDIR/bin$ ]] \

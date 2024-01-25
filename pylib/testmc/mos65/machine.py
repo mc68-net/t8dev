@@ -10,7 +10,7 @@ from    sys import stderr
 from    testmc.generic  import *
 from    testmc.mos65.instructions  import Instructions
 
-from    testmc.tool import asl, asxxxx
+from    binary.tool import asl, asxxxx
 
 #   We don't use ObservableMemory, but if we did, we'd need this.
 #

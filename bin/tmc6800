@@ -15,7 +15,7 @@ addsitedir(join(B8_HOME, 'pylib'))
 
 from    t8dev  import path
 from    testmc.mc6800  import Machine
-from    testmc.tool.asl  import parse_obj_fromfile
+from    binary.tool.asl  import parse_obj_fromfile
 
 def binname(fname):
     if '.' not in fname: fname += '.p'

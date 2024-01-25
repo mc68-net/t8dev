@@ -1,5 +1,5 @@
 from    testmc  import *
-from    testmc.symtab  import SymTab
+from    binary.symtab  import SymTab
 import  pytest
 
 
