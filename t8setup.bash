@@ -39,20 +39,23 @@ die() {
 
 warn() { echo 1>&2 "WARNNG:" "$@"; }
 
-#   From: https://github.com/0cjs/sedoc, git/submodule.md
-submodules_warn_modified() {
-    count=$(git submodule status --recursive | sed -n -e '/^[^ ]/p' | wc -l)
-    [ $count -eq 0 ] || warn "$count Git submodules are modified."
-    #   XXX Can we figure out a way to look for submodules that have no
-    #   working copy, and ask for a `git submodule update --init` on those?
-    #   At the moment, the end user needs to figure it out himself.
-}
-
 submodules_list() {
     #   Return a list of all submodule paths relative to $T8_PROJDIR.
     #   XXX This should set an array so we can handle spaces in the paths.
     git config -f "$T8_PROJDIR"/.gitmodules -l \
         | sed -n -e 's/^submodule\.//' -e 's/.*\.path=//p'
+}
+
+submodules_warn_modified() {
+    #   If any submodules are modified, warn about this. Usually this is
+    #   because the developer is working on submodule code (and needs to
+    #   commit it before commiting her project) or the developer is testing
+    #   an update to new versions of submodules.
+    local sms="$(submodules_list)"
+    git -C "$T8_PROJDIR" diff-index --quiet @ $sms || {
+        echo '----- WARNING: submodules are modified:' \
+            "$(git -C "$T8_PROJDIR" status -s $sms | tr -d '\n')"
+    }
 }
 
 submodules_init_empty() {
@@ -112,9 +115,9 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
     *)      break;;
 esac; done
 
-(cd "$T8_PROJDIR" && submodules_warn_modified)
 . "$(dirname ${BASH_SOURCE[0]})"/pactivate -B "$T8_PROJDIR" -q
 submodules_init_empty
+submodules_warn_modified
 submodules_pip_install_e
 
 #   XXX This can go away once we switch to `pip -e` installs of t8dev.
