@@ -12,6 +12,7 @@
 #       t8dir=tool/t8dev    # or whatever your submodule path is
 #       [[ -r $T8_PROJDIR/$t8dir/t8setup.bash ]] \
 #           || git submodule update --init "$T8_PROJDIR/$t8dir"
+#       . "$T8_PROJDIR"/$t8dir/t8setup.bash
 #
 #   Note that as well as doing setup, this will do some command-line
 #   argument processing for common arguments.
