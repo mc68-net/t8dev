@@ -48,23 +48,42 @@ submodules_warn_modified() {
     #   At the moment, the end user needs to figure it out himself.
 }
 
+submodules_list() {
+    #   Return a list of all submodule paths relative to $T8_PROJDIR.
+    #   XXX This should set an array so we can handle spaces in the paths.
+    git config -f "$T8_PROJDIR"/.gitmodules -l \
+        | sed -n -e 's/^submodule\.//' -e 's/.*\.path=//p'
+}
+
+submodules_init_empty() {
+    #   Check out any "empty" submodules in the parent project, i.e., those
+    #   that appear not to be initialised because they do not have a file
+    #   or directory named `.git` in their submodule directory.
+    local sm
+    for sm in $(submodules_list); do
+        dir="$T8_PROJDIR/$sm"
+        [[ -e $dir/.git ]] && continue
+        echo "----- Initializing empty submodule $sm"
+        (cd $T8_PROJDIR && git submodule update --init "$sm")
+    done
+}
+
 submodules_pip_install_e() {
     #   If the parent project has any submodules that have a `pyproject.toml`
     #   at the top level, we assume that those are Python dependencies that
     #   should be installed and, further, they should be installed as
     #   editable because that's why they're submodules instead of just in
     #   requirements.txt.
-    for submodule in $(git config -f .gitmodules -l \
-        | sed -n -e 's/^submodule\.//' -e 's/.*\.path=//p')
-    do
-        dir="$T8_PROJDIR/$submodule"
+    local sm
+    for sm in $(submodules_list); do
+        dir="$T8_PROJDIR/$sm"
         [[ -r $dir/pyproject.toml ]] || continue
         #   XXX The `pip inspect` is slowish (almost a second), but not as slow
         #   as doing the `pip install -e` when it's already been done. Can we
         #   somehow do this check faster?
         #   See: https://stackoverflow.com/q/77875816/107294
         if ! pip inspect | grep -q ".url.: .file://$dir"; then
-            echo "----- Installing submodule $submodule" \
+            echo "----- Installing submodule $sm" \
                 'as editable into virtual environment.'
             pip install -q -e "$dir"
         fi
@@ -95,6 +114,7 @@ esac; done
 
 (cd "$T8_PROJDIR" && submodules_warn_modified)
 . "$(dirname ${BASH_SOURCE[0]})"/pactivate -B "$T8_PROJDIR" -q
+submodules_init_empty
 submodules_pip_install_e
 
 #   XXX This can go away once we switch to `pip -e` installs of t8dev.
