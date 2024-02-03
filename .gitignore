@@ -1,1 +1,4 @@
 __pycache__/
+
+#   setuptools output files.
+/pylib/t8dev.egg-info/
