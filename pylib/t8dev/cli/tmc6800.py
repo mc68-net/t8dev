@@ -3,15 +3,10 @@
 #  tmc6800 - load an AS .p file into the testmc.mc6800 simulator and run it
 #
 
-from    os.path  import abspath, dirname, join
-from    site  import addsitedir
 from    sys  import argv, stdin, stdout, stderr
 from    os  import isatty
 from    traceback  import print_exception
 import  termios, tty
-
-B8_HOME = dirname(dirname(abspath(__file__)))
-addsitedir(join(B8_HOME, 'pylib'))
 
 from    t8dev  import path
 from    testmc.mc6800  import Machine
@@ -77,6 +72,6 @@ def usage():
     print('Usage: tmc6800 <file>', file=stderr)
     exit(2)
 
-if __name__ == '__main__':
+def main():
     if len(argv) != 2: usage()
     exec(binname(argv[1]))

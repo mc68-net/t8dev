@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 
-from    os.path  import abspath, dirname, join
-from    site  import addsitedir
 from    sys  import argv, stderr
-
-B8_HOME = dirname(dirname(abspath(__file__)))
-addsitedir(join(B8_HOME, 'pylib'))
-
 from    binary.tool.asl  import parse_obj_fromfile
 
 def load_image(fname):
@@ -36,7 +30,7 @@ def usage():
     print('Usage: wozmon-deposit -c|-n <file>', file=stderr)
     exit(2)
 
-if __name__ == '__main__':
+def main():
     if len(argv) < 3: usage()
     if   argv[1] == '-c': eol = '\r'
     elif argv[1] == '-n': eol = '\n'

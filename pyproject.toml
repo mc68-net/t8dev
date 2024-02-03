@@ -8,6 +8,12 @@ authors = [
 ]
 
 [project.scripts]
+ascii2a2t       = 't8dev.cli.ascii2a2t:main'
+mb6885          = 't8dev.cli.mb6885:main'
+p2a2bin         = 't8dev.cli.p2a2bin:main'
+t8dev           = 't8dev.cli.t8dev:main'
+tmc6800         = 't8dev.cli.tmc6800:main'
+wozmon-deposit  = 't8dev.cli.wozmon_deposit:main'
 
 [build-system]
 requires = ['setuptools']

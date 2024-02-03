@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 #   ascii2a2t - convert ASCII file to Apple II text format
 #
@@ -36,6 +35,3 @@ def main():
             b |= 0x80           # set high bit for Apple
             output.write(bytes([b]))
     output.flush()
-
-if __name__ == '__main__':
-    main()

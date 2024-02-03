@@ -26,14 +26,9 @@ from    argparse  import ArgumentParser
 from    collections  import namedtuple as ntup
 from    contextlib  import contextmanager
 from    itertools  import chain
-from    os.path  import abspath, dirname
 from    pathlib  import Path
 from    site  import addsitedir
 import  importlib.util, importlib.machinery, os, shutil, sys
-
-#   Configure and use t8dev's Python library path
-B8_HOME = dirname(dirname(abspath(__file__)))
-addsitedir(os.path.join(B8_HOME, 'pylib'))
 
 from    t8dev  import path, run, toolset
 
@@ -588,7 +583,7 @@ COMMANDS = {
     'pytest':   pytest,
 }
 
-if __name__ == '__main__':
+def main():
     global ARGS; ARGS = parseargs()
 
     if ARGS.project_dir:    # override environment
@@ -609,8 +604,6 @@ if __name__ == '__main__':
     #   to sit down and work out how we really want to deal with it.
     #
     addsitedir(str(path.proj()))
-
-    path.addbin(B8_HOME, 'bin')
 
     cmdf = COMMANDS.get(ARGS.command)
     if cmdf is None:

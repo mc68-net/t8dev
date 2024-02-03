@@ -6,13 +6,8 @@
 #
 
 from    os  import fdopen
-from    os.path  import abspath, dirname, join
-from    site  import addsitedir
 from    struct  import pack
 from    sys  import argv, stdout, stderr
-
-B8_HOME = dirname(dirname(abspath(__file__)))
-addsitedir(join(B8_HOME, 'pylib'))
 
 from    t8dev  import path
 from    binary.tool.asl  import parse_obj_fromfile
@@ -43,6 +38,6 @@ def usage():
     print('Usage: p2a2bin <file>', file=stderr)
     exit(2)
 
-if __name__ == '__main__':
+def main():
     if len(argv) != 2: usage()
     print_a2bin(load_image(argv[1]))

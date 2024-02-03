@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 '''
     mb6885 - load an AS .p file into the bm2 simulator and run it
 
@@ -7,12 +6,7 @@
     ``.build/obj/exe/mb6885/``.
 '''
 
-from    os.path  import abspath, dirname, join
-from    site  import addsitedir
-from    sys  import argv, stdin, stdout, stderr
-
-B8_HOME = dirname(dirname(abspath(__file__)))
-addsitedir(join(B8_HOME, 'pylib'))
+from    sys  import argv, stderr
 
 from    t8dev  import path
 from    t8dev.run  import tool
@@ -77,5 +71,5 @@ def usage():
     print('Usage: mb6885 [-n] <file.p>', file=stderr)
     exit(2)
 
-if __name__ == '__main__':
+def main():
     runbm2(*parseargs(argv[1:]))
