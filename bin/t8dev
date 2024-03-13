@@ -521,8 +521,19 @@ def pytest(args):
     #   Remember that pytest comes from the (virtual) environment in which
     #   this program is run; it's not a tool installed by this program.
 
-    default_discovery_dirs = list(map(str, ([
-        path.proj('src/'), path.b8home('pylib'), ])))
+    #   As well as using src/ as a default directory in which to discover
+    #   tests, we also want to discover tests in our submodules such as
+    #   t8dev and r8format. Ideally this should be done by extracting the
+    #   test paths from tool.pytest.ini_options.testpaths in any
+    #   pyproject.toml files in this working copy, but that's a bit
+    #   difficult. So for the moment we rely on the fact that t8dev and
+    #   r8format put their code under a pylib/ subdir, and we just add any
+    #   of those we find.
+    default_discovery_dirs = list(map(str, [
+        *path.proj().glob('**/pylib/'),
+        path.proj('src/'),
+        ]))
+
     non_opt_args = [ a for a in args if not a.startswith('-') ]
     args = [
         '--rootdir=' + str(path.proj()),
