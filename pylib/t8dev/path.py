@@ -86,22 +86,6 @@ def pretty(path):
         #   ValueError: Path(path) is not below T8_PROJDIR
         return str(path)
 
-def b8home(*components):
-    ''' The path to the t8dev repo or installation.
-
-        This assumes that the `__main__` module has figured out where
-        the t8dev installation is (since it needed to do this to make
-        this module available in the first place) and has set its global
-        `B8_HOME` to that. (If it's not, a NameError pointing at this
-        function will be raised.)
-    '''
-    from __main__ import B8_HOME
-    return Path(B8_HOME, *components)
-
-def pylib(*components):
-    ' The top-level directory of Python libraries supplied by by t8dev. '
-    return b8home('pylib', *components)
-
 def addbin(*components, environ=os.environ):
     bindir = str(Path(*components))
     path = environ.get('PATH', '')
