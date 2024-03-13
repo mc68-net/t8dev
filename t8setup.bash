@@ -85,7 +85,9 @@ submodules_pip_install_e() {
         #   as doing the `pip install -e` when it's already been done. Can we
         #   somehow do this check faster?
         #   See: https://stackoverflow.com/q/77875816/107294
-        if ! pip inspect | grep -q ".url.: .file://$dir"; then
+        #   Also, note that we do not use `grep -q` as this stops reading
+        #   on the first match and can thus produce Errno 32 Broken pipe.
+        if ! pip inspect | grep >/dev/null ".url.: .file://$dir"; then
             echo "----- Installing submodule $sm" \
                 'as editable into virtual environment.'
             pip install -q -e "$dir"
