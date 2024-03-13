@@ -23,5 +23,6 @@ def test_b8home_path_is_absolute():
     ('/a/bin:/foo:/bar',    { 'PATH': '/foo:/bar' }),
 ])
 def test_addbin(environ, expected):
+    environ = dict(environ)     # make a copy for addbin() to modify
     addbin('/a', Path('bin'), environ=environ)
     assert expected == environ['PATH']
