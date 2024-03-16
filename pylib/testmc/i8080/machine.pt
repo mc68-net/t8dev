@@ -22,3 +22,6 @@ def test_regs(m):
     r0 = R(pc=0, a=0, bc=0, de=0, hl=0, sp=0xE000,
             S=0, Z=0, H=0, P=0, C=0)
     assert r0 == m.regs
+
+def test_narrow_regs():
+    assert R(b=1, c=2) == R(bc=0x21)
