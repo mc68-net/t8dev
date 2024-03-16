@@ -13,9 +13,18 @@ from    math  import ceil
 
 class Reg:
     ' A register with a name and width. '
-    def __init__(self, name, width=8):
+    def __init__(self, name, width=8, split8=False):
         self.name = name
         self.width = width
+        self.split8 = split8
+
+        #   split8=True adds aliases for name[0] as the high 8 bits and
+        #   name[1] for the low 8 bits of the register. This may eventually
+        #   be replaced by a more general scheme that can also add a wider
+        #   alias for a pair of narrow registers along the lines of:
+        #      AliasNarrow('b', 'bc', 8, 0xFF00),
+        #      AliasNarrow('c', 'bc', 0, 0xFF),
+        #      AliasCombine('d', ['a','b']),   # 6809 D register
 
     def checkvalue(self, value):
         ' Return `value` if valid, otherwise raise `ValueError()`. '

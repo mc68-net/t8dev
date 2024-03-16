@@ -9,7 +9,7 @@ def R():
         class fails, we want it to do so at runtime, not collection time.
     '''
     class Regs(GenericRegisters):
-        registers = ( Reg('pc', 16), Reg('a'), )
+        registers = ( Reg('pc', 16), Reg('a'), Reg('hl', 16, split8=1), )
         srbits = (Bit(1), Flag('B', True), Bit(0), Flag('C'))
         srname = 'sr'
     return Regs
@@ -47,6 +47,7 @@ def test_instantiation_goodargs(R):
     R(B=False)
     R(C=True)
     R(pc=0xFFFF, a=0xFF, B=True, C=False)
+    assert R(hl=0xabcd) == R(h=0xab, l=0xcd)
 
 def test_instantiation_badname(R):
     ''' We can test with only one bad keyword since, emulating CPython, we
@@ -162,11 +163,13 @@ def test_all(R):
 
 def test_clone(R):
     def all(**changes):
-        defaults = { 'pc': 0x1000, 'a': 0x20, 'B': 0, 'C': 1, }
+        defaults = { 'pc': 0x1000, 'a': 0x20, 'hl': 0xABCD, 'B': 0, 'C': 1, }
         return R(**dict(defaults, **changes))
 
     assert all()                == all().clone()
     assert all(pc=0x8000)       == all().clone(pc=0x8000)
+    assert all(hl=0x12AB)       == all().clone(h=0x12)
+    assert all(hl=0x34CD)       == all().clone(l=0x34)
     assert all(B=1)             == all().clone(B=1)
     assert all(a=199, C=0)      == all().clone(C=0, a=199)
 
@@ -226,7 +229,7 @@ def test_reg_format(name, width, value, expected):
 
 def test_str_dontcares(R):
     r = R()
-    expected = 'CPU pc=---- a=-- ----'
+    expected = 'CPU pc=---- a=-- hl=---- ----'
     assert expected == str(r)
     assert expected == repr(r)
 
@@ -234,8 +237,8 @@ def test_str_allvalues(R):
     class TR(R):
         machname = 'TCPU'
 
-    r = TR(pc=0x1234, a=0x56, sr=0b0011)
-    expected = 'TCPU pc=1234 a=56 -b-C'
+    r = TR(pc=0x1234, a=0x56, hl=0xABCD, sr=0b0011)
+    expected = 'TCPU pc=1234 a=56 hl=ABCD -b-C'
     assert expected == str(r)
     assert expected == repr(r)
 
