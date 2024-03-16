@@ -13,9 +13,18 @@ from    math  import ceil
 
 class Reg:
     ' A register with a name and width. '
-    def __init__(self, name, width=8):
+    def __init__(self, name, width=8, split8=False):
         self.name = name
         self.width = width
+        self.split8 = split8
+
+        #   split8=True adds aliases for name[0] as the high 8 bits and
+        #   name[1] for the low 8 bits of the register. This may eventually
+        #   be replaced by a more general scheme that can also add a wider
+        #   alias for a pair of narrow registers along the lines of:
+        #      AliasNarrow('b', 'bc', 8, 0xFF00),
+        #      AliasNarrow('c', 'bc', 0, 0xFF),
+        #      AliasCombine('d', ['a','b']),   # 6809 D register
 
     def checkvalue(self, value):
         ' Return `value` if valid, otherwise raise `ValueError()`. '
@@ -38,6 +47,39 @@ class Reg:
             return '{}={}'.format(self.name, '-' * vlen)
         else:
             return '{}={:0{}X}'.format(self.name, value, vlen)
+
+class RegSplit:
+    def __init__(self, widereg):
+        self.widereg = widereg
+
+    def __get__(self, obj, objtype=None):
+        val = getattr(obj, self.widereg)
+        if val is None:     return None
+        else:               return self.narrow(val)
+
+    def __set__(self, obj, nval):
+        wval = getattr(obj, self.widereg)
+        if wval is None: wval = 0
+        wval = self.expand(wval, nval)
+        setattr(obj, self.widereg, wval)
+
+class RegSplit8LB (RegSplit):
+    def __init__(self, widereg):
+        self.aliasreg = widereg[1]
+        super().__init__(widereg)
+    def narrow(self, val):
+        return (val & 0xFF)
+    def expand(self, wval, nval):
+        return (wval & ~0xFF) | nval
+
+class RegSplit8MB (RegSplit):
+    def __init__(self, widereg):
+        self.aliasreg = widereg[0]
+        super().__init__(widereg)
+    def narrow(self, val):
+        return (val & 0xFF00) >> 8
+    def expand(self, wval, nval):
+        return (wval & 0x00FF) | (nval << 8)
 
 class Bit:
     ''' An unused status register bit that does not correspond to a flag.
@@ -162,17 +204,23 @@ class GenericRegisters:
         for regspec in self.registers:
             self.__setattr__(regspec.name,
                 regspec.checkvalue(initvals.pop(regspec.name, None)))
+            if regspec.split8:
+                setattr(type(self), regspec.name[0], RegSplit8MB(regspec.name))
+                setattr(type(self), regspec.name[1], RegSplit8LB(regspec.name))
 
         if self._srname() in initvals:
             self._init_with_sr(initvals)
         else:
             self._init_with_flags(initvals)
 
-        if len(initvals) > 0:   # Unknown keyword parameters on instantiation?
-            name = tuple(initvals.keys())[0]
-            raise TypeError(
-                "__init__() got an unexpected keyword argument '{}'"
-                .format(name))
+        #   Pseudo-registers from split8 etc.
+        for pname, pval in initvals.items():
+            if hasattr(self, pname):
+                setattr(self, pname, pval)
+            else:
+                raise TypeError(
+                    "__init__() got an unexpected keyword argument '{}'"
+                    .format(pname))
 
         self._init_repr()
 
