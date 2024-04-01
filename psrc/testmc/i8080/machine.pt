@@ -24,4 +24,4 @@ def test_regs(m):
     assert r0 == m.regs
 
 def test_narrow_regs():
-    assert R(b=1, c=2) == R(bc=0x21)
+    assert R(b=1, c=2) == R(bc=0x0102)
