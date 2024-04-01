@@ -33,7 +33,7 @@ OPCODES = {
 
     0x20: (None,    invalid),       0x30: (None,    invalid),
     0x21: (None,    invalid),       0x31: (None,    invalid),
-    0x22: (None,    invalid),       0x32: (None,    invalid),
+    0x22: (None,    invalid),       0x32: ('STA',   sta),
     0x23: (None,    invalid),       0x33: (None,    invalid),
     0x24: (None,    invalid),       0x34: (None,    invalid),
     0x25: (None,    invalid),       0x35: (None,    invalid),
@@ -45,7 +45,7 @@ OPCODES = {
     0x2B: (None,    invalid),       0x3B: (None,    invalid),
     0x2C: (None,    invalid),       0x3C: (None,    invalid),
     0x2D: (None,    invalid),       0x3D: (None,    invalid),
-    0x2E: (None,    invalid),       0x3E: (None,    invalid),
+    0x2E: (None,    invalid),       0x3E: ('MVIa',  mvia),
     0x2F: (None,    invalid),       0x3F: (None,    invalid),
 
     0x40: (None,    invalid),       0x50: (None,    invalid),
@@ -125,7 +125,7 @@ OPCODES = {
     0xC6: (None,    invalid),       0xD6: (None,    invalid),
     0xC7: (None,    invalid),       0xD7: (None,    invalid),
     0xC8: (None,    invalid),       0xD8: (None,    invalid),
-    0xC9: (None,    invalid),       0xD9: (None,    invalid),
+    0xC9: ('RET',   ret),           0xD9: (None,    invalid),
     0xCA: (None,    invalid),       0xDA: (None,    invalid),
     0xCB: (None,    invalid),       0xDB: (None,    invalid),
     0xCC: (None,    invalid),       0xDC: (None,    invalid),

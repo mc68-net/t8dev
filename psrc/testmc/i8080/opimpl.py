@@ -41,7 +41,6 @@ def readbyte(m):
     m.pc = incword(m.pc, 1)
     return val
 
-#   XXX endian?
 def signedbyteat(m, addr):
     ' Return the byte at `addr` as a signed value. '
     return unpack('b', m.bytes(addr, 1))[0]
@@ -55,7 +54,7 @@ def readsignedbyte(m):
 def readword(m):
     ' Consume a word at [PC] and return it. '
     # Careful! PC may wrap between bytes.
-    return (readbyte(m) << 8) | readbyte(m)
+    return readbyte(m) | (readbyte(m) << 8)
 
 def readreloff(m):
     ''' Consume a signed relative offset byte at [PC] and return the
@@ -67,5 +66,40 @@ def readindex(m):
     ''' Consume an unsigned offset byte at [PC], add it to the X register
         contents and return the result.
     '''
+    #   XXX 6800 has an X register, we don't!
     return incword(m.x, readbyte(m))
+
+####################################################################
+#   Instructions affecting the stack
+
+def popbyte(m):
+    ' Pop a byte off the stack and return it. '
+    val = m.byte(m.sp)
+    m.sp = incword(m.sp, 1)
+    return val
+
+def popword(m):
+    ' Pop a word off the stack and return it. '
+    lsb = popbyte(m)
+    msb = popbyte(m)
+    return (msb << 8) + lsb
+
+def pushbyte(m, byte):
+    ' Push a byte on to the stack. '
+    m.sp = incword(m.sp, -1)
+    m.deposit(m.sp, byte)
+
+def pushword(m, word):
+    ' Push a word on to the stack, MSB higher in memory than LSB. '
+    pushbyte(m, word >> 8)
+    pushbyte(m, word & 0xFF)
+
+def ret(m):     m.pc = popword(m)
+
+####################################################################
+#   Instructions
+
+def mvia(m):    m.a = readbyte(m)
+
+def sta(m):     m.mem[readword(m)] = m.a
 

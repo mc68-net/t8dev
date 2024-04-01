@@ -1,0 +1,30 @@
+from    testmc.i8080.opcodes   import Instructions as I
+from    testmc.i8080.opcodes   import *
+from    testmc.i8080.opimpl    import *
+from    testmc.i8080           import Machine
+from    testmc                 import LB, MB, tmc_tid
+import  pytest
+
+#   XXX Push/pop really should be tested through the instructions, so we
+#   don't have to worry about our internal APIs.
+
+def test_pushpop():
+    m = Machine()
+    m.sp = 0x1000
+
+    pushbyte(m, 0xEE)
+    assert (m.sp,   m.mem[0x1000], m.mem[0x0FFF], m.mem[0x0FFE]) \
+        == (0x0FFF,          0x00,          0xEE,          0x00)
+
+    v = popbyte(m)
+    assert (m.sp, v) == (0x1000, 0xEE)
+
+    pushword(m, 0x1234)
+    assert (m.sp,   m.mem[0x1000], m.mem[0x0FFF], m.mem[0x0FFE], m.mem[0x0FFD])\
+        == (0x0FFE,          0x00,          0x12,          0x34,          0x00)
+
+    m.sp = 0x124
+    m.mem[0x125] = 0xAB
+    m.mem[0x124] = 0xCD
+    val = popword(m)
+    assert (0x126, 0xABCD) == (m.sp, val)

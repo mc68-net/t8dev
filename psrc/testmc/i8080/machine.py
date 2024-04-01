@@ -1,5 +1,5 @@
 from    testmc.generic  import *
-from    testmc.i8080.opcodes  import OPCODES, Instructions
+from    testmc.i8080.opcodes  import OPCODES, Instructions as I
 from    testmc.i8080.opimpl  import (
             InvalidOpcode, incword, readbyte, signedbyteat,
             )
@@ -32,7 +32,7 @@ class Machine(GenericMachine):
                       Bit(0), Flag('P'), Bit(0), Flag('C') )
         srname    = 'f'     # Flags Register
 
-    _RTS_opcodes    = set()     # XXX
+    _RTS_opcodes    = set([I.RET]) # XXX add conditional RETs
     _ABORT_opcodes  = set()     # XXX
 
     def _getpc(self):   return self.pc
