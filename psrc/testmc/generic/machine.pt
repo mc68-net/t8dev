@@ -135,11 +135,11 @@ def test_setregs_status_register(m, R):
 
 def test_regs_setregs_regsattr(m, R):
     ' Test using a separate object to hold the register values. '
-    class SubMachine(): pass
-    sm = SubMachine()
-    sm.pc = 99;  sm.B = True
+    class RegHolder(): pass
+    rh = RegHolder()
+    rh.pc = 99;  rh.hl = 0; rh.B = True
 
-    m = m();  del m.pc;  m.regsobj = sm
+    m = m();  del m.pc;  m.regsobj = rh
     assert not hasattr(m, 'pc')
     assert not hasattr(m, 'B')
     assert not hasattr(m, 'srname')
@@ -148,7 +148,7 @@ def test_regs_setregs_regsattr(m, R):
 
     m.setregs(R(pc=201, B=0))
     assert R(pc=201, B=0) == m.regs
-    assert (201, False) == (sm.pc, sm.B)
+    assert (201, False) == (rh.pc, rh.B)
     assert not hasattr(m, 'pc')
     assert not hasattr(m, 'B')
 
