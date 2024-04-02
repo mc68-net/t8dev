@@ -48,6 +48,10 @@ class Reg:
         else:
             return '{}={:0{}X}'.format(self.name, value, vlen)
 
+    def __repr__(self):
+        return f'Reg({repr(self.name)}' \
+            f', width={self.width}, split8={self.split8})'
+
 class RegSplit:
     def __init__(self, widereg):
         self.widereg = widereg
@@ -193,6 +197,11 @@ class GenericRegisters:
         #   just instantiate an "empty" instance to use this.
         return getattr(self, 'srname', None)
 
+    @staticmethod
+    def init_split8(cls, regspec):
+        setattr(cls, regspec.name[0], RegSplit8MB(regspec.name))
+        setattr(cls, regspec.name[1], RegSplit8LB(regspec.name))
+
     def __init__(self, **kwargs):
         #   Assert that sublcass was correctly defined or configured.
         self.machname
@@ -205,8 +214,7 @@ class GenericRegisters:
             self.__setattr__(regspec.name,
                 regspec.checkvalue(initvals.pop(regspec.name, None)))
             if regspec.split8:
-                setattr(type(self), regspec.name[0], RegSplit8MB(regspec.name))
-                setattr(type(self), regspec.name[1], RegSplit8LB(regspec.name))
+                self.init_split8(type(self), regspec)
 
         if self._srname() in initvals:
             self._init_with_sr(initvals)
