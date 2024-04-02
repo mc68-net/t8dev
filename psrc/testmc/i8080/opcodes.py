@@ -55,7 +55,7 @@ OPCODES = {
     0x44: (None,    invalid),       0x54: (None,    invalid),
     0x45: (None,    invalid),       0x55: (None,    invalid),
     0x46: (None,    invalid),       0x56: (None,    invalid),
-    0x47: (None,    invalid),       0x57: (None,    invalid),
+    0x47: ('MOVba', movba),         0x57: (None,    invalid),
     0x48: (None,    invalid),       0x58: (None,    invalid),
     0x49: (None,    invalid),       0x59: (None,    invalid),
     0x4A: (None,    invalid),       0x5A: (None,    invalid),
@@ -63,7 +63,7 @@ OPCODES = {
     0x4C: (None,    invalid),       0x5C: (None,    invalid),
     0x4D: (None,    invalid),       0x5D: (None,    invalid),
     0x4E: (None,    invalid),       0x5E: (None,    invalid),
-    0x4F: (None,    invalid),       0x5F: (None,    invalid),
+    0x4F: ('MOVca', movca),         0x5F: (None,    invalid),
 
     0x60: (None,    invalid),       0x70: (None,    invalid),
     0x61: (None,    invalid),       0x71: (None,    invalid),
@@ -114,7 +114,7 @@ OPCODES = {
     0xAC: (None,    invalid),       0xBC: (None,    invalid),
     0xAD: (None,    invalid),       0xBD: (None,    invalid),
     0xAE: (None,    invalid),       0xBE: (None,    invalid),
-    0xAF: (None,    invalid),       0xBF: (None,    invalid),
+    0xAF: ('XRAa',  xraa),          0xBF: (None,    invalid),
 
     0xC0: (None,    invalid),       0xD0: (None,    invalid),
     0xC1: (None,    invalid),       0xD1: (None,    invalid),

@@ -103,3 +103,37 @@ def mvia(m):    m.a = readbyte(m)
 
 def sta(m):     m.mem[readword(m)] = m.a
 
+#   XXX how to parametrize this so as not to repeat it 64 times?
+def movba(m):   m.b = m.a
+def movca(m):   m.c = m.a
+
+####################################################################
+#   Logic Functions
+
+def iszero(b):
+    return b == 0
+
+def isneg(b):
+    sign = b & (1 << 7)
+    return 0 !=  sign
+
+def parity(byte):
+    #   _Hacker's Delight,_ 2nd ed, §5.2, p.100
+    p = byte ^ (byte>>1)
+    p = p ^ (p>>2)
+    p = p ^ (p>>4)
+    return not (p&1)
+
+def logicSZP(m, val):
+    ''' Set sign, zero and parity flags based on `val`.
+        Clear carry and half (auxiliary) carry.
+        This is used for logic operations.
+    '''
+    m.S = isneg(val)
+    m.Z = iszero(val)
+    m.P = parity(val)
+    m.H = m.C = False
+    return val
+
+def xraa(m):    m.a = logicSZP(m, m.a ^ m.a)
+

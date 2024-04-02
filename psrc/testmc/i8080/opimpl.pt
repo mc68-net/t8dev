@@ -5,6 +5,10 @@ from    testmc.i8080           import Machine
 from    testmc                 import LB, MB, tmc_tid
 import  pytest
 
+R = Machine.Registers
+
+####################################################################
+
 #   XXX Push/pop really should be tested through the instructions, so we
 #   don't have to worry about our internal APIs.
 
@@ -28,3 +32,45 @@ def test_pushpop():
     m.mem[0x124] = 0xCD
     val = popword(m)
     assert (0x126, 0xABCD) == (m.sp, val)
+
+####################################################################
+#   "Helper" function tests
+
+def test_iszero():
+    assert (True,          False,      False) \
+        == (iszero(0), iszero(1), iszero(-1))
+
+def test_isneg():
+    assert (   False,    False,       False,        True,        True) \
+        == (isneg(0), isneg(1), isneg(0x7F), isneg(0x80), isneg(0xFF))
+
+@pytest.mark.parametrize('even, val', [
+    (1, 0b00000000),
+    (0, 0b00000001),
+    (0, 0b10000000),
+    (0, 0b00010000),
+    (1, 0b10000001),
+    (1, 0b00100010),
+    (1, 0b11111111),
+    (0, 0b01111111),
+    (0, 0b11111110),
+    (0, 0b11011111),
+])
+def test_parity(even, val):
+    assert even == parity(val)
+
+####################################################################
+#   Instruction Tests
+#
+#   We currently do not have full coverage here; for that we will probably
+#   rely on running an 8080 test suite in the simulator. The tests here
+#   do cover the core functionality, particularly routines that are
+#   parametrized by register and the like.
+
+def test_mov():
+    m = Machine(); m.setregs(R(a=80, b=81, c=82))
+    assert (80, 81, 82, 0) == (m.a, m.b, m.c, m.d)
+
+    # XXX execute some MOV opcodes here and make sure that they're
+    # working
+    assert(0)
