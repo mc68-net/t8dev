@@ -55,7 +55,7 @@ OPCODES = {
     0x44: (None,    invalid),       0x54: (None,    invalid),
     0x45: (None,    invalid),       0x55: (None,    invalid),
     0x46: (None,    invalid),       0x56: (None,    invalid),
-    0x47: ('MOVba', movba),         0x57: (None,    invalid),
+    0x47: ('MOVba', movba),         0x57: ('MOVda', movda),
     0x48: (None,    invalid),       0x58: (None,    invalid),
     0x49: (None,    invalid),       0x59: (None,    invalid),
     0x4A: (None,    invalid),       0x5A: (None,    invalid),

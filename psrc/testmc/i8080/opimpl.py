@@ -106,6 +106,7 @@ def sta(m):     m.mem[readword(m)] = m.a
 #   XXX how to parametrize this so as not to repeat it 64 times?
 def movba(m):   m.b = m.a
 def movca(m):   m.c = m.a
+def movda(m):   raise NotImplementedError('XXX genericise this!')
 
 ####################################################################
 #   Logic Functions

@@ -67,10 +67,14 @@ def test_parity(even, val):
 #   do cover the core functionality, particularly routines that are
 #   parametrized by register and the like.
 
-def test_mov():
-    m = Machine(); m.setregs(R(a=80, b=81, c=82))
-    assert (80, 81, 82, 0) == (m.a, m.b, m.c, m.d)
-
-    # XXX execute some MOV opcodes here and make sure that they're
-    # working
-    assert(0)
+@pytest.mark.parametrize('opcode, outregs', [
+    (I.MOVba, R(a=0x40, bc=0x4052, de=0x6162)),
+    (I.MOVca, R(a=0x40, bc=0x5140, de=0x6162)),
+    (I.MOVda, R(a=0x40, bc=0x5152, de=0x4062)),
+])
+def test_mov(opcode, outregs):
+    m = Machine()
+    m.setregs(R(a=0x40, bc=0x5152, de=0x6162))
+    m.pc = 8; m.mem[8] = opcode
+    m._step()
+    assert outregs == m.regs
