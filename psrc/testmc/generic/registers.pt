@@ -49,7 +49,7 @@ def test_instantiation_goodargs(R):
     R(pc=0xFFFF, a=0xFF, B=True, C=False)
 
 def test_instantiation_regsplit(R):
-    assert R(hl=0xabcd) == R(h=0xab, l=0xcd)
+    assert R(hl=0xABCD) == R(h=0xAB, l=0xCD)
     assert R(hl=0x0012) == R(l=0x12)
     assert R(hl=0x3400) == R(h=0x34)
 
