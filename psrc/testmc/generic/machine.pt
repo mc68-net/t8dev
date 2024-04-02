@@ -11,12 +11,14 @@ def m():
     class Machine(GenericMachine):
 
         class Registers(GenericRegisters):
-            registers = (Reg('pc', 16), )
+            registers = (Reg('pc', 16), Reg('hl', 16, split8=1))
             srbits = (Bit(1), Bit(0), Flag('B'), Bit(1))
 
         def __init__(self, pc=0):
             self.mem = [0] * 16
             self.pc = pc
+            self.hl = 0
+            super().__init__()
             #   This must still have either attribute B or a status
             #   resgister defined.
 
@@ -89,8 +91,8 @@ def test_regs_flag_attributes(m, R):
     assert R() == m.regs
     assert R(pc=0, B=0) == m.regs
 
-    m.pc = 3; m.B = True
-    assert R(pc=3, B=1) == m.regs
+    m.pc = 3; m.h = 4; m.l = 5; m.B = True
+    assert R(pc=3, hl=0x0405, B=1) == m.regs
 
     #   We still use flags if property named by `Registers.srname`
     #   does not exist on the Machine.
@@ -217,8 +219,8 @@ def test_step_trace(m, capsys):
     out, err = capsys.readouterr()
     assert '' == err
     tracelines = ''.join((
-        'CPU pc=0000 --b- opcode=00\n',
-        'CPU pc=0001 --b- opcode=00\n',
+        'CPU pc=0000 hl=0000 --b- opcode=00\n',
+        'CPU pc=0001 hl=0000 --b- opcode=00\n',
         ))
     assert tracelines == out
 

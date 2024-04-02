@@ -31,6 +31,9 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             `Registers.srname`, but not both.
         '''
         self.symtab = SymTab()      # symtab initially empty
+        for regspec in self.Registers.registers:
+            if regspec.split8:
+                self.Registers.init_split8(type(self._regsobj()), regspec)
 
     @abstractproperty
     def Registers(self):
