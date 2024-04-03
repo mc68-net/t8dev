@@ -23,7 +23,7 @@ def mov(dst_src):
 OPCODES = {
 
     0x00: (None,    invalid),       0x10: (None,    invalid),
-    0x01: (None,    invalid),       0x11: (None,    invalid),
+    0x01: ('LXIb',  lxib),          0x11: ('LXId',  lxid),
     0x02: (None,    invalid),       0x12: (None,    invalid),
     0x03: (None,    invalid),       0x13: (None,    invalid),
     0x04: (None,    invalid),       0x14: (None,    invalid),
@@ -40,7 +40,7 @@ OPCODES = {
     0x0F: (None,    invalid),       0x1F: (None,    invalid),
 
     0x20: (None,    invalid),       0x30: (None,    invalid),
-    0x21: (None,    invalid),       0x31: (None,    invalid),
+    0x21: ('LXIh',  lxih),          0x31: ('LXIs',  lxis),
     0x22: (None,    invalid),       0x32: ('STA',   sta),
     0x23: (None,    invalid),       0x33: (None,    invalid),
     0x24: (None,    invalid),       0x34: (None,    invalid),
@@ -71,7 +71,7 @@ OPCODES = {
     0x4C: (None,    invalid),       0x5C: (None,    invalid),
     0x4D: (None,    invalid),       0x5D: (None,    invalid),
     0x4E: (None,    invalid),       0x5E: (None,    invalid),
-    0x4F: ('MOVca', mov('c,a')),    0x5F: (None,    invalid),
+    0x4F: ('MOVca', mov('c,a')),    0x5F: ('MOVea', mov('e,a')),
 
     0x60: (None,    invalid),       0x70: (None,    invalid),
     0x61: (None,    invalid),       0x71: (None,    invalid),

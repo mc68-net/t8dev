@@ -78,3 +78,12 @@ def test_mov(opcode, outregs):
     m.pc = 8; m.mem[8] = opcode
     m._step()
     assert outregs == m.regs
+
+def test_lxi():
+    m = Machine()
+    m.setregs(R(a=0x40, bc=0x5152, de=0x6162))
+    m.pc = 8; m.mem[8] = I.LXIb
+    m.mem[9] = 0xEF; m.mem[0xA] = 0xCD
+    m._step()
+    assert R(bc=0xCDEF) == m.regs
+

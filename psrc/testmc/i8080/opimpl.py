@@ -102,6 +102,10 @@ def ret(m):     m.pc = popword(m)
 def mvia(m):    m.a = readbyte(m)
 
 def sta(m):     m.mem[readword(m)] = m.a
+def lxib(m):    m.bc = readword(m)
+def lxid(m):    m.de = readword(m)
+def lxih(m):    m.hl = readword(m)
+def lxis(m):    m.sp = readword(m)
 
 def movrr(m, dst, src): setattr(m, dst, getattr(m, src))
 
