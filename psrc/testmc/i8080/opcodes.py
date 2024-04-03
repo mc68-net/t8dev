@@ -9,6 +9,14 @@ from    testmc.i8080.opimpl  import *
 __all__ = ( 'OPCODES', 'Instructions', 'InvalidOpcode' )
 
 ####################################################################
+#   XXX
+
+def mov(dst_src):
+    'Return a function that takes a Machine and does the specified MOV instr.'
+    dst, src = dst_src.split(',')
+    return lambda m: movrr(m, dst, src)
+
+####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
 #   See `Instructions` below for mnemonic naming.
 
@@ -55,7 +63,7 @@ OPCODES = {
     0x44: (None,    invalid),       0x54: (None,    invalid),
     0x45: (None,    invalid),       0x55: (None,    invalid),
     0x46: (None,    invalid),       0x56: (None,    invalid),
-    0x47: ('MOVba', movba),         0x57: ('MOVda', movda),
+    0x47: ('MOVba', mov('b,a')),    0x57: ('MOVda', mov('d,a')),
     0x48: (None,    invalid),       0x58: (None,    invalid),
     0x49: (None,    invalid),       0x59: (None,    invalid),
     0x4A: (None,    invalid),       0x5A: (None,    invalid),
@@ -63,7 +71,7 @@ OPCODES = {
     0x4C: (None,    invalid),       0x5C: (None,    invalid),
     0x4D: (None,    invalid),       0x5D: (None,    invalid),
     0x4E: (None,    invalid),       0x5E: (None,    invalid),
-    0x4F: ('MOVca', movca),         0x5F: (None,    invalid),
+    0x4F: ('MOVca', mov('c,a')),    0x5F: (None,    invalid),
 
     0x60: (None,    invalid),       0x70: (None,    invalid),
     0x61: (None,    invalid),       0x71: (None,    invalid),
