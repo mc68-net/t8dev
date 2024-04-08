@@ -88,6 +88,17 @@ def test_movm(opcode, val, dest):
     m.mem[9] = opcode; m.pc = 9; m._step()
     assert val == m.byte(dest)
 
+def test_inx():
+    m = Machine()
+
+    m.setregs(R(bc=0x5152))
+    m.mem[9] = 0x03; m.pc = 9; m._step()
+    assert R(bc=0x5153) == m.regs
+
+    m.setregs(R(hl=0xFFFF))
+    m.mem[9] = 0x23; m.pc = 9; m._step()
+    assert R(hl=0x0000) == m.regs
+
 def test_lxi():
     m = Machine()
     m.setregs(R(a=0x40, bc=0x5152, de=0x6162))

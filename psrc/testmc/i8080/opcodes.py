@@ -22,6 +22,9 @@ def mov(dst_src):
 def movm(src):
     return lambda m: movmr(m, src)
 
+def inx(reg):
+    return lambda m: inxr(m, reg)
+
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
 #   See `Instructions` below for mnemonic naming.
@@ -31,7 +34,7 @@ OPCODES = {
     0x00: (None,    invalid),       0x10: (None,    invalid),
     0x01: ('LXIb',  lxib),          0x11: ('LXId',  lxid),
     0x02: (None,    invalid),       0x12: (None,    invalid),
-    0x03: (None,    invalid),       0x13: (None,    invalid),
+    0x03: ('INXbc', inx('bc')),     0x13: ('INXde', inx('de')),
     0x04: (None,    invalid),       0x14: (None,    invalid),
     0x05: (None,    invalid),       0x15: (None,    invalid),
     0x06: ('MVIb',  mvi('b')),      0x16: ('MVId',  mvi('d')),
@@ -48,7 +51,7 @@ OPCODES = {
     0x20: (None,    invalid),       0x30: (None,    invalid),
     0x21: ('LXIh',  lxih),          0x31: ('LXIs',  lxis),
     0x22: (None,    invalid),       0x32: ('STA',   sta),
-    0x23: (None,    invalid),       0x33: (None,    invalid),
+    0x23: ('INXhl', inx('hl')),     0x33: ('INXsp', inx('sp')),
     0x24: (None,    invalid),       0x34: (None,    invalid),
     0x25: (None,    invalid),       0x35: (None,    invalid),
     0x26: ('MVIh',  mvi('h')),      0x36: ('MVIl',  mvi('h')),
