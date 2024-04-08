@@ -111,7 +111,8 @@ def movir(m, dst):      setattr(m, dst, readbyte(m))
 def movrr(m, dst, src): setattr(m, dst, getattr(m, src))
 def movmr(m, src):      m.mem[m.hl] = getattr(m, src)
 
-def inxr(m, reg):       setattr(m, reg, incword(getattr(m, reg), 1))
+def inxr(m, reg):       setattr(m, reg, incword(getattr(m, reg),  1))
+def dcxr(m, reg):       setattr(m, reg, incword(getattr(m, reg), -1))
 
 ####################################################################
 #   Logic Functions

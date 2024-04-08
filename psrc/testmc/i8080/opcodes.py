@@ -19,11 +19,9 @@ def mov(dst_src):
     dst, src = dst_src.split(',')
     return lambda m: movrr(m, dst, src)
 
-def movm(src):
-    return lambda m: movmr(m, src)
-
-def inx(reg):
-    return lambda m: inxr(m, reg)
+def movm(src):  return lambda m: movmr(m, src)
+def inx(reg):   return lambda m: inxr(m, reg)
+def dcx(reg):   return lambda m: dcxr(m, reg)
 
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
@@ -42,7 +40,7 @@ OPCODES = {
     0x08: (None,    invalid),       0x18: (None,    invalid),
     0x09: (None,    invalid),       0x19: (None,    invalid),
     0x0A: (None,    invalid),       0x1A: (None,    invalid),
-    0x0B: (None,    invalid),       0x1B: (None,    invalid),
+    0x0B: ('DCXbc', dcx('bc')),     0x1B: ('DCXde', dcx('de')),
     0x0C: (None,    invalid),       0x1C: (None,    invalid),
     0x0D: (None,    invalid),       0x1D: (None,    invalid),
     0x0E: ('MVIc',  mvi('c')),      0x1E: ('MVIe',  mvi('e')),
@@ -59,7 +57,7 @@ OPCODES = {
     0x28: (None,    invalid),       0x38: (None,    invalid),
     0x29: (None,    invalid),       0x39: (None,    invalid),
     0x2A: (None,    invalid),       0x3A: (None,    invalid),
-    0x2B: (None,    invalid),       0x3B: (None,    invalid),
+    0x2B: ('DCXhl', dcx('hl')),     0x2B: ('DCXsp', dcx('sp')),
     0x2C: (None,    invalid),       0x3C: (None,    invalid),
     0x2D: (None,    invalid),       0x3D: (None,    invalid),
     0x2E: (None,    invalid),       0x3E: ('MVIa',  mvi('a')),
