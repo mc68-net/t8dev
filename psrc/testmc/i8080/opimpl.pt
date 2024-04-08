@@ -75,9 +75,18 @@ def test_parity(even, val):
 def test_mov(opcode, outregs):
     m = Machine()
     m.setregs(R(a=0x40, bc=0x5152, de=0x6162))
-    m.pc = 8; m.mem[8] = opcode
-    m._step()
+    m.mem[8] = opcode; m.pc = 8; m._step()
     assert outregs == m.regs
+
+@pytest.mark.parametrize('opcode, val, dest', [
+    (I.MOVmb, 0x51, 0x1234),
+    (I.MOVmc, 0x52, 0xFFFE),
+])
+def test_movm(opcode, val, dest):
+    m = Machine()
+    m.setregs(R( bc=0x5152, hl=dest))
+    m.mem[9] = opcode; m.pc = 9; m._step()
+    assert val == m.byte(dest)
 
 def test_lxi():
     m = Machine()

@@ -16,6 +16,12 @@ def mov(dst_src):
     dst, src = dst_src.split(',')
     return lambda m: movrr(m, dst, src)
 
+def movm(src):
+    ''' Return a function that takes a Machine and does the specified
+        MOV M,x instr.
+    '''
+    return lambda m: movmr(m, src)
+
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
 #   See `Instructions` below for mnemonic naming.
@@ -73,14 +79,14 @@ OPCODES = {
     0x4E: (None,    invalid),       0x5E: (None,    invalid),
     0x4F: ('MOVca', mov('c,a')),    0x5F: ('MOVea', mov('e,a')),
 
-    0x60: (None,    invalid),       0x70: (None,    invalid),
-    0x61: (None,    invalid),       0x71: (None,    invalid),
-    0x62: (None,    invalid),       0x72: (None,    invalid),
-    0x63: (None,    invalid),       0x73: (None,    invalid),
-    0x64: (None,    invalid),       0x74: (None,    invalid),
-    0x65: (None,    invalid),       0x75: (None,    invalid),
+    0x60: (None,    invalid),       0x70: ('MOVmb', movm('b')),
+    0x61: (None,    invalid),       0x71: ('MOVmc', movm('c')),
+    0x62: (None,    invalid),       0x72: ('MOVmd', movm('d')),
+    0x63: (None,    invalid),       0x73: ('MOVme', movm('e')),
+    0x64: (None,    invalid),       0x74: ('MOVmh', movm('h')),
+    0x65: (None,    invalid),       0x75: ('MOVml', movm('l')),
     0x66: (None,    invalid),       0x76: (None,    invalid),
-    0x67: (None,    invalid),       0x77: (None,    invalid),
+    0x67: (None,    invalid),       0x77: ('MOVma', movm('a')),
     0x68: (None,    invalid),       0x78: (None,    invalid),
     0x69: (None,    invalid),       0x79: (None,    invalid),
     0x6A: (None,    invalid),       0x7A: (None,    invalid),

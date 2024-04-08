@@ -108,6 +108,7 @@ def lxih(m):    m.hl = readword(m)
 def lxis(m):    m.sp = readword(m)
 
 def movrr(m, dst, src): setattr(m, dst, getattr(m, src))
+def movmr(m, src):      m.mem[m.hl] = getattr(m, src)
 
 ####################################################################
 #   Logic Functions
