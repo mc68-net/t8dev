@@ -107,6 +107,7 @@ def lxid(m):    m.de = readword(m)
 def lxih(m):    m.hl = readword(m)
 def lxis(m):    m.sp = readword(m)
 
+def movir(m, dst):      setattr(m, dst, readbyte(m))
 def movrr(m, dst, src): setattr(m, dst, getattr(m, src))
 def movmr(m, src):      m.mem[m.hl] = getattr(m, src)
 

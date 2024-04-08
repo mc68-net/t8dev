@@ -9,17 +9,17 @@ from    testmc.i8080.opimpl  import *
 __all__ = ( 'OPCODES', 'Instructions', 'InvalidOpcode' )
 
 ####################################################################
-#   XXX
+#   Functions that return functions that take a Machine and
+#   and execute the correct opcode for the given parameter.
+
+def mvi(dst):
+    return lambda m: movir(m, dst)
 
 def mov(dst_src):
-    'Return a function that takes a Machine and does the specified MOV instr.'
     dst, src = dst_src.split(',')
     return lambda m: movrr(m, dst, src)
 
 def movm(src):
-    ''' Return a function that takes a Machine and does the specified
-        MOV M,x instr.
-    '''
     return lambda m: movmr(m, src)
 
 ####################################################################
@@ -34,7 +34,7 @@ OPCODES = {
     0x03: (None,    invalid),       0x13: (None,    invalid),
     0x04: (None,    invalid),       0x14: (None,    invalid),
     0x05: (None,    invalid),       0x15: (None,    invalid),
-    0x06: (None,    invalid),       0x16: (None,    invalid),
+    0x06: ('MVIb',  mvi('b')),      0x16: ('MVId',  mvi('d')),
     0x07: (None,    invalid),       0x17: (None,    invalid),
     0x08: (None,    invalid),       0x18: (None,    invalid),
     0x09: (None,    invalid),       0x19: (None,    invalid),
@@ -42,7 +42,7 @@ OPCODES = {
     0x0B: (None,    invalid),       0x1B: (None,    invalid),
     0x0C: (None,    invalid),       0x1C: (None,    invalid),
     0x0D: (None,    invalid),       0x1D: (None,    invalid),
-    0x0E: (None,    invalid),       0x1E: (None,    invalid),
+    0x0E: ('MVIc',  mvi('c')),      0x1E: ('MVIe',  mvi('e')),
     0x0F: (None,    invalid),       0x1F: (None,    invalid),
 
     0x20: (None,    invalid),       0x30: (None,    invalid),
@@ -51,7 +51,7 @@ OPCODES = {
     0x23: (None,    invalid),       0x33: (None,    invalid),
     0x24: (None,    invalid),       0x34: (None,    invalid),
     0x25: (None,    invalid),       0x35: (None,    invalid),
-    0x26: (None,    invalid),       0x36: (None,    invalid),
+    0x26: ('MVIh',  mvi('h')),      0x36: ('MVIl',  mvi('h')),
     0x27: (None,    invalid),       0x37: (None,    invalid),
     0x28: (None,    invalid),       0x38: (None,    invalid),
     0x29: (None,    invalid),       0x39: (None,    invalid),
@@ -59,7 +59,7 @@ OPCODES = {
     0x2B: (None,    invalid),       0x3B: (None,    invalid),
     0x2C: (None,    invalid),       0x3C: (None,    invalid),
     0x2D: (None,    invalid),       0x3D: (None,    invalid),
-    0x2E: (None,    invalid),       0x3E: ('MVIa',  mvia),
+    0x2E: (None,    invalid),       0x3E: ('MVIa',  mvi('a')),
     0x2F: (None,    invalid),       0x3F: (None,    invalid),
 
     0x40: (None,    invalid),       0x50: (None,    invalid),
