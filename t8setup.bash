@@ -125,6 +125,10 @@ except ModuleNotFoundError as ex:
 #   by the caller are exported by us, if the caller didn't export.
 export T8_PROJDIR BUILDDIR
 
+#   This may include our tools path twice if it was already in the path,
+#   but that's unlikely and fairly harmless anyway.
+PATH="$BUILDDIR/tool/bin:$PATH"
+
 #   Leading command line args (these must be at the start):
 #   • -C: clean rebuild of everything, including toolchains
 #   • -c: clean rebuild of only this repo's source (test/toolchain output)
