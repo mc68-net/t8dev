@@ -97,37 +97,28 @@ def pushword(m, word):
 def ret(m):     m.pc = popword(m)
 
 ####################################################################
-#   Instructions
+#   8-bit Register Move Instructions
 
-def mvia(m):    m.a = readbyte(m)
-
-def sta(m):     m.mem[readword(m)] = m.a
-def lxib(m):    m.bc = readword(m)
-def lxid(m):    m.de = readword(m)
-def lxih(m):    m.hl = readword(m)
-def lxis(m):    m.sp = readword(m)
-
-def inxr(m, reg):       setattr(m, reg, incword(getattr(m, reg),  1))
-def dcxr(m, reg):       setattr(m, reg, incword(getattr(m, reg), -1))
-
-def movir(m, dst):      setattr(m, dst, readbyte(m))
-def movrr(m, dst, src): setattr(m, dst, getattr(m, src))
-def movmr_(m, src):     m.mem[m.hl] = getattr(m, src)
+def ld_rr(m, dst, src): setattr(m, dst, getattr(m, src))
+def ld_ri(m, dst):      setattr(m, dst, readbyte(m))
+def ld_mr(m, src):      m.mem[m.hl] = getattr(m, src)
 def movrm_(m, dest):    setattr(m, dst, m.mem[m.hl])
 
-def addr(m, reg):   assert 0
-def adcm(m):        assert 0
-def addr(m, reg):   assert 0
-def adcm(m):        assert 0
-def subr(m, reg):   assert 0
-def subm(m):        assert 0
-def sbcr(m, reg):   assert 0
-def sbcm(m):        assert 0
-def cmpr(m, reg):   assert 0
-def cmpm(m):        assert 0
+####################################################################
+#   16-bit Instructions and Operands
+
+def sta(m):             m.mem[readword(m)] = m.a
+
+def inx_r(m, reg):       setattr(m, reg, incword(getattr(m, reg),  1))
+def dcx_r(m, reg):       setattr(m, reg, incword(getattr(m, reg), -1))
+
+def lxib(m):            m.bc = readword(m)
+def lxid(m):            m.de = readword(m)
+def lxih(m):            m.hl = readword(m)
+def lxis(m):            m.sp = readword(m)
 
 ####################################################################
-#   Logic Functions
+#   Logic Instructions
 
 def iszero(b):
     return b == 0
@@ -154,9 +145,23 @@ def logicSZP(m, val):
     m.H = m.C = False
     return val
 
-def andr(m, reg):   m.a = logicSZP(m, m.a & getattr(m, reg))
-def andm(m):        m.a = logicSZP(m, m.a & m.mem[m.hl])
-def orr(m, reg):    m.a = logicSZP(m, m.a | getattr(m, reg))
-def orm(m):         m.a = logicSZP(m, m.a | m.mem[m.hl])
-def xorr(m, reg):   m.a = logicSZP(m, m.a ^ getattr(m, reg))
-def xorm(m):        m.a = logicSZP(m, m.a ^ m.mem[m.hl])
+def and_r(m, reg):   m.a = logicSZP(m, m.a & getattr(m, reg))
+def and_m(m):        m.a = logicSZP(m, m.a & m.mem[m.hl])
+def  or_r(m, reg):   m.a = logicSZP(m, m.a | getattr(m, reg))
+def  or_m(m):        m.a = logicSZP(m, m.a | m.mem[m.hl])
+def xor_r(m, reg):   m.a = logicSZP(m, m.a ^ getattr(m, reg))
+def xor_m(m):        m.a = logicSZP(m, m.a ^ m.mem[m.hl])
+
+####################################################################
+#   Arithemetic Instructions
+
+def add_r(m, reg):  assert 0
+def add_m(m):       assert 0
+def adc_r(m, reg):  assert 0
+def adc_m(m):       assert 0
+def sub_r(m, reg):  assert 0
+def sub_m(m):       assert 0
+def sbc_r(m, reg):  assert 0
+def sbc_m(m):       assert 0
+def cmp_r(m, reg):  assert 0
+def cmp_m(m):       assert 0
