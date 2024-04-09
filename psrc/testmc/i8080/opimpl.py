@@ -107,13 +107,24 @@ def lxid(m):    m.de = readword(m)
 def lxih(m):    m.hl = readword(m)
 def lxis(m):    m.sp = readword(m)
 
+def inxr(m, reg):       setattr(m, reg, incword(getattr(m, reg),  1))
+def dcxr(m, reg):       setattr(m, reg, incword(getattr(m, reg), -1))
+
 def movir(m, dst):      setattr(m, dst, readbyte(m))
 def movrr(m, dst, src): setattr(m, dst, getattr(m, src))
 def movmr_(m, src):     m.mem[m.hl] = getattr(m, src)
 def movrm_(m, dest):    setattr(m, dst, m.mem[m.hl])
 
-def inxr(m, reg):       setattr(m, reg, incword(getattr(m, reg),  1))
-def dcxr(m, reg):       setattr(m, reg, incword(getattr(m, reg), -1))
+def addr(m, reg):   assert 0
+def adcm(m):        assert 0
+def addr(m, reg):   assert 0
+def adcm(m):        assert 0
+def subr(m, reg):   assert 0
+def subm(m):        assert 0
+def sbcr(m, reg):   assert 0
+def sbcm(m):        assert 0
+def cmpr(m, reg):   assert 0
+def cmpm(m):        assert 0
 
 ####################################################################
 #   Logic Functions
@@ -143,5 +154,9 @@ def logicSZP(m, val):
     m.H = m.C = False
     return val
 
-def xraa(m):    m.a = logicSZP(m, m.a ^ m.a)
-
+def andr(m, reg):   m.a = logicSZP(m, m.a & getattr(m, reg))
+def andm(m):        m.a = logicSZP(m, m.a & m.mem[m.hl])
+def orr(m, reg):    m.a = logicSZP(m, m.a | getattr(m, reg))
+def orm(m):         m.a = logicSZP(m, m.a | m.mem[m.hl])
+def xorr(m, reg):   m.a = logicSZP(m, m.a ^ getattr(m, reg))
+def xorm(m):        m.a = logicSZP(m, m.a ^ m.mem[m.hl])

@@ -24,6 +24,24 @@ def movrm(dest): return lambda m: movrm_(m, dest)
 def inx(reg):   return lambda m: inxr(m, reg)
 def dcx(reg):   return lambda m: dcxr(m, reg)
 
+def add(reg):   return lambda m: addr(m, reg)
+def _addm():    return lambda m: adcm(m)
+def adc(reg):   return lambda m: addr(m, reg)
+def _adcm():    return lambda m: adcm(m)
+def sub(reg):   return lambda m: subr(m, reg)
+def _subm():    return lambda m: subm(m)
+def sbc(reg):   return lambda m: sbcr(m, reg)
+def _sbcm():    return lambda m: sbcm(m)
+def cmp(reg):   return lambda m: cmpr(m, reg)
+def _cmpm():    return lambda m: cmpm(m)
+
+def _and(reg):  return lambda m: andr(m, reg)
+def _andm():    return lambda m: andm(m)
+def _or(reg):   return lambda m: orr(m, reg)
+def _orm():     return lambda m: orm(m)
+def xor(reg):   return lambda m: xorr(m, reg)
+def _xorm():    return lambda m: xorm(m)
+
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
 #   See `Instructions` below for mnemonic naming.
@@ -98,38 +116,38 @@ OPCODES = {
     0x6E: ('MOVlm', movrm('l')),    0x7E: ('MOVam', movrm('a')),
     0x6F: ('MOVla', mov('l,a')),    0x7F: ('MOVaa', mov('a,a')),
 
-    0x80: ('ADDx',  add('x')),      0x90: ('SUBx',  sub('x')),
-    0x81: ('ADDx',  add('x')),      0x91: ('SUBx',  sub('x')),
-    0x82: ('ADDx',  add('x')),      0x92: ('SUBx',  sub('x')),
-    0x83: ('ADDx',  add('x')),      0x93: ('SUBx',  sub('x')),
-    0x84: ('ADDx',  add('x')),      0x94: ('SUBx',  sub('x')),
-    0x85: ('ADDx',  add('x')),      0x95: ('SUBx',  sub('x')),
-    0x86: ('ADDx',  addm('x')),     0x96: ('SUBx',  subm('x')),
-    0x87: ('ADDx',  add('x')),      0x97: ('SUBx',  sub('x')),
+    0x80: ('ADDb',  add('b')),      0x90: ('SUBx',  sub('x')),
+    0x81: ('ADDc',  add('c')),      0x91: ('SUBx',  sub('x')),
+    0x82: ('ADDd',  add('d')),      0x92: ('SUBx',  sub('x')),
+    0x83: ('ADDe',  add('e')),      0x93: ('SUBx',  sub('x')),
+    0x84: ('ADDh',  add('h')),      0x94: ('SUBx',  sub('x')),
+    0x85: ('ADDl',  add('l')),      0x95: ('SUBx',  sub('x')),
+    0x86: ('ADDm',  _addm()),       0x96: ('SUBx',  _subm()),
+    0x87: ('ADDa',  add('a')),      0x97: ('SUBx',  sub('x')),
     0x88: ('ADCx',  adc('x')),      0x98: ('SBCx',  sbc('x')),
     0x89: ('ADCx',  adc('x')),      0x99: ('SBCx',  sbc('x')),
     0x8A: ('ADCx',  adc('x')),      0x9A: ('SBCx',  sbc('x')),
     0x8B: ('ADCx',  adc('x')),      0x9B: ('SBCx',  sbc('x')),
     0x8C: ('ADCx',  adc('x')),      0x9C: ('SBCx',  sbc('x')),
     0x8D: ('ADCx',  adc('x')),      0x9D: ('SBCx',  sbc('x')),
-    0x8E: ('ADCx',  adcm('x')),     0x9E: ('SBCx',  sbcm('x')),
+    0x8E: ('ADCx',  _adcm()),       0x9E: ('SBCx',  _sbcm()),
     0x8F: ('ADCx',  adc('x')),      0x9F: ('SBCx',  sbc('x')),
 
-    0xA0: ('ANDx',  and('x')),      0xB0: ('ORx',   or('x')),
-    0xA1: ('ANDx',  and('x')),      0xB1: ('ORx',   or('x')),
-    0xA2: ('ANDx',  and('x')),      0xB2: ('ORx',   or('x')),
-    0xA3: ('ANDx',  and('x')),      0xB3: ('ORx',   or('x')),
-    0xA4: ('ANDx',  and('x')),      0xB4: ('ORx',   or('x')),
-    0xA5: ('ANDx',  and('x')),      0xB5: ('ORx',   or('x')),
-    0xA6: ('ANDx',  andm('x')),     0xB6: ('ORx',   orm('x')),
-    0xA7: ('ANDx',  and('x')),      0xB7: ('ORx',   or('x')),
+    0xA0: ('ANDx',  _and('x')),     0xB0: ('ORx',   _or('x')),
+    0xA1: ('ANDx',  _and('x')),     0xB1: ('ORx',   _or('x')),
+    0xA2: ('ANDx',  _and('x')),     0xB2: ('ORx',   _or('x')),
+    0xA3: ('ANDx',  _and('x')),     0xB3: ('ORx',   _or('x')),
+    0xA4: ('ANDx',  _and('x')),     0xB4: ('ORx',   _or('x')),
+    0xA5: ('ANDx',  _and('x')),     0xB5: ('ORx',   _or('x')),
+    0xA6: ('ANDx',  _andm()),       0xB6: ('ORx',   _orm()),
+    0xA7: ('ANDx',  _and('x')),     0xB7: ('ORx',   _or('x')),
     0xA8: ('XORx',  xor('x')),      0xB8: ('CMPx',  cmp('x')),
     0xA9: ('XORx',  xor('x')),      0xB9: ('CMPx',  cmp('x')),
     0xAA: ('XORx',  xor('x')),      0xBA: ('CMPx',  cmp('x')),
     0xAB: ('XORx',  xor('x')),      0xBB: ('CMPx',  cmp('x')),
     0xAC: ('XORx',  xor('x')),      0xBC: ('CMPx',  cmp('x')),
     0xAD: ('XORx',  xor('x')),      0xBD: ('CMPx',  cmp('x')),
-    0xAE: ('XORx',  xorm('x')),     0xBE: ('CMPx',  cmpm('x')),
+    0xAE: ('XORx',  _xorm()),       0xBE: ('CMPx',  _cmpm()),
     0xAF: ('XORa',  xor('a')),      0xBF: ('CMPx',  cmp('x')),
 
     0xC0: (None,    invalid),       0xD0: (None,    invalid),
