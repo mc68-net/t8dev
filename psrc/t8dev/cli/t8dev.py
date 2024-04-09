@@ -522,9 +522,10 @@ def pytest(args):
     #   test paths from tool.pytest.ini_options.testpaths in any
     #   pyproject.toml files in this working copy, but that's a bit
     #   difficult. So for the moment we rely on the fact that t8dev and
-    #   r8format put their code under a pylib/ subdir, and we just add any
-    #   of those we find.
+    #   r8format put their code under a psrc/ or (deprecated) pylib/
+    #   subdir, and we just add any of those we find.
     default_discovery_dirs = list(map(str, [
+        *path.proj().glob('**/psrc/'),
         *path.proj().glob('**/pylib/'),
         path.proj('src/'),
         ]))

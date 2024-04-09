@@ -6,7 +6,7 @@
     files have specific locations defined in docstrings below for the
     functions that generate paths underneath these locations.
 
-    The one path not defined here is t8dev's ``pylib/``; that's added
+    The one path not defined here is t8dev's ``psrc/``; that's added
     to `sys.path` by the t8dev when it starts.
 
     Source code and data may be placed directly in $T8_PROJDIR but more

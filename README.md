@@ -21,7 +21,7 @@ Contents:
 
 This repo supports development of programs in 8-bit assembly languages (for
 a variety of platforms) and tools to aid this development. It includes a
-Python framework under `pylib/` and build tool `bin/t8dev` that builds and
+Python framework under `psrc/` and build tool `bin/t8dev` that builds and
 tests the assembly code.
 
 Unit tests are written in [pytest] and use Python-based CPU simulators
@@ -94,7 +94,7 @@ __Simulators and Emulators__:
 
 Versions 1.42 builds 205 through at least 218 are broken for t8dev due to
 the "Symbols in Segment NOTHING" section disappearing from the map file.
-See [`t8dev.toolset.asl`](pylib/t8dev/toolset/asl.py) for more
+See [`t8dev.toolset.asl`](psrc/t8dev/toolset/asl.py) for more
 details.
 
 #### ASxxxx Notes

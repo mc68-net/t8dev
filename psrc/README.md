@@ -1,7 +1,7 @@
 t8dev Python Libraries
 ======================
 
-This `pylib/` subdirectory contains all of the various Python libraries
+This `psrc/` subdirectory contains all of the various Python libraries
 that come with t8dev, including CPU simulators and the like.
 
 Many functions also expect the environment variable `T8_PROJDIR` to be set
