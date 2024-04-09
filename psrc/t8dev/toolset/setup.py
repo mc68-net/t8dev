@@ -355,8 +355,9 @@ class Setup(metaclass=abc.ABCMeta):
         if needed:
             errexit(1, 'Missing dependencies. Try installing:', *sorted(needed))
 
-    def make_src(self, *makeargs):
-        ''' Run ``make`` in the source directory.
+    def make_src(self, *makeargs, subdir=''):
+        ''' Run ``make`` in the source directory, or the given subdir
+            of the source directory.
 
             This provides some standard arguments, including a PREFIX
             definition. Further arguments may be passed as `*makeargs`.
@@ -364,7 +365,7 @@ class Setup(metaclass=abc.ABCMeta):
         prefix = 'PREFIX=' + str(self.pdir())
         cmd = ('make', '-j8', prefix) + makeargs
         self.printaction(*cmd)
-        runcmd(cmd, cwd=self.srcdir())
+        runcmd(cmd, cwd=self.srcdir().joinpath(subdir))
 
     ####################################################################
     #   High-level setup description
