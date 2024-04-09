@@ -1,3 +1,5 @@
+	include "8080mac.i80"
+
 	title	'Preliminary Z80 tests'
 
 ; prelim.z80 - Preliminary Z80 tests
