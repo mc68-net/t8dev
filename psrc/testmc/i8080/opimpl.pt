@@ -108,7 +108,9 @@ def test_lxi():
     assert R(bc=0xCDEF) == m.regs
 
 @pytest.mark.parametrize('a, b, r', [
-    (0, 0, R(a=0, S=0, Z=1, H=0, P=1, C=0)),
+    (0x00, 0x00, R(a=0x00, S=0, Z=1, H=0, P=1, C=0)),
+    (0x7F, 0x02, R(a=0x81, S=1, Z=0, H=1, P=1, C=0)),
+    (0xFF, 0x02, R(a=0x01, S=0, Z=0, H=1, P=0, C=1)),
 ])
 def test_add(a, b, r):
     m = Machine()

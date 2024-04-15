@@ -160,22 +160,60 @@ def xor_i(m):       assert 0
 ####################################################################
 #   Arithemetic Instructions
 
-def add_r(m, reg):  assert 0
-def add_m(m):       assert 0
-def add_i(m):       assert 0
+def add(m, augend, addend, carry=0):
+    ''' Return the modular 8-bit sum of adding `augend` (the accumulator),
+        `addend` (the operand) and `carry`, setting flags appropriately.
+    '''
+    sum = incbyte(augend, addend)
+    sum = incbyte(sum, carry)
+    logicSZP(m, sum)    # set logic flags
 
-def adc_r(m, reg):  assert 0
-def adc_m(m):       assert 0
-def adc_i(m):       assert 0
+    #   Stolen from the MC6800 code (which is from PRG pages A-4 and A-5).
+    bit7 = 0b10000000;              bit3 = 0b1000
+    x7 = bool(augend & bit7);       x3 = bool(augend & bit3)
+    m7 = bool(addend & bit7);       m3 = bool(addend & bit3)
+    r7 = bool(sum & bit7);          r3 = bool(sum & bit3)
+    m.C = x7 and m7  or  m7 and not r7  or  not r7 and x7
+    m.H = x3 and m3  or  m3 and not r3  or  not r3 and x3
+    #   Overflow available only on Z80.
+    #m.V = x7 and m7 and not r7  or  not x7 and not m7 and r7
 
-def sub_r(m, reg):  assert 0
-def sub_m(m):       assert 0
-def sub_i(m):       assert 0
+    return sum
 
-def sbc_r(m, reg):  assert 0
-def sbc_m(m):       assert 0
-def sbc_i(m):       assert 0
+def sub(m, minuend, subtrahend, borrow=0):
+    difference = incbyte(minuend, -subtrahend)
+    difference = incbyte(difference, -borrow)
+    logicSZP(m, difference)
 
-def cmp_r(m, reg):  assert 0
-def cmp_m(m):       assert 0
-def cmp_i(m):       assert 0
+    bit7 = 0b10000000;              bit3 = 0b1000
+    x7 = bool(minuend & bit7);      x3 = bool(minuend & bit3)
+    m7 = bool(subtrahend & bit7);   m3 = bool(subtrahend & bit3)
+    r7 = bool(difference & bit7);   r3 = bool(difference & bit3)
+    #   The following is copied pretty much directly from the PRG,
+    #   page A-31 (CMP).
+    m.C = (not x7 and m7) or (m7 and r7) or (r7 and not x7)
+    m.H = 0 # XXX
+    #   Overflow on Z80 only.
+    #m.V = (x7 and not m7 and not r7) or (not x7 and m7 and r7)
+
+    return difference
+
+def add_r(m, reg):  m.a = add(m, m.a, getattr(m, reg))
+def add_m(m):       m.a = add(m, m.a, m.mem[m.hl])
+def add_i(m):       m.a = add(m, m.a, readbyte(m))
+
+def adc_r(m, reg):  m.a = add(m, m.a, getattr(m, reg),  m.C)
+def adc_m(m):       m.a = add(m, m.a, m.mem[m.hl],      m.C)
+def adc_i(m):       m.a = add(m, m.a, readbyte(m),      m.C)
+
+def sub_r(m, reg):  m.a = sub(m, m.a, getattr(m, reg))
+def sub_m(m):       m.a = sub(m, m.a, m.mem[m.hl])
+def sub_i(m):       m.a = sub(m, m.a, readbyte(m))
+
+def sbc_r(m, reg):  m.a = sub(m, m.a, getattr(m, reg),  m.C)
+def sbc_m(m):       m.a = sub(m, m.a, m.mem[m.hl],      m.C)
+def sbc_i(m):       m.a = sub(m, m.a, readbyte(m),      m.C)
+
+def cmp_r(m, reg):        sub(m, m.a, getattr(m, reg))
+def cmp_m(m):             sub(m, m.a, m.mem[m.hl])
+def cmp_i(m):             sub(m, m.a, readbyte(m))
