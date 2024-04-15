@@ -31,12 +31,6 @@
 ####################################################################
 #   Functions (used here and by the caller)
 
-die() {
-    local exitcode="$1"; shift
-    [[ -z $1 ]] || echo 1>&2 "$@"
-    exit $exitcode
-}
-
 warn() { echo 1>&2 "WARNNG:" "$@"; }
 
 submodules_list() {
@@ -118,7 +112,7 @@ except ModuleNotFoundError as ex:
 ####################################################################
 #   Main
 
-[[ -n ${T8_PROJDIR:-} ]] || die 2 "$0: T8_PROJDIR not set"
+[[ -n ${T8_PROJDIR:-} ]] || { echo 2>&1 'ERROR: T8_PROJDIR not set'; return 2; }
 [[ -z ${BUILDDIR:-} ]] && BUILDDIR="$T8_PROJDIR/.build"
 
 #   Exports are separate from setting to ensure that variables set
