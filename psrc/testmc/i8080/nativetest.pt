@@ -1,0 +1,25 @@
+''' "Native" tests of the CPU simulator. (I.e., machine-language CPU test
+    programs that run on the simulator itself.
+'''
+
+from    pathlib  import Path
+from    binary.memimage  import MemImage
+from    testmc.i8080 import  Machine
+
+TESTDATA_DIR = Path(__file__).parent
+TPA_ADDR = 0x100
+def load_com(m, filename):
+    print(f'Loading {filename} from {TESTDATA_DIR}')
+    with open(Path(TESTDATA_DIR, filename), 'rb') as f:
+        #   XXX Should be able to load directly from file, w/o memimage!
+        #   (As well as _load_asl(), etc., need _load_bin(startaddr).
+        prog = MemImage()
+        prog.addrec(TPA_ADDR, f.read())
+        prog.entrypoint = TPA_ADDR
+        m.load_memimage(prog, setPC=True)
+    m.pc = TPA_ADDR
+
+def test_8080pre(m, R):
+    load_com(m, '8080PRE.COM')
+    m.stepto(stopat=[0x102])
+    assert R(a=1) == m.regs
