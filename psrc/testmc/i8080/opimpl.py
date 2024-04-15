@@ -109,8 +109,8 @@ def ld_rm(m, dst):      setattr(m, dst, m.mem[m.hl])
 
 def sta(m):             m.mem[readword(m)] = m.a
 
-def inx_r(m, reg):       setattr(m, reg, incword(getattr(m, reg),  1))
-def dcx_r(m, reg):       setattr(m, reg, incword(getattr(m, reg), -1))
+def inx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg),  1))
+def dcx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg), -1))
 
 def lxib(m):            m.bc = readword(m)
 def lxid(m):            m.de = readword(m)
@@ -145,16 +145,16 @@ def logicSZP(m, val):
     m.H = m.C = False
     return val
 
-def and_r(m, reg):   m.a = logicSZP(m, m.a & getattr(m, reg))
-def and_m(m):        m.a = logicSZP(m, m.a & m.mem[m.hl])
+def and_r(m, reg):  m.a = logicSZP(m, m.a & getattr(m, reg))
+def and_m(m):       m.a = logicSZP(m, m.a & m.mem[m.hl])
 def and_i(m):       assert 0
 
-def  or_r(m, reg):   m.a = logicSZP(m, m.a | getattr(m, reg))
-def  or_m(m):        m.a = logicSZP(m, m.a | m.mem[m.hl])
+def  or_r(m, reg):  m.a = logicSZP(m, m.a | getattr(m, reg))
+def  or_m(m):       m.a = logicSZP(m, m.a | m.mem[m.hl])
 def  or_i(m):       assert 0
 
-def xor_r(m, reg):   m.a = logicSZP(m, m.a ^ getattr(m, reg))
-def xor_m(m):        m.a = logicSZP(m, m.a ^ m.mem[m.hl])
+def xor_r(m, reg):  m.a = logicSZP(m, m.a ^ getattr(m, reg))
+def xor_m(m):       m.a = logicSZP(m, m.a ^ m.mem[m.hl])
 def xor_i(m):       assert 0
 
 ####################################################################
