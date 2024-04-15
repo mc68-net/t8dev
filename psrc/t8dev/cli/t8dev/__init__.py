@@ -76,6 +76,7 @@ def buildtoolsets(args):
 
         XXX WRITEME
     '''
+    raise NotImplementedError('XXX writeme')
 
 def buildtoolset(args):
     ''' Given the name of a toolset, run its setup/build/install code.
