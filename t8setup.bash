@@ -105,7 +105,7 @@ except ModuleNotFoundError as ex:
     python -c "$pyprg" || {
         echo 1>&2 \
             'ERROR: r8format package not available. Install or add submodule.'
-        exit 8
+        return 8
     }
 }
 
@@ -146,4 +146,4 @@ esac; done
 submodules_init_empty
 submodules_warn_modified
 submodules_pip_install_e
-t8_check_r8format_dependency
+t8_check_r8format_dependency || return $?
