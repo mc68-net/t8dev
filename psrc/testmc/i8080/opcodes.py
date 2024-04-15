@@ -155,7 +155,7 @@ OPCODES = {
     0xC3: (None,    invalid),       0xD3: (None,    invalid),
     0xC4: (None,    invalid),       0xD4: (None,    invalid),
     0xC5: (None,    invalid),       0xD5: (None,    invalid),
-    0xC6: (None,    invalid),       0xD6: (None,    invalid),
+    0xC6: ('ADDi',   add_i),        0xD6: ('SUBi',   sub_i),
     0xC7: (None,    invalid),       0xD7: (None,    invalid),
     0xC8: (None,    invalid),       0xD8: (None,    invalid),
     0xC9: ('RET',   ret),           0xD9: (None,    invalid),
@@ -163,7 +163,7 @@ OPCODES = {
     0xCB: (None,    invalid),       0xDB: (None,    invalid),
     0xCC: (None,    invalid),       0xDC: (None,    invalid),
     0xCD: (None,    invalid),       0xDD: (None,    invalid),
-    0xCE: (None,    invalid),       0xDE: (None,    invalid),
+    0xCE: ('ADCi',   adc_i),        0xDE: ('SBCi',   sbc_i),
     0xCF: (None,    invalid),       0xDF: (None,    invalid),
 
     0xE0: (None,    invalid),       0xF0: (None,    invalid),
@@ -172,7 +172,7 @@ OPCODES = {
     0xE3: (None,    invalid),       0xF3: (None,    invalid),
     0xE4: (None,    invalid),       0xF4: (None,    invalid),
     0xE5: (None,    invalid),       0xF5: (None,    invalid),
-    0xE6: (None,    invalid),       0xF6: (None,    invalid),
+    0xE6: ('ANDi',   and_i),        0xF6: ('ORi',    or_i),
     0xE7: (None,    invalid),       0xF7: (None,    invalid),
     0xE8: (None,    invalid),       0xF8: (None,    invalid),
     0xE9: (None,    invalid),       0xF9: (None,    invalid),
@@ -180,7 +180,7 @@ OPCODES = {
     0xEB: (None,    invalid),       0xFB: (None,    invalid),
     0xEC: (None,    invalid),       0xFC: (None,    invalid),
     0xED: (None,    invalid),       0xFD: (None,    invalid),
-    0xEE: (None,    invalid),       0xFE: (None,    invalid),
+    0xEE: ('XORi',   xor_i),        0xFE: ('CMPi',   cmp_i),
     0xEF: (None,    invalid),       0xFF: (None,    invalid),
 
 }

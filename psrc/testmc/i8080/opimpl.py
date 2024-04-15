@@ -102,7 +102,7 @@ def ret(m):     m.pc = popword(m)
 def ld_rr(m, dst, src): setattr(m, dst, getattr(m, src))
 def ld_ri(m, dst):      setattr(m, dst, readbyte(m))
 def ld_mr(m, src):      m.mem[m.hl] = getattr(m, src)
-def movrm_(m, dest):    setattr(m, dst, m.mem[m.hl])
+def ld_rm(m, dst):      setattr(m, dst, m.mem[m.hl])
 
 ####################################################################
 #   16-bit Instructions and Operands
@@ -147,21 +147,35 @@ def logicSZP(m, val):
 
 def and_r(m, reg):   m.a = logicSZP(m, m.a & getattr(m, reg))
 def and_m(m):        m.a = logicSZP(m, m.a & m.mem[m.hl])
+def and_i(m):       assert 0
+
 def  or_r(m, reg):   m.a = logicSZP(m, m.a | getattr(m, reg))
 def  or_m(m):        m.a = logicSZP(m, m.a | m.mem[m.hl])
+def  or_i(m):       assert 0
+
 def xor_r(m, reg):   m.a = logicSZP(m, m.a ^ getattr(m, reg))
 def xor_m(m):        m.a = logicSZP(m, m.a ^ m.mem[m.hl])
+def xor_i(m):       assert 0
 
 ####################################################################
 #   Arithemetic Instructions
 
 def add_r(m, reg):  assert 0
 def add_m(m):       assert 0
+def add_i(m):       assert 0
+
 def adc_r(m, reg):  assert 0
 def adc_m(m):       assert 0
+def adc_i(m):       assert 0
+
 def sub_r(m, reg):  assert 0
 def sub_m(m):       assert 0
+def sub_i(m):       assert 0
+
 def sbc_r(m, reg):  assert 0
 def sbc_m(m):       assert 0
+def sbc_i(m):       assert 0
+
 def cmp_r(m, reg):  assert 0
 def cmp_m(m):       assert 0
+def cmp_i(m):       assert 0
