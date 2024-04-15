@@ -31,31 +31,31 @@
 ####################################################################
 #   Functions (used here and by the caller)
 
-submodules_list() {
+__t8_submodules_list() {
     #   Return a list of all submodule paths relative to $T8_PROJDIR.
     #   XXX This should set an array so we can handle spaces in the paths.
     git config -f "$T8_PROJDIR"/.gitmodules -l \
         | sed -n -e 's/^submodule\.//' -e 's/.*\.path=//p'
 }
 
-submodules_warn_modified() {
+__t8_submodules_warn_modified() {
     #   If any submodules are modified, warn about this. Usually this is
     #   because the developer is working on submodule code (and needs to
     #   commit it before commiting her project) or the developer is testing
     #   an update to new versions of submodules.
-    local sms="$(submodules_list)"
+    local sms="$(__t8_submodules_list)"
     git -C "$T8_PROJDIR" diff-index --quiet @ $sms || {
         echo '----- WARNING: submodules are modified:' \
             "$(git -C "$T8_PROJDIR" status -s $sms | tr -d '\n')"
     }
 }
 
-submodules_init_empty() {
+__t8_submodules_init_empty() {
     #   Check out any "empty" submodules in the parent project, i.e., those
     #   that appear not to be initialised because they do not have a file
     #   or directory named `.git` in their submodule directory.
     local sm
-    for sm in $(submodules_list); do
+    for sm in $(__t8_submodules_list); do
         dir="$T8_PROJDIR/$sm"
         [[ -e $dir/.git ]] && continue
         echo "----- Initializing empty submodule $sm"
@@ -63,14 +63,14 @@ submodules_init_empty() {
     done
 }
 
-submodules_pip_install_e() {
+__t8_submodules_pip_install_e() {
     #   If the parent project has any submodules that have a `pyproject.toml`
     #   at the top level, we assume that those are Python dependencies that
     #   should be installed and, further, they should be installed as
     #   editable because that's why they're submodules instead of just in
     #   requirements.txt.
     local sm
-    for sm in $(submodules_list); do
+    for sm in $(__t8_submodules_list); do
         dir="$T8_PROJDIR/$sm"
         [[ -r $dir/pyproject.toml ]] || continue
         #   XXX The `pip inspect` is slowish (almost a second), but not as slow
@@ -87,7 +87,7 @@ submodules_pip_install_e() {
     done
 }
 
-t8_check_r8format_dependency() {
+__t8_check_r8format_dependency() {
     #   Ensure that we can import the `binary` package from r8format,
     #   as we depend on several modules from that package.
     #   XXX This should use `binary.__version__ or something like that
@@ -141,7 +141,13 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
 esac; done
 
 . "$(dirname ${BASH_SOURCE[0]})"/pactivate -B "$T8_PROJDIR" -q
-submodules_init_empty
-submodules_warn_modified
-submodules_pip_install_e
-t8_check_r8format_dependency || return $?
+__t8_submodules_init_empty
+__t8_submodules_warn_modified
+__t8_submodules_pip_install_e
+__t8_check_r8format_dependency || return $?
+
+unset \
+    __t8_submodules_list __t8_submodules_warn_modified \
+    __t8_submodules_init_empty __t8_submodules_pip_install_e \
+    __t8_check_r8format_dependency \
+    :
