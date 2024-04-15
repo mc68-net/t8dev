@@ -13,6 +13,9 @@ from    t8dev.cli.t8dev.util  import vprint, cwd, runtool, sandbox_loadmod
 from    t8dev  import path
 import  t8dev.cli.t8dev.shared as shared
 
+####################################################################
+#   ASL Assembler
+
 def runasl(objdir, name, sourcecode):
     ''' Create `objdir`, a source file in it called `name`.asm containing
         `sourcecode`, and assemble it with Macroassembler AS (``asl``).
@@ -169,6 +172,9 @@ def aslauto(paths):
         vprint(2, 'build', 'asltest {}'.format(path.pretty(pt)))
         asltest([pt])
 
+####################################################################
+#   ASxxxx Assembler and Linker
+
 def asx(args):
     ''' Run ASXXXX assembler. Currently this always runs ``as6500``.
 
@@ -244,6 +250,12 @@ def asxlink(args):
         remove_formfeeds(objstem + '.rst')
         remove_formfeeds(objstem + '.map')
 
+####################################################################
+#   Object File Transformation Tools
+#
+#   XXX These currently may call build tools such as asl1(); it's
+#   not clear if or how those parts should be separated out.
+
 def a2dsk(args):
     ' Call `a2dsk1()` on each file in `args`. '
     for src in args: a2dsk1(src)
@@ -271,13 +283,11 @@ def a2dsk1(srcfile):
     #   XXX and TODO:
     #   • t8dev should be handling the fetching and building of all
     #     these programs and template disk images.
-    #   • p2a2bin is actually part of the `testmc` module; not sure
-    #     whether that is part of t8dev or separate. (Does it want a
-    #     proper Python package release, too?)
     #   • The use of str(...) is annoying, perhaps we need some better
     #     general plan for handling paths. The main issue is that they
     #     currently usually come in as strings from command lines, but
-    #     possibly Path objects from other code.
+    #     possibly Path objects from other code. (But also, do we even
+    #     need str(...) if we no longer need Python 3.5 support?
 
     #   XXX srcfile = path.proj(srcfile) breaks; this needs to be fixed
     a2name = Path(srcfile).stem.upper()
