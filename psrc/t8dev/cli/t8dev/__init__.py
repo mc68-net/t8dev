@@ -31,6 +31,7 @@ from    site  import addsitedir
 import  importlib.util, importlib.machinery, os, shutil, sys
 
 from    t8dev  import path, run, toolset
+import  t8dev.cli.t8dev.shared as shared
 
 ####################################################################
 #   t8dev Conventions
@@ -70,16 +71,15 @@ def isa_from_path(path, return_none=False):
 def vprint(verbosity, prefix, *args, **kwargs):
     ''' Print for a given verbosity level.
 
-        The message will be emitted only if `ARGS.verbose` is at least as
-        large as the `verbosity` argument.
+        The message will be emitted only if `shared.ARGS.verbose` is at
+        least as large as the `verbosity` argument.
 
         `prefix` is printed right-justified in a fixed-width field,
         followed by a colon and the message in `args`. This helps commands
         and the like line up nicely to make scanning through the output
         easier.
     '''
-    global ARGS
-    if verbosity <= ARGS.verbose:
+    if verbosity <= shared.ARGS.verbose:
         print('{:>8}:'.format(prefix), *args, **kwargs)
 
 SANDBOX_MODULES = {}
@@ -319,7 +319,7 @@ def aslauto(paths):
     if not paths:
         paths = ('src',)
 
-    excludes_parts = tuple( path.proj(e).parts for e in ARGS.exclude )
+    excludes_parts = tuple( path.proj(e).parts for e in shared.ARGS.exclude )
     def is_excluded(f):
         for e in excludes_parts:
             if e == f.parts[0:len(e)]:
@@ -585,14 +585,14 @@ COMMANDS = {
 }
 
 def main():
-    global ARGS; ARGS = parseargs()
+    shared.ARGS = parseargs()
 
-    if ARGS.project_dir:    # override environment
-        path.T8_PROJDIR = path.strict_resolve(ARGS.project_dir)
+    if shared.ARGS.project_dir:    # override environment
+        path.T8_PROJDIR = path.strict_resolve(shared.ARGS.project_dir)
     if path.T8_PROJDIR is None:
         raise RuntimeError('T8_PROJDIR not set')
     vprint(1, '========',
-        't8dev command={} args={}'.format(ARGS.command, ARGS.args))
+        't8dev command={} args={}'.format(shared.ARGS.command, shared.ARGS.args))
     vprint(1, 'projdir', str(path.proj()))
 
     #   Code common to several .pt files (including entire test suites) may
@@ -606,7 +606,7 @@ def main():
     #
     addsitedir(str(path.proj()))
 
-    cmdf = COMMANDS.get(ARGS.command)
+    cmdf = COMMANDS.get(shared.ARGS.command)
     if cmdf is None:
         help_commands(); exit(2)
-    exit(cmdf(ARGS.args))
+    exit(cmdf(shared.ARGS.args))
