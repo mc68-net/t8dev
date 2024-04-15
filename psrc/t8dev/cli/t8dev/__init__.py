@@ -29,7 +29,8 @@ from    pathlib  import Path
 from    site  import addsitedir
 import  os, shutil, sys
 
-from    t8dev  import path, toolset
+from    t8dev  import path
+from    t8dev.cli.t8dev.toolset  import buildtoolsets, buildtoolset
 from    t8dev.cli.t8dev.util  import vprint, cwd, runtool, sandbox_loadmod
 import  t8dev.cli.t8dev.shared as shared
 
@@ -64,34 +65,6 @@ def isa_from_path(path, return_none=False):
         return isa
     else:
         raise LookupError("No ISA known for extension '{}'".format(ext))
-
-####################################################################
-#   Tool Set Builds
-#
-
-def buildtoolsets(args):
-    ''' This should check the configuration of the project and build
-        all tools that have been enabled (or at least confirm that
-        they are available from the system).
-
-        XXX WRITEME
-    '''
-    raise NotImplementedError('XXX writeme')
-
-def buildtoolset(args):
-    ''' Given the name of a toolset, run its setup/build/install code.
-
-        This will first check to see if the toolset is already available in
-        the current path and do nothing if it is. Otherwise it will fetch,
-        build and install the toolset to the project's local tool directories.
-
-        XXX There should really be an option to force building a
-        project-local toolset even when the system provides one.
-    '''
-    assert len(args) == 1, "buildtool() requires an argument"
-    tsname = args.pop(0)
-    tool_class = toolset.TOOLSETS[tsname]
-    tool_class().main()
 
 ####################################################################
 #   Build commands
