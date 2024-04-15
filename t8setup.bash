@@ -125,6 +125,11 @@ export T8_PROJDIR BUILDDIR
 #   since at this point the tools might not yet have been built.
 [[ :$PATH: = *:$BUILDDIR/tool/bin:* ]] || PATH="$BUILDDIR/tool/bin:$PATH"
 
+#   If the project has its own local bin/ directory, include that in
+#   the path as well.
+[[ -d "$T8_PROJDIR/bin" && :$PATH: != *:$T8_PROJDIR/bin:* ]] \
+    && PATH="$T8_PROJDIR/bin:$PATH"
+
 #   Leading command line args (these must be at the start):
 #   • -C: clean rebuild of everything, including toolchains
 #   • -c: clean rebuild of only this repo's source (test/toolchain output)
@@ -142,7 +147,3 @@ submodules_init_empty
 submodules_warn_modified
 submodules_pip_install_e
 t8_check_r8format_dependency
-
-#   XXX This can go away once we switch to `pip -e` installs of t8dev.
-[[ $PATH =~ ^$T8_PROJDIR/bin:|:$T8_PROJDIR/bin:|:$T8_PROJDIR/bin$ ]] \
-    || export PATH="$T8_PROJDIR/bin:$PATH"
