@@ -107,3 +107,11 @@ def test_lxi():
     m._step()
     assert R(bc=0xCDEF) == m.regs
 
+@pytest.mark.parametrize('a, b, r', [
+    (0, 0, R(a=0, S=0, Z=1, H=0, P=1, C=0)),
+])
+def test_add(a, b, r):
+    m = Machine()
+    m.setregs(R(a=a, b=b))
+    m.pc = 22; m.mem[22] = I.ADDb; m._step()
+    assert r == m.regs
