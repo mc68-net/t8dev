@@ -31,8 +31,6 @@
 ####################################################################
 #   Functions (used here and by the caller)
 
-warn() { echo 1>&2 "WARNNG:" "$@"; }
-
 submodules_list() {
     #   Return a list of all submodule paths relative to $T8_PROJDIR.
     #   XXX This should set an array so we can handle spaces in the paths.
