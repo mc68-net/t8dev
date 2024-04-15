@@ -32,22 +32,14 @@ def _inx(reg):      return lambda m: inx_r(m, reg)
 def _dcx(reg):      return lambda m: dcx_r(m, reg)
 
 def _add(reg):      return lambda m: add_r(m, reg)
-def _addm():        return lambda m: add_m(m)
 def _adc(reg):      return lambda m: adc_r(m, reg)
-def _adcm():        return lambda m: adc_m(m)
 def _sub(reg):      return lambda m: sub_r(m, reg)
-def _subm():        return lambda m: sub_m(m)
 def _sbc(reg):      return lambda m: sbc_r(m, reg)
-def _sbcm():        return lambda m: sbc_m(m)
 def _cmp(reg):      return lambda m: cmp_r(m, reg)
-def _cmpm():        return lambda m: cmp_m(m)
 
 def _and(reg):      return lambda m: and_r(m, reg)
-def _andm():        return lambda m: and_m(m)
 def _or(reg):       return lambda m: or_r(m, reg)
-def _orm():         return lambda m: or_m(m)
 def _xor(reg):      return lambda m: xor_r(m, reg)
-def _xorm():        return lambda m: xor_m(m)
 
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
@@ -112,7 +104,7 @@ OPCODES = {
     0x63: ('MOVhe', _ld('h,e')),    0x73: ('MOVme', _ldmr('e')),
     0x64: ('MOVhh', _ld('h,h')),    0x74: ('MOVmh', _ldmr('h')),
     0x65: ('MOVhl', _ld('h,l')),    0x75: ('MOVml', _ldmr('l')),
-    0x66: ('MOVhm', _ldrm('h')),    0x76: ('HLT',   invalid),
+    0x66: ('MOVhm', _ldrm('h')),    0x76: ('HLT',    invalid),
     0x67: ('MOVha', _ld('h,a')),    0x77: ('MOVma', _ldmr('a')),
     0x68: ('MOVlb', _ld('l,b')),    0x78: ('MOVab', _ld('a,b')),
     0x69: ('MOVlc', _ld('l,c')),    0x79: ('MOVac', _ld('a,c')),
@@ -129,7 +121,7 @@ OPCODES = {
     0x83: ('ADDe',  _add('e')),     0x93: ('SUBe', _sub('e')),
     0x84: ('ADDh',  _add('h')),     0x94: ('SUBh', _sub('h')),
     0x85: ('ADDl',  _add('l')),     0x95: ('SUBl', _sub('l')),
-    0x86: ('ADDm',  _addm()),       0x96: ('SUBm', _subm()),
+    0x86: ('ADDm',   add_m),        0x96: ('SUBm',  sub_m),
     0x87: ('ADDa',  _add('a')),     0x97: ('SUBa', _sub('a')),
     0x88: ('ADCb',  _adc('b')),     0x98: ('SBCb', _sbc('b')),
     0x89: ('ADCc',  _adc('c')),     0x99: ('SBCc', _sbc('c')),
@@ -137,7 +129,7 @@ OPCODES = {
     0x8B: ('ADCe',  _adc('e')),     0x9B: ('SBCe', _sbc('e')),
     0x8C: ('ADCh',  _adc('h')),     0x9C: ('SBCh', _sbc('h')),
     0x8D: ('ADCl',  _adc('l')),     0x9D: ('SBCl', _sbc('l')),
-    0x8E: ('ADCm',  _adcm()),       0x9E: ('SBCm', _sbcm()),
+    0x8E: ('ADCm',   adc_m),        0x9E: ('SBCm',  sbc_m),
     0x8F: ('ADCa',  _adc('a')),     0x9F: ('SBCa', _sbc('a')),
 
     0xA0: ('ANDb',  _and('b')),     0xB0: ('ORb',   _or('b')),
@@ -146,7 +138,7 @@ OPCODES = {
     0xA3: ('ANDe',  _and('e')),     0xB3: ('ORe',   _or('e')),
     0xA4: ('ANDh',  _and('h')),     0xB4: ('ORh',   _or('h')),
     0xA5: ('ANDl',  _and('l')),     0xB5: ('ORl',   _or('l')),
-    0xA6: ('ANDm',  _andm()),       0xB6: ('ORm',   _orm()),
+    0xA6: ('ANDm',   and_m),        0xB6: ('ORm',    or_m),
     0xA7: ('ANDa',  _and('a')),     0xB7: ('ORa',   _or('a')),
     0xA8: ('XORb',  _xor('b')),     0xB8: ('CMPb',  _cmp('b')),
     0xA9: ('XORc',  _xor('c')),     0xB9: ('CMPc',  _cmp('c')),
@@ -154,7 +146,7 @@ OPCODES = {
     0xAB: ('XORe',  _xor('e')),     0xBB: ('CMPe',  _cmp('e')),
     0xAC: ('XORh',  _xor('h')),     0xBC: ('CMPh',  _cmp('h')),
     0xAD: ('XORl',  _xor('l')),     0xBD: ('CMPl',  _cmp('l')),
-    0xAE: ('XORm',  _xorm()),       0xBE: ('CMPm',  _cmpm()),
+    0xAE: ('XORm',   xor_m),        0xBE: ('CMPm',   cmp_m),
     0xAF: ('XORa',  _xor('a')),     0xBF: ('CMPa',  _cmp('a')),
 
     0xC0: (None,    invalid),       0xD0: (None,    invalid),
