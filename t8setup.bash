@@ -125,9 +125,11 @@ except ModuleNotFoundError as ex:
 #   by the caller are exported by us, if the caller didn't export.
 export T8_PROJDIR BUILDDIR
 
-#   This may include our tools path twice if it was already in the path,
-#   but that's unlikely and fairly harmless anyway.
-PATH="$BUILDDIR/tool/bin:$PATH"
+#   Bring in directory for tools local to this project, if not already present.
+#   XXX We should probably also be bringing in the paths for discovered
+#   tools external to the project, but it's not clear how to do that here,
+#   since at this point the tools might not yet have been built.
+[[ :$PATH: = *:$BUILDDIR/tool/bin:* ]] || PATH="$BUILDDIR/tool/bin:$PATH"
 
 #   Leading command line args (these must be at the start):
 #   • -C: clean rebuild of everything, including toolchains
