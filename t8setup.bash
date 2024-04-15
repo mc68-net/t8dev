@@ -59,7 +59,7 @@ __t8_submodules_init_empty() {
         dir="$T8_PROJDIR/$sm"
         [[ -e $dir/.git ]] && continue
         echo "----- Initializing empty submodule $sm"
-        (cd $T8_PROJDIR && git submodule update --init "$sm")
+        (cd "$T8_PROJDIR" && git submodule update --init "$sm")
     done
 }
 
@@ -140,7 +140,7 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
     *)      break;;
 esac; done
 
-. "$(dirname ${BASH_SOURCE[0]})"/pactivate -B "$T8_PROJDIR" -q
+. "$(dirname "${BASH_SOURCE[0]}")"/pactivate -B "$T8_PROJDIR" -q
 __t8_submodules_init_empty
 __t8_submodules_warn_modified
 __t8_submodules_pip_install_e
