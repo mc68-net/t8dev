@@ -45,6 +45,8 @@ def _jpf(flag):     return lambda m: jp_f(m, flag)
 def _jpnf(flag):    return lambda m: jp_nf(m, flag)
 def _callf(flag):   return lambda m: call_f(m, flag)
 def _callnf(flag):  return lambda m: call_nf(m, flag)
+def _retf(flag):    return lambda m: ret_f(m, flag)
+def _retnf(flag):   return lambda m: ret_nf(m, flag)
 
 def _push(regs):    return lambda m: push(m, regs)
 def  _pop(regs):    return lambda m:  pop(m, regs)
@@ -157,7 +159,7 @@ OPCODES = {
     0xAE: ('XORm',   xor_m),        0xBE: ('CMPm',   cmp_m),
     0xAF: ('XORa',  _xor('a')),     0xBF: ('CMPa',  _cmp('a')),
 
-    0xC0: (None,    invalid),       0xD0: (None,    invalid),
+    0xC0: ('RETnz', _retnf('Z')),   0xD0: ('RETz',  _retf('Z')),
     0xC1: ('POPbc', _pop('bc')),    0xD1: ('POPde', _pop('de')),
     0xC2: ('JPnz',  _jpnf('Z')),    0xD2: ('JPnc',  _jpnf('C')),
     0xC3: ('JP',     jp),           0xD3: (None,    invalid),
@@ -165,7 +167,7 @@ OPCODES = {
     0xC5: ('PUSHbc',_push('bc')),   0xD5: ('PUSHde',_push('de')),
     0xC6: ('ADDi',   add_i),        0xD6: ('SUBi',   sub_i),
     0xC7: (None,    invalid),       0xD7: (None,    invalid),
-    0xC8: (None,    invalid),       0xD8: (None,    invalid),
+    0xC8: ('RETnc', _retnf('C')),   0xD8: ('RETc',  _retf('C')),
     0xC9: ('RET',   ret),           0xD9: (None,    invalid),
     0xCA: ('JPz',   _jpf('Z')),     0xDA: ('JPc',   _jpf('C')),
     0xCB: (None,    invalid),       0xDB: (None,    invalid),
@@ -174,7 +176,7 @@ OPCODES = {
     0xCE: ('ADCi',   adc_i),        0xDE: ('SBCi',   sbc_i),
     0xCF: (None,    invalid),       0xDF: (None,    invalid),
 
-    0xE0: (None,    invalid),       0xF0: (None,    invalid),
+    0xE0: ('RETpo', _retnf('P')),   0xF0: ('RETpe', _retf('P')),
     0xE1: ('POPhl', _pop('hl')),    0xF1: ('POPaf',  popaf),
     0xE2: ('JPpo',  _jpnf('P')),    0xF2: ('JPp',   _jpnf('S')),
     0xE3: (None,    invalid),       0xF3: (None,    invalid),
@@ -182,7 +184,7 @@ OPCODES = {
     0xE5: ('PUSHhl',_push('hl')),   0xF5: ('PUSHaf', pushaf),
     0xE6: ('ANDi',   and_i),        0xF6: ('ORi',    or_i),
     0xE7: (None,    invalid),       0xF7: (None,    invalid),
-    0xE8: (None,    invalid),       0xF8: (None,    invalid),
+    0xE8: ('RETp',  _retnf('S')),   0xF8: ('RETm',  _retf('S')),
     0xE9: (None,    invalid),       0xF9: (None,    invalid),
     0xEA: ('JPpe',  _jpf('P')),     0xFA: ('JPn',   _jpf('S')),
     0xEB: (None,    invalid),       0xFB: (None,    invalid),

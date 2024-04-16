@@ -79,9 +79,8 @@ def jp(m, take=True):
     target = readword(m)
     if take: m.pc = target
 
-def  jp_f(m, flag):     jp(m,     getattr(m, flag))
+def jp_f(m, flag):      jp(m,     getattr(m, flag))
 def jp_nf(m, flag):     jp(m, not getattr(m, flag)) 
-
 
 ####################################################################
 #   Instructions affecting the stack
@@ -125,7 +124,12 @@ def call(m, take=True):
 def  call_f(m, flag):   call(m,     getattr(m, flag))
 def call_nf(m, flag):   call(m, not getattr(m, flag)) 
 
-def ret(m):     m.pc = popword(m)
+def ret(m, take=True):
+    target = popword(m)
+    if take: m.pc = target
+
+def ret_f(m, flag):     ret(m,     getattr(m, flag))
+def ret_nf(m, flag):    ret(m, not getattr(m, flag)) 
 
 ####################################################################
 #   8-bit Register Move Instructions
