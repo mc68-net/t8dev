@@ -94,7 +94,7 @@ OPCODES = {
     0x28: (None,    invalid),       0x38: (None,    invalid),
     0x29: ('ADDhlhl',_addhl('hl')), 0x39: ('ADDhlsp',_addhl('sp')),
     0x2A: ('LDxhl',  ld_xhl),       0x3A: ('LDax',  ld_ax),
-    0x2B: ('DCXhl', _dcx('hl')),    0x2B: ('DCXsp', _dcx('sp')),
+    0x2B: ('DCXhl', _dcx('hl')),    0x3B: ('DCXsp', _dcx('sp')),
     0x2C: ('INCl',  _incr('l')),    0x3C: ('INCa',  _incr('a')),
     0x2D: ('DECl',  _decr('l')),    0x3D: ('DECa',  _decr('a')),
     0x2E: ('LDli',  _ldi('l')),     0x3E: ('LDai',  _ldi('a')),
