@@ -179,15 +179,15 @@ def logicSZP(m, val):
 
 def and_r(m, reg):  m.a = logicSZP(m, m.a & getattr(m, reg))
 def and_m(m):       m.a = logicSZP(m, m.a & m.mem[m.hl])
-def and_i(m):       assert 0
+def and_i(m):       m.a = logicSZP(m, m.a & readbyte(m))
 
 def  or_r(m, reg):  m.a = logicSZP(m, m.a | getattr(m, reg))
 def  or_m(m):       m.a = logicSZP(m, m.a | m.mem[m.hl])
-def  or_i(m):       assert 0
+def  or_i(m):       m.a = logicSZP(m, m.a | readbyte(m))
 
 def xor_r(m, reg):  m.a = logicSZP(m, m.a ^ getattr(m, reg))
 def xor_m(m):       m.a = logicSZP(m, m.a ^ m.mem[m.hl])
-def xor_i(m):       assert 0
+def xor_i(m):       m.a = logicSZP(m, m.a ^ readbyte(m))
 
 ####################################################################
 #   Arithemetic Instructions
