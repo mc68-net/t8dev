@@ -24,7 +24,7 @@ def load_com(m, filename):
 
 def test_8080pre(m):
     allok = 0x0327      # prints '8080 Preliminary tests complete' and exits
-    load_com(m, '8080PRE.COM')
+    load_com(m, 'programs/8080PRE.COM')
     #   The first few tests jump to $0000 on failure, so we set that
     #   to an instruction that will abort the simulator.
     m.deposit(0, I.HLT)
@@ -33,7 +33,7 @@ def test_8080pre(m):
 
 @pytest.mark.skip('Seems to run forever....')
 def test_8080exer(m):
-    load_com(m, '8080EXER.COM')
+    load_com(m, 'programs/8080EXER.COM')
     m.deposit(0x0005, I.RET)
     while True:
         #   4e7 is ~5 min
