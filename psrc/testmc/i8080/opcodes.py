@@ -85,7 +85,7 @@ OPCODES = {
 
     0x20: (None,    invalid),       0x30: (None,    invalid),
     0x21: ('LXIh',  lxih),          0x31: ('LXIs',  lxis),
-    0x22: ('LDhlx',  ld_hlx),       0x32: ('STA',   ld_xa),
+    0x22: ('LDxhl',  ld_xhl),       0x32: ('STA',   ld_xa),
     0x23: ('INXhl', _inx('hl')),    0x33: ('INXsp', _inx('sp')),
     0x24: ('INCh',  _incr('h')),    0x34: ('INCm',   inc_m),
     0x25: ('DECh',  _decr('h')),    0x35: ('DECm',   dec_m),
@@ -93,7 +93,7 @@ OPCODES = {
     0x27: (None,    invalid),       0x37: (None,    invalid),
     0x28: (None,    invalid),       0x38: (None,    invalid),
     0x29: ('ADDhlhl',_addhl('hl')), 0x39: ('ADDhlsp',_addhl('sp')),
-    0x2A: ('LDxhl',  ld_xhl),       0x3A: ('LDax',  ld_ax),
+    0x2A: ('LDhlx',  ld_hlx),       0x3A: ('LDax',  ld_ax),
     0x2B: ('DCXhl', _dcx('hl')),    0x3B: ('DCXsp', _dcx('sp')),
     0x2C: ('INCl',  _incr('l')),    0x3C: ('INCa',  _incr('a')),
     0x2D: ('DECl',  _decr('l')),    0x3D: ('DECa',  _decr('a')),
