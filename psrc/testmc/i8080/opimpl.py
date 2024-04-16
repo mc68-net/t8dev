@@ -191,22 +191,22 @@ def xor_i(m):       m.a = logicSZP(m, m.a ^ readbyte(m))
 
 def rlca(m):
     rbit = (m.a & 0x80) == 1
-    m.a = (m.a << 1) & 0xFF | rbit
-    m.C = rbit
-
-def rrca(m):
-    rbit = (m.a & 0x01) == 1
-    m.a = (m.a << 1) & 0xFF | m.C
+    m.a = ((m.a << 1) & 0xFF) | rbit
     m.C = rbit
 
 def rla(m):
+    rbit = (m.a & 0x80) == 1
+    m.a = ((m.a << 1) & 0xFF) | m.C
+    m.C = rbit
+
+def rrca(m):
     rbit = m.a & 0x01
-    m.a = (m.a >> 1) | 0x80 if rbit else 0x00
+    m.a = (m.a >> 1) | (0x80 if rbit else 0)
     m.C = rbit
 
 def rra(m):
-    rbit = (m.a & 0x01) == 1
-    m.a = (m.a >> 1) | m.C
+    rbit = m.a & 0x01
+    m.a = (m.a >> 1) | (0x80 if m.C else 0)
     m.C = rbit
 
 ####################################################################
