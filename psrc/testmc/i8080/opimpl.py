@@ -144,6 +144,11 @@ def ld_rm(m, dst):      setattr(m, dst, m.mem[m.hl])
 def ld_ax(m):           m.a = m.mem[readword(m)]
 def ld_xa(m):           m.mem[readword(m)] = m.a
 
+def ld_aqbc(m):         m.a = m.byte(m.bc)
+def ld_aqde(m):         m.a = m.byte(m.de)
+def ld_qbca(m):         m.deposit(m.bc, m.a)
+def ld_qdea(m):         m.deposit(m.de, m.a)
+
 def ld_hlx(m):          m.hl = m.word(readword(m))
 def ld_xhl(m):          m.depword(readword(m), m.hl)
 

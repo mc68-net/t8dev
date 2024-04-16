@@ -57,20 +57,26 @@ def _addhl(reg):    return lambda m: add_hlrr(m, reg)
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
 #   See `Instructions` below for mnemonic naming.
+#
+#   Mnemonic suffixes:
+#   • [abcdehl]: data in register (or register pair if two letters)
+#   • m: (hl), memory from address in hl
+#   • p: (nnnn) immediate address ("pointer")
+#   • q: (rr) address in register pair
 
 OPCODES = {
 
     0x00: (None,    invalid),       0x10: (None,    invalid),
     0x01: ('LXIb',  lxib),          0x11: ('LXId',  lxid),
-    0x02: (None,    invalid),       0x12: (None,    invalid),
-    0x03: ('INXbc', _inx('bc')),     0x13: ('INXde',_inx('de')),
+    0x02: ('LDqbca', ld_qbca),      0x12: ('LDqdea',ld_qdea),
+    0x03: ('INXbc', _inx('bc')),    0x13: ('INXde',_inx('de')),
     0x04: ('INCb',  _incr('b')),    0x14: ('INCd',  _incr('d')),
     0x05: ('DECb',  _decr('b')),    0x15: ('DECd',  _decr('d')),
     0x06: ('LDbi',  _ldi('b')),     0x16: ('LDdi',  _ldi('d')),
     0x07: ('RLCA',   rlca),         0x17: ('RLA',    rla),
     0x08: (None,    invalid),       0x18: (None,    invalid),
     0x09: ('ADDhlbc',_addhl('bc')), 0x19: ('ADDhlde',_addhl('de')),
-    0x0A: (None,    invalid),       0x1A: (None,    invalid),
+    0x0A: ('LDaqbc', ld_aqbc),      0x1A: ('LDaqde', ld_aqde),
     0x0B: ('DCXbc', _dcx('bc')),    0x1B: ('DCXde', _dcx('de')),
     0x0C: ('INCc',  _incr('c')),    0x1C: ('INCe',  _incr('e')),
     0x0D: ('DECc',  _decr('c')),    0x1D: ('DECe',  _decr('e')),
