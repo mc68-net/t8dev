@@ -109,7 +109,7 @@ def pushword(m, word):
     pushbyte(m, word & 0xFF)
 
 def pushaf(m):          pushword(m, (m.a << 8) | m.f)
-def popaf(m):           m.f = popword(m); m.a = popword(m)
+def popaf(m):           m.f = popbyte(m); m.a = popbyte(m)
 def push(m, regs):      pushword(m, getattr(m, regs))
 def pop(m, regs):       setattr(m, regs, popword(m))
 
