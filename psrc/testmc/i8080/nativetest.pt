@@ -30,5 +30,10 @@ def test_8080pre(m):
     assert allok == m.pc
 
 def test_8080exer(m):
+    #   The exerciser performs the following BDOS ($0005) calls:
+    #   • c=2 e=char C_WRITE: write char to console
+    #   • c=9 e=addr C_WRITESTR: write '$'-terminated string to console
+    #   Currently these are just a RET.
     load_com(m, '8080EXER.COM')
-    m.stepto(stopat=[0x0DEE], trace=0)
+    m.deposit(0x0005, I.RET)
+    m.stepto(stopat=[0x0ADC], trace=0)
