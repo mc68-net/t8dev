@@ -139,6 +139,7 @@ def ret_nf(m, flag):    ret(m, not getattr(m, flag))
 def ld_rr(m, dst, src): setattr(m, dst, getattr(m, src))
 def ld_ri(m, dst):      setattr(m, dst, readbyte(m))
 def ld_mr(m, src):      m.mem[m.hl] = getattr(m, src)
+def ld_mi(m):           m.deposit(m.hl, readbyte(m))
 def ld_rm(m, dst):      setattr(m, dst, m.mem[m.hl])
 def ld_ax(m):           m.a = m.mem[readword(m)]
 def ld_xa(m):           m.mem[readword(m)] = m.a
@@ -153,6 +154,7 @@ def lxih(m):            m.hl = readword(m)
 def lxis(m):            m.sp = readword(m)
 
 def ld_sphl(m):         m.sp = m.hl
+def ex_dehl(m):         tmp = m.de; m.de = m.hl; m.hl = tmp
 
 ####################################################################
 #   Logic Instructions
@@ -288,3 +290,11 @@ def sbc_i(m):       m.a = sub(m, m.a, readbyte(m),      m.C)
 def cmp_r(m, reg):        sub(m, m.a, getattr(m, reg))
 def cmp_m(m):             sub(m, m.a, m.mem[m.hl])
 def cmp_i(m):             sub(m, m.a, readbyte(m))
+
+def add_hlrr(m, reg):
+    sum = m.hl + getattr(m, reg)
+    #   8080 affects only carry flag
+    #   XXX Z80 affects carry and half-carry, and also resets N!
+    if sum > 0xFFFF:    m.C = 1
+    else:               m.C = 0
+    m.hl = sum & 0xFFFF

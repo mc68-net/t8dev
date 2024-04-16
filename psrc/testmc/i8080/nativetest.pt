@@ -36,4 +36,4 @@ def test_8080exer(m):
     #   Currently these are just a RET.
     load_com(m, '8080EXER.COM')
     m.deposit(0x0005, I.RET)
-    m.stepto(stopat=[0x0ADC], trace=0)
+    m.stepto(stopat=[0x0C3F], trace=0)

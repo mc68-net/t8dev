@@ -46,11 +46,13 @@ def _incr(reg):     return lambda m: inc_r(m, reg)
 def _decr(reg):     return lambda m: dec_r(m, reg)
 def _inx(reg):      return lambda m: inx_r(m, reg)
 def _dcx(reg):      return lambda m: dcx_r(m, reg)
+
 def _add(reg):      return lambda m: add_r(m, reg)
 def _adc(reg):      return lambda m: adc_r(m, reg)
 def _sub(reg):      return lambda m: sub_r(m, reg)
 def _sbc(reg):      return lambda m: sbc_r(m, reg)
 def _cmp(reg):      return lambda m: cmp_r(m, reg)
+def _addhl(reg):    return lambda m: add_hlrr(m, reg)
 
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
@@ -67,7 +69,7 @@ OPCODES = {
     0x06: ('LDbi',  _ldi('b')),     0x16: ('LDdi',  _ldi('d')),
     0x07: ('RLCA',   rlca),         0x17: ('RLA',    rla),
     0x08: (None,    invalid),       0x18: (None,    invalid),
-    0x09: (None,    invalid),       0x19: (None,    invalid),
+    0x09: ('ADDhlbc',_addhl('bc')), 0x19: ('ADDhlde',_addhl('de')),
     0x0A: (None,    invalid),       0x1A: (None,    invalid),
     0x0B: ('DCXbc', _dcx('bc')),    0x1B: ('DCXde', _dcx('de')),
     0x0C: ('INCc',  _incr('c')),    0x1C: ('INCe',  _incr('e')),
@@ -81,10 +83,10 @@ OPCODES = {
     0x23: ('INXhl', _inx('hl')),    0x33: ('INXsp', _inx('sp')),
     0x24: ('INCh',  _incr('h')),    0x34: ('INCm',   inc_m),
     0x25: ('DECh',  _decr('h')),    0x35: ('DECm',   dec_m),
-    0x26: ('LDhi',  _ldi('h')),     0x36: ('LDmi',  invalid),
+    0x26: ('LDhi',  _ldi('h')),     0x36: ('LDmi',   ld_mi),
     0x27: (None,    invalid),       0x37: (None,    invalid),
     0x28: (None,    invalid),       0x38: (None,    invalid),
-    0x29: (None,    invalid),       0x39: (None,    invalid),
+    0x29: ('ADDhlhl',_addhl('hl')), 0x39: ('ADDhlsp',_addhl('sp')),
     0x2A: ('LDxhl',  ld_xhl),       0x3A: ('LDax',  ld_ax),
     0x2B: ('DCXhl', _dcx('hl')),    0x2B: ('DCXsp', _dcx('sp')),
     0x2C: ('INCl',  _incr('l')),    0x3C: ('INCa',  _incr('a')),
@@ -188,7 +190,7 @@ OPCODES = {
     0xE8: ('RETp',  _retnf('S')),   0xF8: ('RETm',  _retf('S')),
     0xE9: ('JPhl',   jp_hl),        0xF9: ('LDsphl', ld_sphl),
     0xEA: ('JPpe',  _jpf('P')),     0xFA: ('JPn',   _jpf('S')),
-    0xEB: (None,    invalid),       0xFB: (None,    invalid),
+    0xEB: ('EX_dehl',ex_dehl),      0xFB: (None,    invalid),
     0xEC: ('CALLpe',_callf('P')),   0xFC: ('CALLn', _callf('S')),
     0xED: (None,    invalid),       0xFD: (None,    invalid),
     0xEE: ('XORi',   xor_i),        0xFE: ('CMPi',   cmp_i),
