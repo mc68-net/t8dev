@@ -211,8 +211,19 @@ def rra(m):
 ####################################################################
 #   Increment/Decrement and Arithemetic
 
-def inx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg),  1))
-def dcx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg), -1))
+def affectSZHP(m, val):
+    ' Set flags for result of byte-wide increment/decrement instruction. '
+    logicSZP(m, val)
+    m.H = 0 # XXX this is wrong!
+    return val
+
+def inc_r(m, reg):  setattr(m, reg, affectSZHP(m, incbyte(getattr(m, reg), 1)))
+def dec_r(m, reg):  setattr(m, reg, affectSZHP(m, incbyte(getattr(m, reg), -1)))
+def inc_m(m):       m.mem[m.hl] = affectSZHP(m, incbyte(m.mem[m.hl], 1))
+def dec_m(m):       m.mem[m.hl] = affectSZHP(m, incbyte(m.mem[m.hl], -1))
+
+def inx_r(m, reg):  setattr(m, reg, incword(getattr(m, reg),  1))
+def dcx_r(m, reg):  setattr(m, reg, incword(getattr(m, reg), -1))
 
 def add(m, augend, addend, carry=0):
     ''' Return the modular 8-bit sum of adding `augend` (the accumulator),

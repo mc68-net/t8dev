@@ -42,6 +42,8 @@ def _and(reg):      return lambda m: and_r(m, reg)
 def _or(reg):       return lambda m: or_r(m, reg)
 def _xor(reg):      return lambda m: xor_r(m, reg)
 
+def _incr(reg):     return lambda m: inc_r(m, reg)
+def _decr(reg):     return lambda m: dec_r(m, reg)
 def _inx(reg):      return lambda m: inx_r(m, reg)
 def _dcx(reg):      return lambda m: dcx_r(m, reg)
 def _add(reg):      return lambda m: add_r(m, reg)
@@ -59,17 +61,17 @@ OPCODES = {
     0x00: (None,    invalid),       0x10: (None,    invalid),
     0x01: ('LXIb',  lxib),          0x11: ('LXId',  lxid),
     0x02: (None,    invalid),       0x12: (None,    invalid),
-    0x03: ('INXbc', _inx('bc')),     0x13: ('INXde', _inx('de')),
-    0x04: (None,    invalid),       0x14: (None,    invalid),
-    0x05: (None,    invalid),       0x15: (None,    invalid),
+    0x03: ('INXbc', _inx('bc')),     0x13: ('INXde',_inx('de')),
+    0x04: ('INCb',  _incr('b')),    0x14: ('INCd',  _incr('d')),
+    0x05: ('DECb',  _decr('b')),    0x15: ('DECd',  _decr('d')),
     0x06: ('LDbi',  _ldi('b')),     0x16: ('LDdi',  _ldi('d')),
     0x07: ('RLCA',   rlca),         0x17: ('RLA',    rla),
     0x08: (None,    invalid),       0x18: (None,    invalid),
     0x09: (None,    invalid),       0x19: (None,    invalid),
     0x0A: (None,    invalid),       0x1A: (None,    invalid),
     0x0B: ('DCXbc', _dcx('bc')),    0x1B: ('DCXde', _dcx('de')),
-    0x0C: (None,    invalid),       0x1C: (None,    invalid),
-    0x0D: (None,    invalid),       0x1D: (None,    invalid),
+    0x0C: ('INCc',  _incr('c')),    0x1C: ('INCe',  _incr('e')),
+    0x0D: ('DECc',  _decr('c')),    0x1D: ('DECe',  _decr('e')),
     0x0E: ('LDci',  _ldi('c')),     0x1E: ('LDei',  _ldi('e')),
     0x0F: ('RRCA',   rrca),         0x1F: ('RRA',    rra),
 
@@ -77,16 +79,16 @@ OPCODES = {
     0x21: ('LXIh',  lxih),          0x31: ('LXIs',  lxis),
     0x22: (None,    invalid),       0x32: ('STA',   ld_xa),
     0x23: ('INXhl', _inx('hl')),    0x33: ('INXsp', _inx('sp')),
-    0x24: (None,    invalid),       0x34: (None,    invalid),
-    0x25: (None,    invalid),       0x35: (None,    invalid),
+    0x24: ('INCh',  _incr('h')),    0x34: ('INCm',   inc_m),
+    0x25: ('DECh',  _decr('h')),    0x35: ('DECm',   dec_m),
     0x26: ('LDhi',  _ldi('h')),     0x36: ('LDmi',  invalid),
     0x27: (None,    invalid),       0x37: (None,    invalid),
     0x28: (None,    invalid),       0x38: (None,    invalid),
     0x29: (None,    invalid),       0x39: (None,    invalid),
     0x2A: (None,    invalid),       0x3A: ('LDax',  ld_ax),
     0x2B: ('DCXhl', _dcx('hl')),    0x2B: ('DCXsp', _dcx('sp')),
-    0x2C: (None,    invalid),       0x3C: (None,    invalid),
-    0x2D: (None,    invalid),       0x3D: (None,    invalid),
+    0x2C: ('INCl',  _incr('l')),    0x3C: ('INCa',  _incr('a')),
+    0x2D: ('DECl',  _decr('l')),    0x3D: ('DECa',  _decr('a')),
     0x2E: ('LDli',  _ldi('l')),     0x3E: ('LDai',  _ldi('a')),
     0x2F: (None,    invalid),       0x3F: (None,    invalid),
 
