@@ -80,7 +80,9 @@ def jp(m, take=True):
     if take: m.pc = target
 
 def jp_f(m, flag):      jp(m,     getattr(m, flag))
-def jp_nf(m, flag):     jp(m, not getattr(m, flag)) 
+def jp_nf(m, flag):     jp(m, not getattr(m, flag))
+
+def jp_hl(m):           m.pc = m.hl
 
 ####################################################################
 #   Instructions affecting the stack
