@@ -1,9 +1,12 @@
+from    collections.abc  import Sequence
+from    random  import  randrange
+import  pytest
+
 from    testmc.i8080.opcodes   import Instructions as I
 from    testmc.i8080.opcodes   import *
 from    testmc.i8080.opimpl    import *
 from    testmc.i8080           import Machine
 from    testmc                 import LB, MB, tmc_tid
-import  pytest
 
 R = Machine.Registers
 
@@ -67,45 +70,49 @@ def test_parity(even, val):
 #   do cover the core functionality, particularly routines that are
 #   parametrized by register and the like.
 
+def mop(ops, regs=R(), step=True):
+    ''' Create a `Machine`, insert `ops` (an int or sequence of ints) into
+        memory and set the PC to point to it, set the Machine's registers
+        to `regs`, execute the opcode, and return the Machine.
+    '''
+    m = Machine()
+    addr = randrange(0x03, 0x2FF)
+    m.pc = addr
+    if not isinstance(ops, Sequence):  ops = [ops]
+    m.mem[addr:addr+len(ops)] = ops
+    m.setregs(regs)
+    print(f'{m.hexdump(addr, 4)}   {m.regs}')
+    if step: m._step()
+    return m
+
+def test_mexec():
+    m = mop([0x40, 0x41], step=False)
+    assert b'\x40\x41' == m.mem[m.pc:m.pc+2]
+
+    m = mop(0x7F); assert 0x7F == m.mem[m.pc-1]
+
 @pytest.mark.parametrize('opcode, outregs', [
     (I.MOVba, R(a=0x40, bc=0x4052, de=0x6162)),
     (I.MOVca, R(a=0x40, bc=0x5140, de=0x6162)),
     (I.MOVda, R(a=0x40, bc=0x5152, de=0x4062)),
 ])
 def test_mov(opcode, outregs):
-    m = Machine()
-    m.setregs(R(a=0x40, bc=0x5152, de=0x6162))
-    m.mem[8] = opcode; m.pc = 8; m._step()
-    assert outregs == m.regs
+    assert outregs == mop(opcode, R(a=0x40, bc=0x5152, de=0x6162)).regs
 
 @pytest.mark.parametrize('opcode, val, dest', [
     (I.MOVmb, 0x51, 0x1234),
     (I.MOVmc, 0x52, 0xFFFE),
 ])
 def test_movm(opcode, val, dest):
-    m = Machine()
-    m.setregs(R( bc=0x5152, hl=dest))
-    m.mem[9] = opcode; m.pc = 9; m._step()
-    assert val == m.byte(dest)
+    assert val == mop(opcode, R(bc=0x5152, hl=dest)).byte(dest)
 
 def test_inx():
-    m = Machine()
-
-    m.setregs(R(bc=0x5152))
-    m.mem[9] = 0x03; m.pc = 9; m._step()
-    assert R(bc=0x5153) == m.regs
-
-    m.setregs(R(hl=0xFFFF))
-    m.mem[9] = 0x23; m.pc = 9; m._step()
-    assert R(hl=0x0000) == m.regs
+    assert R(bc=0x5153) == mop(I.INXbc, R(bc=0x5152)).regs
+    assert R(hl=0x0000) == mop(I.INXhl, R(hl=0xFFFF)).regs
 
 def test_lxi():
-    m = Machine()
-    m.setregs(R(a=0x40, bc=0x5152, de=0x6162))
-    m.pc = 8; m.mem[8] = I.LXIb
-    m.mem[9] = 0xEF; m.mem[0xA] = 0xCD
-    m._step()
-    assert R(bc=0xCDEF) == m.regs
+    assert R(bc=0xCDEF) \
+        == mop([I.LXIb, 0xEF, 0xCD], R(a=0x40, bc=0x5152, de=0x6162)).regs
 
 @pytest.mark.parametrize('a, b, r', [
     (0x00, 0x00, R(a=0x00, S=0, Z=1, H=0, P=1, C=0)),
@@ -113,7 +120,4 @@ def test_lxi():
     (0xFF, 0x02, R(a=0x01, S=0, Z=0, H=1, P=0, C=1)),
 ])
 def test_add(a, b, r):
-    m = Machine()
-    m.setregs(R(a=a, b=b))
-    m.pc = 22; m.mem[22] = I.ADDb; m._step()
-    assert r == m.regs
+    assert r == mop(I.ADDb, R(a=a, b=b)).regs
