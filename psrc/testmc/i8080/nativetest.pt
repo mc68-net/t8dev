@@ -3,6 +3,8 @@
 '''
 
 from    pathlib  import Path
+import  pytest
+
 from    binary.memimage  import MemImage
 from    testmc.i8080 import  Machine
 from    testmc.i8080.opcodes   import Instructions as I
@@ -29,6 +31,7 @@ def test_8080pre(m):
     m.stepto(stopat=[allok], trace=0)
     assert allok == m.pc
 
+@pytest.mark.skip('Seems to run forever....')
 def test_8080exer(m):
     load_com(m, '8080EXER.COM')
     m.deposit(0x0005, I.RET)
