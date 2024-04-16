@@ -70,6 +70,20 @@ def readindex(m):
     return incword(m.x, readbyte(m))
 
 ####################################################################
+#   Jumps
+
+def jp(m, take=True):
+    ''' Read an absolute jump instruction and its operand, but do not
+        actually take the jump unless `take` is `True`.
+    '''
+    target = readword(m)
+    if take: m.pc = target
+
+def  jp_f(m, flag):     jp(m,     getattr(m, flag))
+def jp_nf(m, flag):     jp(m, not getattr(m, flag)) 
+
+
+####################################################################
 #   Instructions affecting the stack
 
 def popbyte(m):

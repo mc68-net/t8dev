@@ -41,6 +41,9 @@ def _and(reg):      return lambda m: and_r(m, reg)
 def _or(reg):       return lambda m: or_r(m, reg)
 def _xor(reg):      return lambda m: xor_r(m, reg)
 
+def _jpf(flag):     return lambda m: jp_f(m, flag)
+def _jpnf(flag):    return lambda m: jp_nf(m, flag)
+
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
 #   See `Instructions` below for mnemonic naming.
@@ -151,15 +154,15 @@ OPCODES = {
 
     0xC0: (None,    invalid),       0xD0: (None,    invalid),
     0xC1: (None,    invalid),       0xD1: (None,    invalid),
-    0xC2: (None,    invalid),       0xD2: (None,    invalid),
-    0xC3: (None,    invalid),       0xD3: (None,    invalid),
+    0xC2: ('JPnz',  _jpnf('Z')),    0xD2: ('JPnc',  _jpnf('C')),
+    0xC3: ('JP',     jp),           0xD3: (None,    invalid),
     0xC4: (None,    invalid),       0xD4: (None,    invalid),
     0xC5: (None,    invalid),       0xD5: (None,    invalid),
     0xC6: ('ADDi',   add_i),        0xD6: ('SUBi',   sub_i),
     0xC7: (None,    invalid),       0xD7: (None,    invalid),
     0xC8: (None,    invalid),       0xD8: (None,    invalid),
     0xC9: ('RET',   ret),           0xD9: (None,    invalid),
-    0xCA: (None,    invalid),       0xDA: (None,    invalid),
+    0xCA: ('JPz',   _jpf('Z')),     0xDA: ('JPc',   _jpf('C')),
     0xCB: (None,    invalid),       0xDB: (None,    invalid),
     0xCC: (None,    invalid),       0xDC: (None,    invalid),
     0xCD: (None,    invalid),       0xDD: (None,    invalid),
@@ -168,7 +171,7 @@ OPCODES = {
 
     0xE0: (None,    invalid),       0xF0: (None,    invalid),
     0xE1: (None,    invalid),       0xF1: (None,    invalid),
-    0xE2: (None,    invalid),       0xF2: (None,    invalid),
+    0xE2: ('JPpo',  _jpnf('P')),    0xF2: ('JPp',   _jpnf('S')),
     0xE3: (None,    invalid),       0xF3: (None,    invalid),
     0xE4: (None,    invalid),       0xF4: (None,    invalid),
     0xE5: (None,    invalid),       0xF5: (None,    invalid),
@@ -176,7 +179,7 @@ OPCODES = {
     0xE7: (None,    invalid),       0xF7: (None,    invalid),
     0xE8: (None,    invalid),       0xF8: (None,    invalid),
     0xE9: (None,    invalid),       0xF9: (None,    invalid),
-    0xEA: (None,    invalid),       0xFA: (None,    invalid),
+    0xEA: ('JPpe',  _jpf('P')),     0xFA: ('JPn',   _jpf('S')),
     0xEB: (None,    invalid),       0xFB: (None,    invalid),
     0xEC: (None,    invalid),       0xFC: (None,    invalid),
     0xED: (None,    invalid),       0xFD: (None,    invalid),

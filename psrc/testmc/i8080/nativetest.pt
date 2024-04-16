@@ -5,6 +5,7 @@
 from    pathlib  import Path
 from    binary.memimage  import MemImage
 from    testmc.i8080 import  Machine
+from    testmc.i8080.opcodes   import Instructions as I
 
 TESTDATA_DIR = Path(__file__).parent
 TPA_ADDR = 0x100
@@ -21,5 +22,8 @@ def load_com(m, filename):
 
 def test_8080pre(m, R):
     load_com(m, '8080PRE.COM')
-    m.stepto(stopat=[0x102])
+    #   The first few tests jump to $0000 on failure, so we set that
+    #   to an instruction that will abort the simulator.
+    m.deposit(0, I.HLT)
+    m.stepto(stopat=[0x111], trace=0)
     assert R(a=1) == m.regs
