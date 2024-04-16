@@ -109,9 +109,9 @@ def pushword(m, word):
     pushbyte(m, word & 0xFF)
 
 def pushaf(m):          pushword(m, (m.a << 8) | m.f)
-def popaf(m):           popword( m, (m.a << 8) | m.f)
+def popaf(m):           m.f = popword(m); m.a = popword(m)
 def push(m, regs):      pushword(m, getattr(m, regs))
-def pop(m, regs):       popword( m, getattr(m, regs))
+def pop(m, regs):       setattr(m, regs, popword(m))
 
 def call(m, take=True):
     ''' Read an absolute call instruction and its operand, but do not

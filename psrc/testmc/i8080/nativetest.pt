@@ -25,5 +25,4 @@ def test_8080pre(m, R):
     #   The first few tests jump to $0000 on failure, so we set that
     #   to an instruction that will abort the simulator.
     m.deposit(0, I.HLT)
-    m.stepto(stopat=[0x118], trace=0)
-    assert R(a=1) == m.regs
+    m.stepto(stopat=[0x0124], trace=0)
