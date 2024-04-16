@@ -134,11 +134,12 @@ def ld_rr(m, dst, src): setattr(m, dst, getattr(m, src))
 def ld_ri(m, dst):      setattr(m, dst, readbyte(m))
 def ld_mr(m, src):      m.mem[m.hl] = getattr(m, src)
 def ld_rm(m, dst):      setattr(m, dst, m.mem[m.hl])
+def ld_ax(m):           m.a = m.mem[readword(m)]
+def ld_xa(m):           m.mem[readword(m)] = m.a
 
 ####################################################################
 #   16-bit Instructions and Operands
 
-def sta(m):             m.mem[readword(m)] = m.a
 
 def inx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg),  1))
 def dcx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg), -1))

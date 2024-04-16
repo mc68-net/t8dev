@@ -74,7 +74,7 @@ OPCODES = {
 
     0x20: (None,    invalid),       0x30: (None,    invalid),
     0x21: ('LXIh',  lxih),          0x31: ('LXIs',  lxis),
-    0x22: (None,    invalid),       0x32: ('STA',   sta),
+    0x22: (None,    invalid),       0x32: ('STA',   ld_xa),
     0x23: ('INXhl', _inx('hl')),    0x33: ('INXsp', _inx('sp')),
     0x24: (None,    invalid),       0x34: (None,    invalid),
     0x25: (None,    invalid),       0x35: (None,    invalid),
@@ -82,7 +82,7 @@ OPCODES = {
     0x27: (None,    invalid),       0x37: (None,    invalid),
     0x28: (None,    invalid),       0x38: (None,    invalid),
     0x29: (None,    invalid),       0x39: (None,    invalid),
-    0x2A: (None,    invalid),       0x3A: (None,    invalid),
+    0x2A: (None,    invalid),       0x3A: ('LDax',  ld_ax),
     0x2B: ('DCXhl', _dcx('hl')),    0x2B: ('DCXsp', _dcx('sp')),
     0x2C: (None,    invalid),       0x3C: (None,    invalid),
     0x2D: (None,    invalid),       0x3D: (None,    invalid),
