@@ -108,6 +108,18 @@ def pushword(m, word):
     pushbyte(m, word >> 8)
     pushbyte(m, word & 0xFF)
 
+def call(m, take=True):
+    ''' Read an absolute call instruction and its operand, but do not
+        actually execute the call unless `take` is `True`.
+    '''
+    target = readword(m)
+    if take:
+        pushword(m, m.pc)
+        m.pc = target
+
+def  call_f(m, flag):   call(m,     getattr(m, flag))
+def call_nf(m, flag):   call(m, not getattr(m, flag)) 
+
 def ret(m):     m.pc = popword(m)
 
 ####################################################################

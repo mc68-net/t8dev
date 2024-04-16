@@ -43,6 +43,8 @@ def _xor(reg):      return lambda m: xor_r(m, reg)
 
 def _jpf(flag):     return lambda m: jp_f(m, flag)
 def _jpnf(flag):    return lambda m: jp_nf(m, flag)
+def _callf(flag):   return lambda m: call_f(m, flag)
+def _callnf(flag):  return lambda m: call_nf(m, flag)
 
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
@@ -156,7 +158,7 @@ OPCODES = {
     0xC1: (None,    invalid),       0xD1: (None,    invalid),
     0xC2: ('JPnz',  _jpnf('Z')),    0xD2: ('JPnc',  _jpnf('C')),
     0xC3: ('JP',     jp),           0xD3: (None,    invalid),
-    0xC4: (None,    invalid),       0xD4: (None,    invalid),
+    0xC4: ('CALLnz',_callnf('Z')),  0xD4: ('CALLnc', _callnf('C')),
     0xC5: (None,    invalid),       0xD5: (None,    invalid),
     0xC6: ('ADDi',   add_i),        0xD6: ('SUBi',   sub_i),
     0xC7: (None,    invalid),       0xD7: (None,    invalid),
@@ -164,8 +166,8 @@ OPCODES = {
     0xC9: ('RET',   ret),           0xD9: (None,    invalid),
     0xCA: ('JPz',   _jpf('Z')),     0xDA: ('JPc',   _jpf('C')),
     0xCB: (None,    invalid),       0xDB: (None,    invalid),
-    0xCC: (None,    invalid),       0xDC: (None,    invalid),
-    0xCD: (None,    invalid),       0xDD: (None,    invalid),
+    0xCC: ('CALLz', _callf('Z')),   0xDC: ('CALLc', _callf('C')),
+    0xCD: ('CALL',   call),         0xDD: (None,    invalid),
     0xCE: ('ADCi',   adc_i),        0xDE: ('SBCi',   sbc_i),
     0xCF: (None,    invalid),       0xDF: (None,    invalid),
 
@@ -173,7 +175,7 @@ OPCODES = {
     0xE1: (None,    invalid),       0xF1: (None,    invalid),
     0xE2: ('JPpo',  _jpnf('P')),    0xF2: ('JPp',   _jpnf('S')),
     0xE3: (None,    invalid),       0xF3: (None,    invalid),
-    0xE4: (None,    invalid),       0xF4: (None,    invalid),
+    0xE4: ('CALLpo',_callnf('P')),  0xF4: ('CALLp', _callnf('S')),
     0xE5: (None,    invalid),       0xF5: (None,    invalid),
     0xE6: ('ANDi',   and_i),        0xF6: ('ORi',    or_i),
     0xE7: (None,    invalid),       0xF7: (None,    invalid),
@@ -181,7 +183,7 @@ OPCODES = {
     0xE9: (None,    invalid),       0xF9: (None,    invalid),
     0xEA: ('JPpe',  _jpf('P')),     0xFA: ('JPn',   _jpf('S')),
     0xEB: (None,    invalid),       0xFB: (None,    invalid),
-    0xEC: (None,    invalid),       0xFC: (None,    invalid),
+    0xEC: ('CALLpe',_callf('P')),   0xFC: ('CALLn', _callf('S')),
     0xED: (None,    invalid),       0xFD: (None,    invalid),
     0xEE: ('XORi',   xor_i),        0xFE: ('CMPi',   cmp_i),
     0xEF: (None,    invalid),       0xFF: (None,    invalid),
