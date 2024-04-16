@@ -134,7 +134,7 @@ def ret_f(m, flag):     ret(m,     getattr(m, flag))
 def ret_nf(m, flag):    ret(m, not getattr(m, flag)) 
 
 ####################################################################
-#   8-bit Register Move Instructions
+#   Register Moves
 
 def ld_rr(m, dst, src): setattr(m, dst, getattr(m, src))
 def ld_ri(m, dst):      setattr(m, dst, readbyte(m))
@@ -142,13 +142,6 @@ def ld_mr(m, src):      m.mem[m.hl] = getattr(m, src)
 def ld_rm(m, dst):      setattr(m, dst, m.mem[m.hl])
 def ld_ax(m):           m.a = m.mem[readword(m)]
 def ld_xa(m):           m.mem[readword(m)] = m.a
-
-####################################################################
-#   16-bit Instructions and Operands
-
-
-def inx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg),  1))
-def dcx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg), -1))
 
 def lxib(m):            m.bc = readword(m)
 def lxid(m):            m.de = readword(m)
@@ -216,7 +209,10 @@ def rra(m):
     m.C = rbit
 
 ####################################################################
-#   Arithemetic Instructions
+#   Increment/Decrement and Arithemetic
+
+def inx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg),  1))
+def dcx_r(m, reg):      setattr(m, reg, incword(getattr(m, reg), -1))
 
 def add(m, augend, addend, carry=0):
     ''' Return the modular 8-bit sum of adding `augend` (the accumulator),

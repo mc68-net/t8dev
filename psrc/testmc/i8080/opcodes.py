@@ -23,33 +23,32 @@ __all__ = ( 'OPCODES', 'Instructions', 'InvalidOpcode' )
 #   with the functions from `opimpl` that actually do the work.
 
 
-def _ldi(dst):      return lambda m: ld_ri(m, dst)
-def _ld(dst_src):   return lambda m: ld_rr(m, *dst_src.split(','))
-def _ldmr(src):     return lambda m: ld_mr(m, src)
-def _ldrm(dest):    return lambda m: ld_rm(m, dest)
-
-def _inx(reg):      return lambda m: inx_r(m, reg)
-def _dcx(reg):      return lambda m: dcx_r(m, reg)
-
-def _add(reg):      return lambda m: add_r(m, reg)
-def _adc(reg):      return lambda m: adc_r(m, reg)
-def _sub(reg):      return lambda m: sub_r(m, reg)
-def _sbc(reg):      return lambda m: sbc_r(m, reg)
-def _cmp(reg):      return lambda m: cmp_r(m, reg)
-
-def _and(reg):      return lambda m: and_r(m, reg)
-def _or(reg):       return lambda m: or_r(m, reg)
-def _xor(reg):      return lambda m: xor_r(m, reg)
-
 def _jpf(flag):     return lambda m: jp_f(m, flag)
 def _jpnf(flag):    return lambda m: jp_nf(m, flag)
+
+def _push(regs):    return lambda m: push(m, regs)
+def  _pop(regs):    return lambda m:  pop(m, regs)
 def _callf(flag):   return lambda m: call_f(m, flag)
 def _callnf(flag):  return lambda m: call_nf(m, flag)
 def _retf(flag):    return lambda m: ret_f(m, flag)
 def _retnf(flag):   return lambda m: ret_nf(m, flag)
 
-def _push(regs):    return lambda m: push(m, regs)
-def  _pop(regs):    return lambda m:  pop(m, regs)
+def _ldi(dst):      return lambda m: ld_ri(m, dst)
+def _ld(dst_src):   return lambda m: ld_rr(m, *dst_src.split(','))
+def _ldmr(src):     return lambda m: ld_mr(m, src)
+def _ldrm(dest):    return lambda m: ld_rm(m, dest)
+
+def _and(reg):      return lambda m: and_r(m, reg)
+def _or(reg):       return lambda m: or_r(m, reg)
+def _xor(reg):      return lambda m: xor_r(m, reg)
+
+def _inx(reg):      return lambda m: inx_r(m, reg)
+def _dcx(reg):      return lambda m: dcx_r(m, reg)
+def _add(reg):      return lambda m: add_r(m, reg)
+def _adc(reg):      return lambda m: adc_r(m, reg)
+def _sub(reg):      return lambda m: sub_r(m, reg)
+def _sbc(reg):      return lambda m: sbc_r(m, reg)
+def _cmp(reg):      return lambda m: cmp_r(m, reg)
 
 ####################################################################
 #   Map opcodes to opcode mnemonics and implementations.
