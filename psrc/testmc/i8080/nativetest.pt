@@ -42,8 +42,9 @@ def test_8080exer(m):
 def test_microcosm_diag(m):
     load_com(m, 'programs/TEST.COM')
     while True:
-        m.stepto(stopat=[0x0000, 0x0005, 0x0106], trace=0)
+        m.stepto(stopat=[0x0000, 0x0005], trace=0)
         if not cpm_bdos(m): break
+    assert 0, 'need to check output for pass fail indication'
 
 def cpm_bdos(m, file='/dev/null'):
     ''' Emulate, within the test framework, a CPM BDOS call.

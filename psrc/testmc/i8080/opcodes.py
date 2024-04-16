@@ -188,7 +188,7 @@ OPCODES = {
     0xE0: ('RETpo', _retnf('P')),   0xF0: ('RETp',  _retnf('S')),
     0xE1: ('POPhl', _pop('hl')),    0xF1: ('POPaf',  popaf),
     0xE2: ('JPpo',  _jpnf('P')),    0xF2: ('JPp',   _jpnf('S')),
-    0xE3: (None,    invalid),       0xF3: (None,    invalid),
+    0xE3: ('EXsthl', ex_sthl),      0xF3: (None,    invalid),
     0xE4: ('CALLpo',_callnf('P')),  0xF4: ('CALLp', _callnf('S')),
     0xE5: ('PUSHhl',_push('hl')),   0xF5: ('PUSHaf', pushaf),
     0xE6: ('ANDi',   and_i),        0xF6: ('ORi',    or_i),

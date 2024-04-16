@@ -133,6 +133,8 @@ def ret(m, take=True):
 def ret_f(m, flag):     ret(m,     getattr(m, flag))
 def ret_nf(m, flag):    ret(m, not getattr(m, flag)) 
 
+def ex_sthl(m):         tmp = m.word(m.sp); m.depword(m.sp, m.hl); m.hl = tmp
+
 ####################################################################
 #   Register Moves (Load/Store)
 
