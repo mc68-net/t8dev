@@ -121,3 +121,20 @@ def test_lxi():
 ])
 def test_add(a, b, r):
     assert r == mop(I.ADDb, R(a=a, b=b)).regs
+
+@pytest.mark.parametrize('op, regs, taken', [
+    (I.JP,   R(),    True ),
+    (I.JPz,  R(Z=0), False), (I.JPz,  R(Z=1), True ),
+    (I.JPnz, R(Z=0), True ), (I.JPnz, R(Z=1), False),
+    (I.JPp,  R(S=1), False), (I.JPp,  R(S=0), True ),
+    (I.JPn,  R(S=1), True ), (I.JPn,  R(S=0), False),
+    (I.JPc,  R(C=0), False), (I.JPc,  R(C=1), True ),
+    (I.JPnc, R(C=0), True ), (I.JPnc, R(C=1), False),
+    (I.JPpo, R(P=1), False), (I.JPpo, R(P=0), True ),
+    (I.JPpe, R(P=1), True ), (I.JPpe, R(P=0), False),
+])
+def test_jp(op, regs, taken):
+    print(f'op=${op:02X} regs={regs} taken={taken}')
+    m = mop([op, 0x01, 0x04], regs)
+    if taken:   assert 0x0401 == m.pc
+    else:       assert 0x0401 != m.pc
