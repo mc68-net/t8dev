@@ -108,8 +108,8 @@ def pushword(m, word):
     pushbyte(m, word >> 8)
     pushbyte(m, word & 0xFF)
 
-def pushaf(m):          pushword(m, (m.a << 8) | m.f)
-def popaf(m):           m.f = popbyte(m); m.a = popbyte(m)
+def pushaf(m):          pushbyte(m, m.a); pushbyte(m, m.regs.f)
+def popaf(m):           m.setregs(m.Registers(f=popbyte(m))); m.a = popbyte(m)
 def push(m, regs):      pushword(m, getattr(m, regs))
 def pop(m, regs):       setattr(m, regs, popword(m))
 
@@ -188,6 +188,26 @@ def  or_i(m):       m.a = logicSZP(m, m.a | readbyte(m))
 def xor_r(m, reg):  m.a = logicSZP(m, m.a ^ getattr(m, reg))
 def xor_m(m):       m.a = logicSZP(m, m.a ^ m.mem[m.hl])
 def xor_i(m):       m.a = logicSZP(m, m.a ^ readbyte(m))
+
+def rlca(m):
+    rbit = (m.a & 0x80) == 1
+    m.a = (m.a << 1) & 0xFF | rbit
+    m.C = rbit
+
+def rrca(m):
+    rbit = (m.a & 0x01) == 1
+    m.a = (m.a << 1) & 0xFF | m.C
+    m.C = rbit
+
+def rla(m):
+    rbit = m.a & 0x01
+    m.a = (m.a >> 1) | 0x80 if rbit else 0x00
+    m.C = rbit
+
+def rra(m):
+    rbit = (m.a & 0x01) == 1
+    m.a = (m.a >> 1) | m.C
+    m.C = rbit
 
 ####################################################################
 #   Arithemetic Instructions

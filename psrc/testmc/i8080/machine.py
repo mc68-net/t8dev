@@ -31,7 +31,7 @@ class Machine(GenericMachine):
            #AliasNarrow('c', 'bc', 0, 0xFF),
            #AliasCombine('d', ['a','b']),   # 6809 D register
         srbits    = ( Flag('S'), Flag('Z'), Bit(0), Flag('H'),
-                      Bit(0), Flag('P'), Bit(0), Flag('C') )
+                      Bit(0), Flag('P'), Bit(1), Flag('C') )
         srname    = 'f'     # Flags Register
 
     _RTS_opcodes    = set([I.RET]) # XXX add conditional RETs
@@ -49,12 +49,12 @@ class Machine(GenericMachine):
 
     def _step(self):
         opcode = readbyte(self)
-        _, f = OPCODES.get(opcode, (None, None))
-        if not f:
+        _, fn = OPCODES.get(opcode, (None, None))
+        if not fn:
             raise self.NotImplementedError(
                 'opcode=${:02X} pc=${:04X}'
                 .format(opcode, incword(self.pc, -1)))
-        f(self)
+        fn(self)
 
     def pushretaddr(self, word):
         self.sp -= 2

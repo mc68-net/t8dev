@@ -62,7 +62,7 @@ OPCODES = {
     0x04: (None,    invalid),       0x14: (None,    invalid),
     0x05: (None,    invalid),       0x15: (None,    invalid),
     0x06: ('LDbi',  _ldi('b')),     0x16: ('LDdi',  _ldi('d')),
-    0x07: (None,    invalid),       0x17: (None,    invalid),
+    0x07: ('RLCA',   rlca),         0x17: ('RLA',    rla),
     0x08: (None,    invalid),       0x18: (None,    invalid),
     0x09: (None,    invalid),       0x19: (None,    invalid),
     0x0A: (None,    invalid),       0x1A: (None,    invalid),
@@ -70,7 +70,7 @@ OPCODES = {
     0x0C: (None,    invalid),       0x1C: (None,    invalid),
     0x0D: (None,    invalid),       0x1D: (None,    invalid),
     0x0E: ('LDci',  _ldi('c')),     0x1E: ('LDei',  _ldi('e')),
-    0x0F: (None,    invalid),       0x1F: (None,    invalid),
+    0x0F: ('RRCA',   rrca),         0x1F: ('RRA',    rra),
 
     0x20: (None,    invalid),       0x30: (None,    invalid),
     0x21: ('LXIh',  lxih),          0x31: ('LXIs',  lxis),
