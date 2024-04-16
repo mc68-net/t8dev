@@ -37,16 +37,50 @@ def test_8080exer(m):
     m.deposit(0x0005, I.RET)
     while True:
         #   4e7 is ~5 min
-        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e6), trace=0)
+        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e5), trace=0)
+        if not cpm_bdos(m, 'z.8080exer'): break
+
+def test_microcosm_diag(m):
+    load_com(m, 'programs/TEST.COM')
+    m.deposit(0x0005, I.RET)
+    while True:
+        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e5), trace=1)
+        if not cpm_bdos(m, 'z.microcosm'): break
+    # XXX doesn't seem to run
+    assert 0
+
+def cpm_bdos(m, file='/dev/null'):
+    ''' Emulate, within the test framework, a CPM BDOS call.
+        This returns `True` if the test should continue runnning, or `False`
+        if the test should exit successfully. (An exception will be raised
+        on any type of failure.)
+
+        The `file` parameter may be set to a filename (or ``'/dev/tty'``) to
+        write output that file as well as to `stdout` for capture by pytest.
+
+        This handles calls to the following addresses, which must be set
+        in the `stopat` list for `Machine.stepto()`:
+        • ``CALL $0000``: Exit.
+        • ``CALL $0005``: CP/M BDOS function call.
+    '''
+    m.deposit(0x0005, I.RET)    # Ensure we return from CP/M BDOS calls.
+    with open(file, 'a') as f:
+        def pr(*args, **kwargs):
+            print(*args, **kwargs)
+            print(*args, file=f, flush=True, **kwargs)
+
         if 0x0000 == m.pc:
-            print('Exit via $0000')
-            break
-        if 0x0005 == m.pc:      # BDOS call
+            pr(f'●Exit via $0000')
+            return False
+        elif 0x0005 == m.pc:    # BDOS call
             if 2 == m.c:        # write character in E to console
-                print(f"'{char(m.e)}", end='')
+                pr(f"{char(m.e)}", end='')
             if 0x09 == m.c:     # write $-terminated string at DE to console
                 terminator = m.mem.find(b'$', m.de)
-                s = '> ' + m.bytes(m.de, terminator-m.de).decode('ASCII')
-                print(s)
+                pr(m.bytes(m.de, terminator-m.de).decode('ASCII'))
             else:
                 assert 0, 'Unknown BDOS call: ${:02X}'.format(m.c)
+        else:
+            assert 0, 'Unknown call address: ${:04X}'.format(m.pc)
+    return True
+
