@@ -28,3 +28,7 @@ def test_8080pre(m):
     m.deposit(0, I.HLT)
     m.stepto(stopat=[allok], trace=0)
     assert allok == m.pc
+
+def test_8080exer(m):
+    load_com(m, '8080EXER.COM')
+    m.stepto(stopat=[0x0DEE], trace=0)

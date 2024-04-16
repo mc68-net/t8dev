@@ -134,7 +134,7 @@ def ret_f(m, flag):     ret(m,     getattr(m, flag))
 def ret_nf(m, flag):    ret(m, not getattr(m, flag)) 
 
 ####################################################################
-#   Register Moves
+#   Register Moves (Load/Store)
 
 def ld_rr(m, dst, src): setattr(m, dst, getattr(m, src))
 def ld_ri(m, dst):      setattr(m, dst, readbyte(m))
@@ -143,10 +143,16 @@ def ld_rm(m, dst):      setattr(m, dst, m.mem[m.hl])
 def ld_ax(m):           m.a = m.mem[readword(m)]
 def ld_xa(m):           m.mem[readword(m)] = m.a
 
+def ld_hlx(m):          m.hl = m.word(readword(m))
+def ld_xhl(m):          m.depword(readword(m), m.hl)
+
+#   XXX these names need to be Z80'd, I think.
 def lxib(m):            m.bc = readword(m)
 def lxid(m):            m.de = readword(m)
 def lxih(m):            m.hl = readword(m)
 def lxis(m):            m.sp = readword(m)
+
+def ld_sphl(m):         m.sp = m.hl
 
 ####################################################################
 #   Logic Instructions
