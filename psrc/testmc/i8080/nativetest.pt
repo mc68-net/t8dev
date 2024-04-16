@@ -44,7 +44,7 @@ def test_microcosm_diag(m):
     load_com(m, 'programs/TEST.COM')
     m.deposit(0x0005, I.RET)
     while True:
-        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e5), trace=1)
+        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e5), trace=0)
         if not cpm_bdos(m, 'z.microcosm'): break
     # XXX doesn't seem to run
     assert 0
@@ -73,9 +73,9 @@ def cpm_bdos(m, file='/dev/null'):
             pr(f'●Exit via $0000')
             return False
         elif 0x0005 == m.pc:    # BDOS call
-            if 2 == m.c:        # write character in E to console
-                pr(f"{char(m.e)}", end='')
-            if 0x09 == m.c:     # write $-terminated string at DE to console
+            if 0x02 == m.c:     # write character in E to console
+                pr(f"{chr(m.e)}", end='')
+            elif 0x09 == m.c:   # write $-terminated string at DE to console
                 terminator = m.mem.find(b'$', m.de)
                 pr(m.bytes(m.de, terminator-m.de).decode('ASCII'))
             else:
