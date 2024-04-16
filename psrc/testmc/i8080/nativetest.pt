@@ -30,10 +30,20 @@ def test_8080pre(m):
     assert allok == m.pc
 
 def test_8080exer(m):
-    #   The exerciser performs the following BDOS ($0005) calls:
-    #   • c=2 e=char C_WRITE: write char to console
-    #   • c=9 e=addr C_WRITESTR: write '$'-terminated string to console
-    #   Currently these are just a RET.
     load_com(m, '8080EXER.COM')
     m.deposit(0x0005, I.RET)
-    m.stepto(stopat=[0x0C3F], trace=0)
+    while True:
+        #   4e7 is ~5 min
+        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e6), trace=0)
+        if 0x0000 == m.pc:
+            print('Exit via $0000')
+            break
+        if 0x0005 == m.pc:      # BDOS call
+            if 2 == m.c:        # write character in E to console
+                print(f"'{char(m.e)}", end='')
+            if 0x09 == m.c:     # write $-terminated string at DE to console
+                terminator = m.mem.find(b'$', m.de)
+                s = '> ' + m.bytes(m.de, terminator-m.de).decode('ASCII')
+                print(s)
+            else:
+                assert 0, 'Unknown BDOS call: ${:02X}'.format(m.c)
