@@ -195,7 +195,7 @@ OPCODES = {
     0xE7: (None,    invalid),       0xF7: (None,    invalid),
     0xE8: ('RETpe', _retf('P')),    0xF8: ('RETm',  _retf('S')),
     0xE9: ('JPhl',   jp_hl),        0xF9: ('LDsphl', ld_sphl),
-    0xEA: ('JPpe',  _jpf('P')),     0xFA: ('JPn',   _jpf('S')),
+    0xEA: ('JPpe',  _jpf('P')),     0xFA: ('JPm',   _jpf('S')),
     0xEB: ('EX_dehl',ex_dehl),      0xFB: (None,    invalid),
     0xEC: ('CALLpe',_callf('P')),   0xFC: ('CALLn', _callf('S')),
     0xED: (None,    invalid),       0xFD: (None,    invalid),

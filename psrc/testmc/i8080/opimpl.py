@@ -127,8 +127,8 @@ def  call_f(m, flag):   call(m,     getattr(m, flag))
 def call_nf(m, flag):   call(m, not getattr(m, flag)) 
 
 def ret(m, take=True):
-    target = popword(m)
-    if take: m.pc = target
+    if not take: return
+    m.pc = popword(m)
 
 def ret_f(m, flag):     ret(m,     getattr(m, flag))
 def ret_nf(m, flag):    ret(m, not getattr(m, flag)) 

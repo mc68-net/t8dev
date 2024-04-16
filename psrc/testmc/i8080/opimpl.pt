@@ -127,7 +127,7 @@ def test_add(a, b, r):
     (I.JPz,  R(Z=0), False), (I.JPz,  R(Z=1), True ),
     (I.JPnz, R(Z=0), True ), (I.JPnz, R(Z=1), False),
     (I.JPp,  R(S=1), False), (I.JPp,  R(S=0), True ),
-    (I.JPn,  R(S=1), True ), (I.JPn,  R(S=0), False),
+    (I.JPm,  R(S=1), True ), (I.JPm,  R(S=0), False),
     (I.JPc,  R(C=0), False), (I.JPc,  R(C=1), True ),
     (I.JPnc, R(C=0), True ), (I.JPnc, R(C=1), False),
     (I.JPpo, R(P=1), False), (I.JPpo, R(P=0), True ),
@@ -138,3 +138,26 @@ def test_jp(op, regs, taken):
     m = mop([op, 0x01, 0x04], regs)
     if taken:   assert 0x0401 == m.pc
     else:       assert 0x0401 != m.pc
+
+@pytest.mark.parametrize('op, regs, taken', [
+    (I.RET,   R(),    True ),
+    (I.RETz,  R(Z=0), False), (I.RETz,  R(Z=1), True ),
+    (I.RETnz, R(Z=0), True ), (I.RETnz, R(Z=1), False),
+    (I.RETp,  R(S=1), False), (I.RETp,  R(S=0), True ),
+    (I.RETm,  R(S=1), True ), (I.RETm,  R(S=0), False),
+    (I.RETc,  R(C=0), False), (I.RETc,  R(C=1), True ),
+    (I.RETnc, R(C=0), True ), (I.RETnc, R(C=1), False),
+    (I.RETpe, R(P=0), False), (I.RETpe, R(P=1), True ),
+    (I.RETpo, R(P=0), True ), (I.RETpo, R(P=1), False),
+
+])
+def test_jp(op, regs, taken):
+    print(f'op=${op:02X} regs={regs} taken={taken}')
+    m = mop(op, regs, step=False)
+    oldpc = m.pc
+    m.sp = 0x7FFE; m.deposit(0x7FFE, [0x01, 0x04])
+    m._step()
+    if taken:
+        assert (0x8000, 0x0401) == (m.sp, m.pc)
+    else:
+        assert (0x7FFE, oldpc+1) == (m.sp, m.pc)
