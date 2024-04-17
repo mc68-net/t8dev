@@ -193,7 +193,7 @@ def logicSZP(m, val):
     m.H = m.C = False
     return val
 
-def scf(m):         m.C = 1
+def scf(m):         m.C = True
 def ccf(m):         m.C = not m.C
 
 def and_r(m, reg):  m.a = logicSZP(m, m.a & getattr(m, reg))
@@ -211,22 +211,22 @@ def xor_i(m):       m.a = logicSZP(m, m.a ^ readbyte(m))
 def rlca(m):
     rbit = (m.a & 0x80) == 1
     m.a = ((m.a << 1) & 0xFF) | rbit
-    m.C = rbit
+    m.C = bool(rbit)
 
 def rla(m):
     rbit = (m.a & 0x80) == 1
     m.a = ((m.a << 1) & 0xFF) | m.C
-    m.C = rbit
+    m.C = bool(rbit)
 
 def rrca(m):
     rbit = m.a & 0x01
     m.a = (m.a >> 1) | (0x80 if rbit else 0)
-    m.C = rbit
+    m.C = bool(rbit)
 
 def rra(m):
     rbit = m.a & 0x01
     m.a = (m.a >> 1) | (0x80 if m.C else 0)
-    m.C = rbit
+    m.C = bool(rbit)
 
 ####################################################################
 #   Increment/Decrement and Arithemetic
@@ -260,8 +260,10 @@ def add(m, augend, addend, carry=0):
     x7 = bool(augend & bit7);       x3 = bool(augend & bit3)
     m7 = bool(addend & bit7);       m3 = bool(addend & bit3)
     r7 = bool(sum & bit7);          r3 = bool(sum & bit3)
+   #print(f'XXX add   C={m.C} H={m.H} x7={x7} m7={m7} r7={r7}')
     m.C = x7 and m7  or  m7 and not r7  or  not r7 and x7
     m.H = x3 and m3  or  m3 and not r3  or  not r3 and x3
+   #print(f'XXX add → C={m.C} H={m.H} sum=${sum:02X}')
     #   Overflow available only on Z80.
     #m.V = x7 and m7 and not r7  or  not x7 and not m7 and r7
 
@@ -278,8 +280,10 @@ def sub(m, minuend, subtrahend, borrow=0):
     r7 = bool(difference & bit7);   r3 = bool(difference & bit3)
     #   The following is copied pretty much directly from the PRG,
     #   page A-31 (CMP).
+   #print(f'XXX sub   C={m.C} H={m.H} x7={x7} m7={m7} r7={r7}')
     m.C = (not x7 and m7) or (m7 and r7) or (r7 and not x7)
-    m.H = 0 # XXX
+    m.H = False # XXX
+   #print(f'XXX sub → C={m.C} H={m.H} diff=${difference:02X}')
     #   Overflow on Z80 only.
     #m.V = (x7 and not m7 and not r7) or (not x7 and m7 and r7)
 
@@ -309,11 +313,19 @@ def add_hlrr(m, reg):
     sum = m.hl + getattr(m, reg)
     #   8080 affects only carry flag
     #   XXX Z80 affects carry and half-carry, and also resets N!
-    if sum > 0xFFFF:    m.C = 1
-    else:               m.C = 0
+    if sum > 0xFFFF:    m.C = True
+    else:               m.C = False
     m.hl = sum & 0xFFFF
 
-def daa(m):         raise NotImplementedError(f'daa at {mregs}')
+def daa(m):
+    lsn = m.a & 0x0F
+    msn = (m.a >> 4) & 0x0F
+    val = m.a
+    if m.H or (lsn > 9):   val += 0x06
+    if m.C or (msn > 9):   val += 0x60
+    val = val & 0xFF
+    print(f'daa C={m.C} H={m.H} ${m.a:02X} → ${val:02X}')
+    m.a = val & 0xFF
 
 ####################################################################
 #   Misc.

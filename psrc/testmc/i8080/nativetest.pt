@@ -43,7 +43,7 @@ def test_8080exer(m):
 def test_microcosm_diag(m):
     load_com(m, 'programs/TEST.COM')
     CPUOK = 0x6B7   # address at which "CPU ok" message is finished printing
-    PARTIAL = 0x5B3 # up to DAA tests
+    PARTIAL = None
     while True:
         m.stepto(stopat=[0x0000, 0x0005, CPUOK, PARTIAL], trace=0)
         if m.pc == PARTIAL: return      # stop in middle of program?
