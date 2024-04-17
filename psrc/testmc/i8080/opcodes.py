@@ -90,7 +90,7 @@ OPCODES = {
     0x24: ('INCh',  _incr('h')),    0x34: ('INCm',   inc_m),
     0x25: ('DECh',  _decr('h')),    0x35: ('DECm',   dec_m),
     0x26: ('LDhi',  _ldi('h')),     0x36: ('LDmi',   ld_mi),
-    0x27: (None,    invalid),       0x37: (None,    invalid),
+    0x27: ('DAA',    daa),          0x37: ('SCF',    scf),
     0x28: (None,    invalid),       0x38: (None,    invalid),
     0x29: ('ADDhlhl',_addhl('hl')), 0x39: ('ADDhlsp',_addhl('sp')),
     0x2A: ('LDhlx',  ld_hlx),       0x3A: ('LDax',  ld_ax),
@@ -98,7 +98,7 @@ OPCODES = {
     0x2C: ('INCl',  _incr('l')),    0x3C: ('INCa',  _incr('a')),
     0x2D: ('DECl',  _decr('l')),    0x3D: ('DECa',  _decr('a')),
     0x2E: ('LDli',  _ldi('l')),     0x3E: ('LDai',  _ldi('a')),
-    0x2F: (None,    invalid),       0x3F: (None,    invalid),
+    0x2F: ('CPL',    cpl),          0x3F: ('CCF',    ccf),
 
     0x40: ('MOVbb', _ld('b,b')),    0x50: ('MOVdb', _ld('d,b')),
     0x41: ('MOVbc', _ld('b,c')),    0x51: ('MOVdc', _ld('d,c')),

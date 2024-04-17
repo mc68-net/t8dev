@@ -191,6 +191,9 @@ def logicSZP(m, val):
     m.H = m.C = False
     return val
 
+def scf(m):         m.C = 1
+def ccf(m):         m.C = not m.C
+
 def and_r(m, reg):  m.a = logicSZP(m, m.a & getattr(m, reg))
 def and_m(m):       m.a = logicSZP(m, m.a & m.mem[m.hl])
 def and_i(m):       m.a = logicSZP(m, m.a & readbyte(m))
@@ -239,6 +242,8 @@ def dec_m(m):       m.mem[m.hl] = affectSZHP(m, incbyte(m.mem[m.hl], -1))
 
 def inx_r(m, reg):  setattr(m, reg, incword(getattr(m, reg),  1))
 def dcx_r(m, reg):  setattr(m, reg, incword(getattr(m, reg), -1))
+
+def cpl(m):         m.a = m.a ^ 0xFF
 
 def add(m, augend, addend, carry=0):
     ''' Return the modular 8-bit sum of adding `augend` (the accumulator),
@@ -305,3 +310,5 @@ def add_hlrr(m, reg):
     if sum > 0xFFFF:    m.C = 1
     else:               m.C = 0
     m.hl = sum & 0xFFFF
+
+def daa(m):         assert 0, 'XXX write me! {}'.format(m.regs)
