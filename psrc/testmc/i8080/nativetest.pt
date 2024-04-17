@@ -52,19 +52,28 @@ def test_microcosm_diag(m):
         #   We exited for some reason other than success.
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
 
-@pytest.mark.skip('Long, generates some errors...')
+@pytest.mark.skip('Long, finds a simulator error.')
 def test_supersoft(m):
     load_com(m, 'programs/CPUTEST.COM') # Supersoft Diagnostics II v1.2
     CPUOK = 0xFFFF
     PARTIAL = 0xFFFF
     stops = [0x0000, 0x0005, CPUOK, PARTIAL]
     while True:
-        m.stepto(stopat=stops, maxsteps=int(1e8), trace=0)
+        m.stepto(stopat=stops, maxsteps=int(5e7), trace=0)
         if m.pc == PARTIAL: return      # stop in middle of program?
         if m.pc == CPUOK:   return      # we printed success message
         if emu_cpm(m):      continue    # we handled a BDOS call
         #   We exited for some reason other than success.
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
+
+    #   XXX This currently fails with:
+    #       INSTRUCTION SEQUENCE WAS 050000H
+    #       REGISTER f CONTAINS 46H
+    #       BUT SHOULD CONTAIN 56H
+    #       REGISTER VALUE BEFORE INSTRUCTION SEQUENCE WAS 02H
+    #       TEST NUMBER  0011H
+    #   The incorrect bit in regster f above is the half-carry.
+
 
 def emu_cpm(m, file='/dev/null'):
     ''' Emulate, within the test framework, a CPM call. Returns:
