@@ -37,39 +37,47 @@ def test_8080exer(m):
     while True:
         #   4e7 is ~5 min
         m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e5), trace=0)
-        if not cpm_bdos(m, 'z.8080exer'): break
+        if cpm_bdos(m, 'z.8080exer'): continue
 
 def test_microcosm_diag(m):
     load_com(m, 'programs/TEST.COM')
+    CPUOK = 0x6B7   # address at which "CPU ok" message is finished printing
     while True:
-        m.stepto(stopat=[0x0000, 0x0005], trace=0)
-        if not cpm_bdos(m): break
-    assert 0, 'need to check output for pass fail indication'
+        m.stepto(stopat=[0x0000, 0x0005, CPUOK], trace=0)
+        if m.pc == CPUOK:   return      # we printed success message
+        if emu_cpm(m):      continue    # we handled a BDOS call
+        #   We exited for some reason other than success.
+        raise RuntimeError(f'bad exit at ${m.pc:02X}')
 
-def cpm_bdos(m, file='/dev/null'):
-    ''' Emulate, within the test framework, a CPM BDOS call.
-        This returns `True` if the test should continue runnning, or `False`
-        if the test should exit successfully. (An exception will be raised
-        on any type of failure.)
+def emu_cpm(m, file='/dev/null'):
+    ''' Emulate, within the test framework, a CPM call. Returns:
+        - `True`: the call was successfully handled, and the test should
+          continue running.
+        - `False`: the call was not handled, and the test should examine
+          the machine state and take appropriate action.
 
-        The `file` parameter may be set to a filename (or ``'/dev/tty'``) to
-        write output that file as well as to `stdout` for capture by pytest.
+        Output is always written to `stdout`; the `file` parameter may be
+        set to a filename (or ``'/dev/tty'``) to also write output to that
+        file.
 
         This handles calls to the following addresses, which must be set
         in the `stopat` list for `Machine.stepto()`:
-          • ``CALL $0000``: Exit.
-          • ``CALL $0005``: CP/M BDOS function call.
-        Any other addresses will be ignored, and `True` will be returned.
+        - ``CALL $0000``: Writes a message indicating warm start, but
+          returns `False`. (The caller should decide whether it should pass
+          or fail the test.)
+        - ``CALL $0005``: CP/M BDOS function call. This currently handles
+          only printing (which is done to stdout), otherwise an exception
+          is raised.
     '''
-    m.deposit(0x0005, I.RET)    # Ensure we return from CP/M BDOS calls.
     with open(file, 'a') as f:
         def pr(*args, **kwargs):
             print(*args, **kwargs)
             print(*args, file=f, flush=True, **kwargs)
 
         if m.pc == 0x0000:
-            pr(f'●Exit via $0000')
+            pr('■CP/M WARM START via $0000')
             return False
+
         if m.pc == 0x0005:      # BDOS call
             if m.c == 0x02:     # write character in E to console
                 pr(f"{chr(m.e)}", end='')
@@ -78,5 +86,10 @@ def cpm_bdos(m, file='/dev/null'):
                 pr(m.bytes(m.de, terminator-m.de).decode('ASCII'))
             else:
                 assert 0, 'Unknown BDOS call: ${:02X}'.format(m.c)
-    return True
+            #   Ensure we return from the successful CP/M BDOS call.
+            if m.byte(0x0005) != I.RET:
+                m.deposit(0x0005, I.RET)
+            return True
+
+        return False
 
