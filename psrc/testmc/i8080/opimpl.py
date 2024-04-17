@@ -318,14 +318,15 @@ def add_hlrr(m, reg):
     m.hl = sum & 0xFFFF
 
 def daa(m):
-    lsn = m.a & 0x0F
-    msn = (m.a >> 4) & 0x0F
+   #print(f'XXX daa   a=${m.a:02X} C={int(m.C)} H={int(m.H)}')
     val = m.a
-    if m.H or (lsn > 9):   val += 0x06
-    if m.C or (msn > 9):   val += 0x60
+    lsn = val & 0x0F
+    if m.H or (lsn > 9):   val += 0x06; m.H = True
+    msn = (val >> 4) & 0x0F
+    if m.C or (msn > 9):   val += 0x60; m.C = True
     val = val & 0xFF
-    print(f'daa C={m.C} H={m.H} ${m.a:02X} → ${val:02X}')
     m.a = val & 0xFF
+   #print(f'XXX daa → a=${m.a:02X} C={int(m.C)} H={int(m.H)}')
 
 ####################################################################
 #   Misc.
