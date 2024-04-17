@@ -58,7 +58,7 @@ def test_supersoft(m):
     CPUOK = 0xFFFF
     PARTIAL = 0xFFFF
     stops = [0x0000, 0x0005, CPUOK, PARTIAL]
-    while True:
+    while True:                         # ~4 minutes
         m.stepto(stopat=stops, maxsteps=int(5e7), trace=0)
         if m.pc == PARTIAL: return      # stop in middle of program?
         if m.pc == CPUOK:   return      # we printed success message
