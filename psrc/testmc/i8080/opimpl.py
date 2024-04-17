@@ -209,22 +209,22 @@ def xor_m(m):       m.a = logicSZP(m, m.a ^ m.mem[m.hl])
 def xor_i(m):       m.a = logicSZP(m, m.a ^ readbyte(m))
 
 def rlca(m):
-    rbit = (m.a & 0x80) == 1
+    rbit = (m.a & 0x80) != 0
     m.a = ((m.a << 1) & 0xFF) | rbit
-    m.C = bool(rbit)
+    m.C = rbit
 
 def rla(m):
-    rbit = (m.a & 0x80) == 1
+    rbit = (m.a & 0x80) != 0
     m.a = ((m.a << 1) & 0xFF) | m.C
-    m.C = bool(rbit)
+    m.C = rbit
 
 def rrca(m):
-    rbit = m.a & 0x01
+    rbit = (m.a & 0x01) != 0
     m.a = (m.a >> 1) | (0x80 if rbit else 0)
     m.C = bool(rbit)
 
 def rra(m):
-    rbit = m.a & 0x01
+    rbit = (m.a & 0x01) != 0
     m.a = (m.a >> 1) | (0x80 if m.C else 0)
     m.C = bool(rbit)
 
