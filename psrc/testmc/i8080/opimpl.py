@@ -84,6 +84,8 @@ def jp_nf(m, flag):     jp(m, not getattr(m, flag))
 
 def jp_hl(m):           m.pc = m.hl
 
+def rst(m, addr):       m.pc = addr
+
 ####################################################################
 #   Instructions affecting the stack
 
@@ -311,4 +313,14 @@ def add_hlrr(m, reg):
     else:               m.C = 0
     m.hl = sum & 0xFFFF
 
-def daa(m):         assert 0, 'XXX write me! {}'.format(m.regs)
+def daa(m):         raise NotImplementedError(f'daa at {mregs}')
+
+####################################################################
+#   Misc.
+
+def nop(m):         return
+
+#   We don't generate interrupts in the simulator, so it's safe
+#   to leave them on or off.
+def di(m):          return
+def ei(m):          raise NotImplementedError(f'ei at {m.regs}')

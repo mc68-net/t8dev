@@ -36,17 +36,31 @@ def test_8080exer(m):
     load_com(m, 'programs/8080EXER.COM')
     while True:
         #   4e7 is ~5 min
-        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(4e5), trace=0)
-        if cpm_bdos(m, 'z.8080exer'): continue
+        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(8e7), trace=0)
+        if emu_cpm(m): continue
+        raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
 
 def test_microcosm_diag(m):
     load_com(m, 'programs/TEST.COM')
     CPUOK = 0x6B7   # address at which "CPU ok" message is finished printing
-    PARTIAL_UPTO = 0x5B3    # up to DAA tests
+    PARTIAL = 0x5B3 # up to DAA tests
     while True:
-        m.stepto(stopat=[0x0000, 0x0005, CPUOK, PARTIAL_UPTO], trace=0)
-        if m.pc == PARTIAL_UPTO:        # stop before finishing test?
-            return                      #   (while we're still writing the sim)
+        m.stepto(stopat=[0x0000, 0x0005, CPUOK, PARTIAL], trace=0)
+        if m.pc == PARTIAL: return      # stop in middle of program?
+        if m.pc == CPUOK:   return      # we printed success message
+        if emu_cpm(m):      continue    # we handled a BDOS call
+        #   We exited for some reason other than success.
+        raise RuntimeError(f'bad exit at ${m.pc:02X}')
+
+@pytest.mark.skip('Long, generates some errors...')
+def test_supersoft(m):
+    load_com(m, 'programs/CPUTEST.COM') # Supersoft Diagnostics II v1.2
+    CPUOK = 0xFFFF
+    PARTIAL = 0xFFFF
+    stops = [0x0000, 0x0005, CPUOK, PARTIAL]
+    while True:
+        m.stepto(stopat=stops, maxsteps=int(1e8), trace=0)
+        if m.pc == PARTIAL: return      # stop in middle of program?
         if m.pc == CPUOK:   return      # we printed success message
         if emu_cpm(m):      continue    # we handled a BDOS call
         #   We exited for some reason other than success.

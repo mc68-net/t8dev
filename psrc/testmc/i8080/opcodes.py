@@ -25,6 +25,7 @@ __all__ = ( 'OPCODES', 'Instructions', 'InvalidOpcode' )
 
 def _jpf(flag):     return lambda m: jp_f(m, flag)
 def _jpnf(flag):    return lambda m: jp_nf(m, flag)
+def _rst(addr):     return lambda m: rst(m, addr)
 
 def _push(regs):    return lambda m: push(m, regs)
 def  _pop(regs):    return lambda m:  pop(m, regs)
@@ -66,8 +67,8 @@ def _addhl(reg):    return lambda m: add_hlrr(m, reg)
 
 OPCODES = {
 
-    0x00: (None,    invalid),       0x10: (None,    invalid),
-    0x01: ('LXIb',  lxib),          0x11: ('LXId',  lxid),
+    0x00: ('NOP',    nop),          0x10: (None,    invalid),
+    0x01: ('LXIb',   lxib),         0x11: ('LXId',  lxid),
     0x02: ('LDqbca', ld_qbca),      0x12: ('LDqdea',ld_qdea),
     0x03: ('INXbc', _inx('bc')),    0x13: ('INXde',_inx('de')),
     0x04: ('INCb',  _incr('b')),    0x14: ('INCd',  _incr('d')),
@@ -175,7 +176,7 @@ OPCODES = {
     0xC4: ('CALLnz',_callnf('Z')),  0xD4: ('CALLnc', _callnf('C')),
     0xC5: ('PUSHbc',_push('bc')),   0xD5: ('PUSHde',_push('de')),
     0xC6: ('ADDi',   add_i),        0xD6: ('SUBi',   sub_i),
-    0xC7: (None,    invalid),       0xD7: (None,    invalid),
+    0xC7: ('RST00', _rst(0x00)),    0xD7: ('RST10', _rst(0x10)),
     0xC8: ('RETz',  _retf('Z')),    0xD8: ('RETc',  _retf('C')),
     0xC9: ('RET',   ret),           0xD9: (None,    invalid),
     0xCA: ('JPz',   _jpf('Z')),     0xDA: ('JPc',   _jpf('C')),
@@ -183,16 +184,16 @@ OPCODES = {
     0xCC: ('CALLz', _callf('Z')),   0xDC: ('CALLc', _callf('C')),
     0xCD: ('CALL',   call),         0xDD: (None,    invalid),
     0xCE: ('ADCi',   adc_i),        0xDE: ('SBCi',   sbc_i),
-    0xCF: (None,    invalid),       0xDF: (None,    invalid),
+    0xCF: ('RST08', _rst(0x08)),    0xDF: ('RST18', _rst(0x18)),
 
     0xE0: ('RETpo', _retnf('P')),   0xF0: ('RETp',  _retnf('S')),
     0xE1: ('POPhl', _pop('hl')),    0xF1: ('POPaf',  popaf),
     0xE2: ('JPpo',  _jpnf('P')),    0xF2: ('JPp',   _jpnf('S')),
-    0xE3: ('EXsthl', ex_sthl),      0xF3: (None,    invalid),
+    0xE3: ('EXsthl', ex_sthl),      0xF3: ('DI',     di),
     0xE4: ('CALLpo',_callnf('P')),  0xF4: ('CALLp', _callnf('S')),
     0xE5: ('PUSHhl',_push('hl')),   0xF5: ('PUSHaf', pushaf),
     0xE6: ('ANDi',   and_i),        0xF6: ('ORi',    or_i),
-    0xE7: (None,    invalid),       0xF7: (None,    invalid),
+    0xE7: ('RST20', _rst(0x20)),    0xF7: ('RST28', _rst(0x28)),
     0xE8: ('RETpe', _retf('P')),    0xF8: ('RETm',  _retf('S')),
     0xE9: ('JPhl',   jp_hl),        0xF9: ('LDsphl', ld_sphl),
     0xEA: ('JPpe',  _jpf('P')),     0xFA: ('JPm',   _jpf('S')),
@@ -200,7 +201,7 @@ OPCODES = {
     0xEC: ('CALLpe',_callf('P')),   0xFC: ('CALLn', _callf('S')),
     0xED: (None,    invalid),       0xFD: (None,    invalid),
     0xEE: ('XORi',   xor_i),        0xFE: ('CMPi',   cmp_i),
-    0xEF: (None,    invalid),       0xFF: (None,    invalid),
+    0xEF: ('RST30', _rst(0x30)),    0xFF: ('RST38', _rst(0x38)),
 
 }
 
