@@ -290,7 +290,7 @@ def sub(m, minuend, subtrahend, borrow=0):
     #   page A-31 (CMP).
    #print(f'XXX sub   C={m.C} H={m.H} x7={x7} m7={m7} r7={r7}')
     m.C = (not x7 and m7) or (m7 and r7) or (r7 and not x7)
-    m.H = (subtrahend & 0x0F) > (minuend & 0x0F)
+    m.H = ((subtrahend & 0x0F) + borrow) > (minuend & 0x0F)
    #print(f'XXX sub → C={m.C} H={m.H} diff=${difference:02X}')
     #   Overflow on Z80 only.
     #m.V = (x7 and not m7 and not r7) or (not x7 and m7 and r7)
