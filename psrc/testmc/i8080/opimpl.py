@@ -269,6 +269,14 @@ def add(m, augend, addend, carry=0):
 
     return sum
 
+def broken_sub(m, minuend, subtrahend, borrow=0):
+    #   This doesn't work: the carry/borrow calculation appears to be borked.
+    addend = ((subtrahend ^ 0xFF) + 1) & 0xFF
+   #print(f'\nsub {minuend:02X} {subtrahend:02X}→{addend:02X} B={borrow}')
+    val = add(m, minuend, addend, borrow)
+   #print(f'  = {val:02X} B={m.C}')
+    return val
+
 def sub(m, minuend, subtrahend, borrow=0):
     difference = incbyte(minuend, -subtrahend)
     difference = incbyte(difference, -borrow)
