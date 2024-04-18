@@ -67,13 +67,14 @@ def test_supersoft(m):
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
 
     #   XXX This currently fails with:
+    #       CPU FAILED:
+    #       ERROR COUNT 0001H
     #       INSTRUCTION SEQUENCE WAS 050000H
     #       REGISTER f CONTAINS 46H
     #       BUT SHOULD CONTAIN 56H
     #       REGISTER VALUE BEFORE INSTRUCTION SEQUENCE WAS 02H
     #       TEST NUMBER  0011H
     #   The incorrect bit in regster f above is the half-carry.
-
 
 def emu_cpm(m, file='/dev/null'):
     ''' Emulate, within the test framework, a CPM call. Returns:

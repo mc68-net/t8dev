@@ -24,7 +24,8 @@ not all include source (`.ASM` or `.MAC`).
   fraction of a second). Can be built with ASL.
 
 - `CPUTEST`: Diagnostics II, version 1.2, CPU test by Supersoft Associates.
-  Source not available, but a GitHub repo has [`CPUTEST.COM`].
+  Source not available, but a GitHub repo has [`CPUTEST.COM`]. Takes 3-4
+  minutes to run.
 
 
 
