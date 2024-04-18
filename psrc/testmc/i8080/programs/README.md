@@ -18,6 +18,11 @@ not all include source (`.ASM` or `.MAC`).
   - `8080EXER` is mainly test vectors and a framework to run them. In part
     because it does extensive CRC calculations for the test vectors, it
     takes a _very_ long time to run under the simulator.
+  - There is another version of this for the Soviet KR580VM80A CPU (which
+    has some undocumented bits), [`8080EX1.MAC`]. That has non-zero
+    expected CRCs for the vectors, which makes the all-zero expected CRCs
+    for the version above a bit suspcious. Whether those all-zeros are
+    correct needs to be investigated.
 
 - `TEST`: [Microcosm Associates 8080/8085 CPU Diagnostic][microcosm]
   (1980). Originally designed to check an Altair 8800. Runs quickly (a
@@ -31,6 +36,7 @@ not all include source (`.ASM` or `.MAC`).
 
 <!-------------------------------------------------------------------->
 [ASL]: http://john.ccac.rwth-aachen.de:8000/as/
+[`8080EX1.MAC`]: https://github.com/begoon/i8080-core/blob/master/asm/8080EX1.MAC
 [`CPUTEST.COM`]: https://github.com/JALsnipe/i8080-core/blob/master/CPUTEST.COM
 [bart]: https://web.archive.org/web/20141129075303/www.idb.me.uk/sunhillow/8080.html
 [microcosm]: https://github.com/begoon/i8080-core/blob/master/asm/TEST.ASM
