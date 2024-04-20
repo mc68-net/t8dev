@@ -52,7 +52,7 @@ def test_microcosm_diag(m):
         #   We exited for some reason other than success.
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
 
-@pytest.mark.skip('Long, finds a simulator error.')
+#pytest.mark.skip('Long, finds a simulator error.')
 def test_supersoft(m):
     load_com(m, 'programs/CPUTEST.COM') # Supersoft Diagnostics II v1.2
     CPUOK = 0xFFFF
@@ -67,14 +67,12 @@ def test_supersoft(m):
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
 
     #   XXX This currently fails with:
-    #       CPU FAILED:
-    #       ERROR COUNT 0001H
-    #       INSTRUCTION SEQUENCE WAS 050000H
-    #       REGISTER f CONTAINS 46H
-    #       BUT SHOULD CONTAIN 56H
-    #       REGISTER VALUE BEFORE INSTRUCTION SEQUENCE WAS 02H
-    #       TEST NUMBER  0011H
-    #   The incorrect bit in regster f above is the half-carry.
+    #       INSTRUCTION SEQUENCE WAS 030000H
+    #       REGISTER c CONTAINS 19H
+    #       BUT SHOULD CONTAIN 19H
+    #       REGISTER VALUE BEFORE INSTRUCTION SEQUENCE WAS 18H
+    #       TEST NUMBER  0005H
+    #   Not clear how I'm returning "the wrong" `19H`.
 
 def emu_cpm(m, file='/dev/null'):
     ''' Emulate, within the test framework, a CPM call. Returns:

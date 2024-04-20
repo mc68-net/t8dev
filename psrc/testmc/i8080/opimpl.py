@@ -182,31 +182,33 @@ def parity(byte):
     p = p ^ (p>>4)
     return not (p&1)
 
-def logicSZP(m, val):
-    ''' Set sign, zero and parity flags based on `val`.
-        Clear carry and half (auxiliary) carry.
-        This is used for logic operations.
+def logicF(m, val, H=False):
+    ''' Flag updates for logic operations (mainly):
+        • Update sign, zero and parity flags based on `val`.
+        • Always clear carry.
+        • Clear half carry unless `H` is supplied and is `True`.
     '''
     m.S = isneg(val)
     m.Z = iszero(val)
     m.P = parity(val)
-    m.H = m.C = False
+    m.H = H
+    m.C = False
     return val
 
 def scf(m):         m.C = True
 def ccf(m):         m.C = not m.C
 
-def and_r(m, reg):  m.a = logicSZP(m, m.a & getattr(m, reg))
-def and_m(m):       m.a = logicSZP(m, m.a & m.mem[m.hl])
-def and_i(m):       m.a = logicSZP(m, m.a & readbyte(m))
+def and_r(m, reg):  m.a = logicF(m, m.a & getattr(m, reg))
+def and_m(m):       m.a = logicF(m, m.a & m.mem[m.hl])
+def and_i(m):       m.a = logicF(m, m.a & readbyte(m))
 
-def  or_r(m, reg):  m.a = logicSZP(m, m.a | getattr(m, reg))
-def  or_m(m):       m.a = logicSZP(m, m.a | m.mem[m.hl])
-def  or_i(m):       m.a = logicSZP(m, m.a | readbyte(m))
+def  or_r(m, reg):  m.a = logicF(m, m.a | getattr(m, reg))
+def  or_m(m):       m.a = logicF(m, m.a | m.mem[m.hl])
+def  or_i(m):       m.a = logicF(m, m.a | readbyte(m))
 
-def xor_r(m, reg):  m.a = logicSZP(m, m.a ^ getattr(m, reg))
-def xor_m(m):       m.a = logicSZP(m, m.a ^ m.mem[m.hl])
-def xor_i(m):       m.a = logicSZP(m, m.a ^ readbyte(m))
+def xor_r(m, reg):  m.a = logicF(m, m.a ^ getattr(m, reg))
+def xor_m(m):       m.a = logicF(m, m.a ^ m.mem[m.hl])
+def xor_i(m):       m.a = logicF(m, m.a ^ readbyte(m))
 
 def rlca(m):
     rbit = (m.a & 0x80) != 0
@@ -231,19 +233,33 @@ def rra(m):
 ####################################################################
 #   Increment/Decrement and Arithemetic
 
-def affectSZHP(m, val):
+def incSZPH(m, val):
     ' Set flags for result of byte-wide increment/decrement instruction. '
-    logicSZP(m, val)
+    logicF(m, val)
     m.H = 0 # XXX this is wrong!
     return val
 
-def inc_r(m, reg):  setattr(m, reg, affectSZHP(m, incbyte(getattr(m, reg), 1)))
-def dec_r(m, reg):  setattr(m, reg, affectSZHP(m, incbyte(getattr(m, reg), -1)))
-def inc_m(m):       m.mem[m.hl] = affectSZHP(m, incbyte(m.mem[m.hl], 1))
-def dec_m(m):       m.mem[m.hl] = affectSZHP(m, incbyte(m.mem[m.hl], -1))
+def inc_r(m, reg):
+    val = incbyte(getattr(m, reg), 1)
+    setattr(m, reg, logicF(m, val, 0))
 
-def inx_r(m, reg):  setattr(m, reg, incword(getattr(m, reg),  1))
-def dcx_r(m, reg):  setattr(m, reg, incword(getattr(m, reg), -1))
+def dec_r(m, reg):
+    val = incbyte(getattr(m, reg), -1)
+    setattr(m, reg, logicF(m, val, 0))
+
+def inc_m(m):
+    val = incbyte(m.mem[m.hl], 1)
+    m.mem[m.hl] = logicF(m, val, (val & 0xF) == 0x0)
+
+def dec_m(m):
+    val = incbyte(m.mem[m.hl], -1)
+    m.mem[m.hl] = logicF(m, val, (val & 0xF) == 0xF)
+
+def inx_r(m, reg):
+    setattr(m, reg, logicF(m, incword(getattr(m, reg),  1), m.H))
+
+def dcx_r(m, reg):
+    setattr(m, reg, logicF(m, incword(getattr(m, reg),  -1), m.H))
 
 def cpl(m):         m.a = m.a ^ 0xFF
 
@@ -253,7 +269,7 @@ def add(m, augend, addend, carry=0):
     '''
     sum = incbyte(augend, addend)
     sum = incbyte(sum, carry)
-    logicSZP(m, sum)    # set logic flags
+    logicF(m, sum)    # set logic flags
 
     #   Stolen from the MC6800 code (which is from PRG pages A-4 and A-5).
     bit7 = 0b10000000;              bit3 = 0b1000
@@ -280,7 +296,7 @@ def broken_sub(m, minuend, subtrahend, borrow=0):
 def sub(m, minuend, subtrahend, borrow=0):
     difference = incbyte(minuend, -subtrahend)
     difference = incbyte(difference, -borrow)
-    logicSZP(m, difference)
+    logicF(m, difference)
 
     bit7 = 0b10000000;              bit3 = 0b1000
     x7 = bool(minuend & bit7);      x3 = bool(minuend & bit3)
