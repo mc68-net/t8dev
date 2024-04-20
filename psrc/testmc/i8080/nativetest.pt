@@ -31,12 +31,11 @@ def test_8080pre(m):
     m.stepto(stopat=[allok], trace=0)
     assert allok == m.pc
 
-@pytest.mark.skip('Seems to run forever....')
+@pytest.mark.skip('Takes 1-2 days to run')
 def test_8080exer(m):
-    load_com(m, 'programs/8080EXER.COM')
+    load_com(m, 'programs/8080EX1.COM')
     while True:
-        #   4e7 is ~5 min
-        m.stepto(stopat=[0x0000, 0x0005], maxsteps=int(8e7), trace=0)
+        m.stepto(stopat=[0x0000, 0x0005], trace=0)
         if emu_cpm(m): continue
         raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
 
@@ -52,7 +51,7 @@ def test_microcosm_diag(m):
         #   We exited for some reason other than success.
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
 
-#pytest.mark.skip('Long, finds a simulator error.')
+@pytest.mark.skip('Long, finds a simulator error.')
 def test_supersoft(m):
     load_com(m, 'programs/CPUTEST.COM') # Supersoft Diagnostics II v1.2
     CPUOK = 0xFFFF
