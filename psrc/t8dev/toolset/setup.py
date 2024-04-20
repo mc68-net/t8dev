@@ -275,20 +275,22 @@ class Setup(metaclass=abc.ABCMeta):
     def fetch_archive(self):
         archive = self.source_archive
         url = self.source_url
-        sha = self.source_sha
+        sha = getattr(self, 'source_sha', None)
         tar_strip = getattr(self, 'source_tar_strip', None)
 
         self.dlfile = self.downloaddir().joinpath(archive)
         if not self.dlfile.exists():
             self.printaction('Downloading {} from {}'.format(archive, url))
             r = requests.get(url + '/' + archive)
+            if r.status_code != requests.codes.ok:
+                raise FileNotFoundError(f'Cannot download {archive} from {url}')
             with open(str(self.dlfile), 'wb') as fd:
                 for data in r.iter_content(chunk_size=65536):
                     fd.write(data)
 
         hash = hashlib.sha256()
         hash.update(self.dlfile.read_bytes())
-        if hash.hexdigest() != sha:
+        if (sha is not None) and (hash.hexdigest() != sha):
             raise RuntimeError(
                 'Bad {} hash for {}:\n expected: {}\n   actual: {}'.format(
                     hash.name, archive, sha, hash.hexdigest()))
