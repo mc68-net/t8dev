@@ -28,6 +28,7 @@ commit ID.
   installed.
 - Changed: Use Python packaging dependency management so that the
   user no longer needs to put t8dev dependencies in `requirements.txt`.
+- Added: Add [CSCP] emulators to toolsets.
 
 ### 0.0.0 (2024-04-23)
 - Initial PyPI release for testing; proper documentation not available.
@@ -39,3 +40,5 @@ commit ID.
 [keepachangelog.com]: https://keepachangelog.com/
 [pyver]: https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers
 [semver]: https://en.wikipedia.org/wiki/Software_versioning#Semantic_versioning
+
+[CSCP]: http://takeda-toshiya.my.coocan.jp/common/
