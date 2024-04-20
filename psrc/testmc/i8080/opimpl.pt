@@ -161,3 +161,8 @@ def test_jp(op, regs, taken):
         assert (0x8000, 0x0401) == (m.sp, m.pc)
     else:
         assert (0x7FFE, oldpc+1) == (m.sp, m.pc)
+
+@pytest.mark.filterwarnings(r'ignore:EI \(\$FB\) at ')
+def test_di_ei():
+    m = mop(I.DI)   #   Expected to do nothing.
+    m = mop(I.EI)   #   Generates a warning.

@@ -4,6 +4,8 @@
 #   XXX This contains a _lot_ of code copied from testmc.mc6800.opimpl;
 #   the common code should be pulled up to testmc.generic.opimpl.
 
+from    warnings  import warn
+
 ####################################################################
 
 class InvalidOpcode(RuntimeError):
@@ -357,7 +359,25 @@ def daa(m):
 
 def nop(m):         return
 
-#   We don't generate interrupts in the simulator, so it's safe
-#   to leave them on or off.
-def di(m):          return
-def ei(m):          raise NotImplementedError(f'ei at {m.regs}')
+def di(m):
+    ''' Disabling interrupts is a no-op as we don't (currently)
+        generate interrupts in the simulator.
+    '''
+    pass
+
+def ei(m):
+    ''' Enabling interrupts is a no-op as we don't (currently)
+        generate interrupts in the simulator.
+
+        However, we do emit a warning on encountering this, as if someone
+        is testing code with an ``EI`` in it, they may have made an error
+        somewhere.
+
+        The warning will by default appear only once when this routine
+        is called outside of pytest; for dealing with this in pytest
+        see the pytest docs_.
+
+        docs_: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    '''
+    warn(f'EI (${m.byte(m.pc-1):02X}) at ${m.pc:04X},'
+        ' but simulator will not generate interrupts')
