@@ -56,6 +56,8 @@ EX_CONFIG       = 78    # Configuration error
 #   toolsets under the tool directory, $BUILD/tool/. This follows
 #   the standard Unix /usr/local/* arrangement.
 PREFIX_SUBDIRS = ('bin', 'doc', 'include', 'lib', 'man', 'share', 'src')
+#   We also have some non-standard directories for our special purposes.
+PREFIX_SUBDIRS += 'extract', # For extracted archives.
 
 ####################################################################
 #   printconfig()
