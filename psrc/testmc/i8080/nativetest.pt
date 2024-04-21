@@ -31,13 +31,40 @@ def test_8080pre(m):
     m.stepto(stopat=[allok], trace=0)
     assert allok == m.pc
 
-@pytest.mark.skip('Takes 1-2 days to run')
+@pytest.mark.skip('Takes 5-10 hours to run')
 def test_8080exer(m):
     load_com(m, 'programs/8080EX1.COM')
     while True:
         m.stepto(stopat=[0x0000, 0x0005], trace=0)
         if emu_cpm(m): continue
         raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
+
+#   Current results as of this commit:
+# dad <b,d,h,sp>................ OK
+# aluop nn...................... ERROR **** crc expected: 9e922f9e found: 52877038
+# aluop <b,c,d,e,h,l,m,a>....... ERROR **** crc expected: cf762c86 found: 469e3369
+# <daa,cma,stc,cmc>............. ERROR **** crc expected: bb3f030c found: dfb7ac82
+# <inr,dcr> a................... ERROR **** crc expected: adb6460e found: 03656f73
+# <inr,dcr> b................... ERROR **** crc expected: 83ed1345 found: 4a0ddbdf
+# <inx,dcx> b................... ERROR **** crc expected: f79287cd found: a3220053
+# <inr,dcr> c................... ERROR **** crc expected: e5f6721b found: ebbc234b
+# <inr,dcr> d................... ERROR **** crc expected: 15b5579a found: 1bff06ca
+# <inx,dcx> d................... ERROR **** crc expected: 7f4e2501 found: 192347fd
+# <inr,dcr> e................... ERROR **** crc expected: cf2ab396 found: c5b5eb43
+# <inr,dcr> h................... ERROR **** crc expected: 12b2952c found: 578b9ea8
+# <inx,dcx> h................... ERROR **** crc expected: 9f2b23c0 found: 9475b01d
+# <inr,dcr> l................... ERROR **** crc expected: ff57d356 found: 3508df15
+# <inr,dcr> m................... ERROR **** crc expected: 92e963bd found: fbccee39
+# <inx,dcx> sp.................. ERROR **** crc expected: d5702fab found: d7c21c72
+# lhld nnnn..................... OK
+# shld nnnn..................... OK
+# lxi <b,d,h,sp>,nnnn........... OK
+# ldax <b,d>.................... OK
+# mvi <b,c,d,e,h,l,m,a>,nn...... OK
+# mov <bcdehla>,<bcdehla>....... OK
+# sta nnnn / lda nnnn........... OK
+# <rlc,rrc,ral,rar>............. OK
+# stax <b,d>.................... OK
 
 def test_microcosm_diag(m):
     load_com(m, 'programs/TEST.COM')
