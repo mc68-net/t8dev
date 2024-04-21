@@ -61,10 +61,18 @@ simulators or whatever.
 The version you want to use is one from the "Results" section below that
 matches the particular CPU you're trying to emulate. Fortunately, most of
 the 8080 CPU implementations (Intel, Nat. Semi., NEC, etc.) all produce the
-same CRC values, even the Russian KR580VM80A clone. The only exception
-seems to be the AMD CPUs, which are said there to have a difference in
-flags implementation for `ANA` (and maybe `ANI`), perhaps more like the
-8085 than the 8080.
+same CRC values, even the Russian KR580VM80A clone. The "mac" and "com"
+links for all of these are to the same files, `8080EX1.MAC` and
+`8080EX1.COM`. The latter was apparently built from a slightly different
+version of the former, however, as the banner in the source file is "8080
+instruction exerciser (Intel and clones)" but the `.COM` file prints "8080
+instruction exerciser (KR580VM80A CPU)".
+
+The only exception seems to be the AMD CPUs, which are said there to have a
+difference in flags implementation for `ANA` (and maybe `ANI`), perhaps
+more like the 8085 than the 8080. (Though my understanding is that it's
+different both, always setting the half carry to `0` where the 8085 sets it
+to `1`.)
 
 
 
