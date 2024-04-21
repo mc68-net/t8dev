@@ -178,7 +178,27 @@ def test_lxi():
     (I.XORa,    R(a=0x5F, Z=0),             R(a=0x00, S=0,Z=1,H=0,P=1)),
     ([I.XORi,0x38],     R(a=0x5F),          R(a=0x67, S=0,Z=0,H=0,P=0)),
 
-    #(I.ANDa, R(bc=0x00FF, Z=0,H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1,C=0)),
+    #   AND is a bit tricky because on 8080 because the behaviour is diverse:
+    #   • Z80:      H=1 always: (Zilog Z80 CPU User Manual, p.158)
+    #   • 8085:     H=1 always: ([pm85], p.1-12, PDF P.22)
+    #   • 8080 ANA: H=OR of bits 3 of inputs (ibid.)
+    #   • 8080 ANI: • as ANA ([pm85] ibid.)
+    #               • H=0    ([um80] p.4-9)
+    #   References:
+    #   • [pm85] 8080/8085 Assembly Language Programming Manual, p.1-12 P.22
+    #   • [um80] Intel 8080 Microcomputer Systems User's Manual (98-153B)
+    #   • https://retrocomputing.stackexchange.com/q/29899/7208
+
+    #   8080 version; not correct for 8085/Z80
+    (I.ANDb,    R(a=0xC0, b=0xA0, S=0),     R(a=0x80, S=1,Z=0,H=0,P=0)),
+    (I.ANDb,    R(a=0x30, b=0x50),          R(a=0x10, S=0,Z=0,H=0,P=0)),
+    (I.ANDb,    R(a=0x30, b=0x58),          R(a=0x10, S=0,Z=0,H=1,P=0)),
+    (I.ANDb,    R(a=0x38, b=0x50),          R(a=0x10, S=0,Z=0,H=1,P=0)),
+    (I.ANDb,    R(a=0x38, b=0x58),          R(a=0x18, S=0,Z=0,H=1,P=1)),
+    (I.ANDm,    R(a=0xF0, hl=0x9000),       R(a=0x00, S=0,Z=1,H=0,P=1)),
+    #   We treat ANDi per the 8085 manual [pm85] until we get a answer to
+    #   https://retrocomputing.stackexchange.com/q/29899/7208
+    ([I.ANDi,0xC3],     R(a=0xF0),          R(a=0xC0, S=1,Z=0,H=0,P=1)),
 ])
 def test_logic(op, input, expected):
     #   On entry, all flags set except those explicitly overridden.

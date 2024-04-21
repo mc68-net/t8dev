@@ -199,9 +199,17 @@ def ccf(m):         m.C = not m.C
 
 def cpl(m):         m.a = m.a ^ 0xFF
 
-def and_r(m, reg):  m.a = logicF(m, m.a & getattr(m, reg))
-def and_m(m):       m.a = logicF(m, m.a & m.mem[m.hl])
-def and_i(m):       m.a = logicF(m, m.a & readbyte(m))
+def and_orig(m, a, b):
+    ' Original 8080 ACA (and ANI???) half-carry handling. '
+    return logicF(m, a & b, H=((a|b)&0x8) != 0)
+
+def and_new(m, a, b):
+    ' 8085 and Z80 half-carry handling '
+    return logicF(m, a & b, H=1)
+
+def and_r(m, reg):  m.a = and_orig(m, m.a, getattr(m, reg))
+def and_m(m):       m.a = and_orig(m, m.a, m.mem[m.hl])
+def and_i(m):       m.a = and_orig(m, m.a, readbyte(m)) # XXX and_new on 8080?
 
 def  or_r(m, reg):  m.a = logicF(m, m.a | getattr(m, reg))
 def  or_m(m):       m.a = logicF(m, m.a | m.mem[m.hl])
