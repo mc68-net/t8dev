@@ -170,12 +170,9 @@ def ex_dehl(m):         tmp = m.de; m.de = m.hl; m.hl = tmp
 ####################################################################
 #   Logic Instructions
 
-def iszero(b):
-    return b == 0
+def iszero(b):      return b == 0
 
-def isneg(b):
-    sign = b & (1 << 7)
-    return 0 !=  sign
+def isneg(b):       sign = b & (1 << 7); return 0 !=  sign
 
 def parity(byte):
     #   _Hacker's Delight,_ 2nd ed, §5.2, p.100
@@ -199,6 +196,8 @@ def logicF(m, val, H=False):
 
 def scf(m):         m.C = True
 def ccf(m):         m.C = not m.C
+
+def cpl(m):         m.a = m.a ^ 0xFF
 
 def and_r(m, reg):  m.a = logicF(m, m.a & getattr(m, reg))
 def and_m(m):       m.a = logicF(m, m.a & m.mem[m.hl])
@@ -233,13 +232,7 @@ def rra(m):
     m.C = bool(rbit)
 
 ####################################################################
-#   Increment/Decrement and Arithemetic
-
-def incSZPH(m, val):
-    ' Set flags for result of byte-wide increment/decrement instruction. '
-    logicF(m, val)
-    m.H = 0 # XXX this is wrong!
-    return val
+#   Increment/Decrement
 
 def inc_r(m, reg):
     val = incbyte(getattr(m, reg), 1)
@@ -263,7 +256,8 @@ def inx_r(m, reg):
 def dcx_r(m, reg):
     setattr(m, reg, incword(getattr(m, reg),  -1))
 
-def cpl(m):         m.a = m.a ^ 0xFF
+####################################################################
+#   Arithmetic
 
 def add(m, augend, addend, carry=0):
     ''' Return the modular 8-bit sum of adding `augend` (the accumulator),
