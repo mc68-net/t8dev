@@ -117,14 +117,23 @@ def test_lxi():
 @pytest.mark.parametrize('op, input, expected', [
     #   On entry, all flags set except those explicitly overridden.
 
-    #   No flags affected on 16-bit increment/decrement.
-    (I.INXbc, R(bc=0xFFFF, Z=0),    R(bc=0x0000, Z=0)),
-    (I.INXbc, R(bc=0x0000),         R(bc=0x0001)),
-    (I.INXbc, R(bc=0x00FF),         R(bc=0x0100)),
+    (I.INCc, R(bc=0x00FF, Z=0,H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1,C=0)),
+    (I.INCc, R(bc=0x000F,     H=0    ), R(bc=0x0010, S=0,Z=0,H=1,P=0,C=0)),
 
-    (I.DCXbc, R(bc=0x0000, S=0),    R(bc=0xFFFF)),
-    (I.DCXbc, R(bc=0x0001, Z=0),    R(bc=0x0000)),
-    (I.DCXbc, R(bc=0x8000),         R(bc=0x7FFF)),
+    (I.DECc, R(bc=0x0000, S=1,H=0,P=0), R(bc=0x00FF, S=1,Z=0,H=1,P=1,C=0)),
+    (I.DECc, R(bc=0x0010,     H=0    ), R(bc=0x000F, S=0,Z=0,H=1,P=1,C=0)),
+    (I.DECc, R(bc=0x0001,         P=0), R(bc=0x0000, S=0,Z=1,H=0,P=1,C=0)),
+    (I.DECc, R(bc=0x0002,            ), R(bc=0x0001, S=0,Z=0,H=0,P=0,C=0)),
+    (I.DECc, R(bc=0x007F,            ), R(bc=0x007E, S=0,Z=0,H=0,P=1,C=0)),
+
+    #   No flags affected on 16-bit increment/decrement.
+    (I.INXbc, R(bc=0xFFFF, Z=0),        R(bc=0x0000, Z=0)),
+    (I.INXbc, R(bc=0x0000),             R(bc=0x0001)),
+    (I.INXbc, R(bc=0x00FF),             R(bc=0x0100)),
+
+    (I.DCXbc, R(bc=0x0000, S=0),        R(bc=0xFFFF)),
+    (I.DCXbc, R(bc=0x0001, Z=0),        R(bc=0x0000)),
+    (I.DCXbc, R(bc=0x8000),             R(bc=0x7FFF)),
 
 ])
 def test_inc_dec(op, input, expected):
