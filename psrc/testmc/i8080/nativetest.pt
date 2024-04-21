@@ -9,6 +9,9 @@ from    binary.memimage  import MemImage
 from    testmc.i8080 import  Machine
 from    testmc.i8080.opcodes   import Instructions as I
 
+####################################################################
+#   .COM file and CP/M Handling
+
 TESTDATA_DIR = Path(__file__).parent
 TPA_ADDR = 0x100
 def load_com(m, filename):
@@ -21,6 +24,53 @@ def load_com(m, filename):
         prog.entrypoint = TPA_ADDR
         m.load_memimage(prog, setPC=True)
     m.pc = TPA_ADDR
+
+def emu_cpm(m, file='/dev/null'):
+    ''' Emulate, within the test framework, a CPM call. Returns:
+        - `True`: the call was successfully handled, and the test should
+          continue running.
+        - `False`: the call was not handled, and the test should examine
+          the machine state and take appropriate action.
+
+        Output is always written to `stdout`; the `file` parameter may be
+        set to a filename (or ``'/dev/tty'``) to also write output to that
+        file.
+
+        This handles calls to the following addresses, which must be set
+        in the `stopat` list for `Machine.stepto()`:
+        - ``CALL $0000``: Writes a message indicating warm start, but
+          returns `False`. (The caller should decide whether it should pass
+          or fail the test.)
+        - ``CALL $0005``: CP/M BDOS function call. This currently handles
+          only printing (which is done to stdout), otherwise an exception
+          is raised.
+    '''
+    with open(file, 'a') as f:
+        def pr(*args, **kwargs):
+            print(*args, **kwargs)
+            print(*args, file=f, flush=True, **kwargs)
+
+        if m.pc == 0x0000:
+            pr('■CP/M WARM START via $0000')
+            return False
+
+        if m.pc == 0x0005:      # BDOS call
+            if m.c == 0x02:     # write character in E to console
+                pr(f"{chr(m.e)}", end='')
+            elif m.c == 0x09:   # write $-terminated string at DE to console
+                terminator = m.mem.find(b'$', m.de)
+                pr(m.bytes(m.de, terminator-m.de).decode('ASCII'))
+            else:
+                assert 0, 'Unknown BDOS call: ${:02X}'.format(m.c)
+            #   Ensure we return from the successful CP/M BDOS call.
+            if m.byte(0x0005) != I.RET:
+                m.deposit(0x0005, I.RET)
+            return True
+
+        return False
+
+####################################################################
+#   Tests
 
 def test_8080pre(m):
     allok = 0x0327      # prints '8080 Preliminary tests complete' and exits
@@ -99,48 +149,3 @@ def test_supersoft(m):
     #       REGISTER VALUE BEFORE INSTRUCTION SEQUENCE WAS 18H
     #       TEST NUMBER  0005H
     #   Not clear how I'm returning "the wrong" `19H`.
-
-def emu_cpm(m, file='/dev/null'):
-    ''' Emulate, within the test framework, a CPM call. Returns:
-        - `True`: the call was successfully handled, and the test should
-          continue running.
-        - `False`: the call was not handled, and the test should examine
-          the machine state and take appropriate action.
-
-        Output is always written to `stdout`; the `file` parameter may be
-        set to a filename (or ``'/dev/tty'``) to also write output to that
-        file.
-
-        This handles calls to the following addresses, which must be set
-        in the `stopat` list for `Machine.stepto()`:
-        - ``CALL $0000``: Writes a message indicating warm start, but
-          returns `False`. (The caller should decide whether it should pass
-          or fail the test.)
-        - ``CALL $0005``: CP/M BDOS function call. This currently handles
-          only printing (which is done to stdout), otherwise an exception
-          is raised.
-    '''
-    with open(file, 'a') as f:
-        def pr(*args, **kwargs):
-            print(*args, **kwargs)
-            print(*args, file=f, flush=True, **kwargs)
-
-        if m.pc == 0x0000:
-            pr('■CP/M WARM START via $0000')
-            return False
-
-        if m.pc == 0x0005:      # BDOS call
-            if m.c == 0x02:     # write character in E to console
-                pr(f"{chr(m.e)}", end='')
-            elif m.c == 0x09:   # write $-terminated string at DE to console
-                terminator = m.mem.find(b'$', m.de)
-                pr(m.bytes(m.de, terminator-m.de).decode('ASCII'))
-            else:
-                assert 0, 'Unknown BDOS call: ${:02X}'.format(m.c)
-            #   Ensure we return from the successful CP/M BDOS call.
-            if m.byte(0x0005) != I.RET:
-                m.deposit(0x0005, I.RET)
-            return True
-
-        return False
-
