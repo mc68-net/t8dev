@@ -60,6 +60,6 @@ hardware are also available.
 <!-------------------------------------------------------------------->
 [ASL]: http://john.ccac.rwth-aachen.de:8000/as/
 [`CPUTEST.COM`]: https://github.com/JALsnipe/i8080-core/blob/master/CPUTEST.COM
-[bart]: https://web.archive.org/web/20141129075303/www.idb.me.uk/sunhillow/8080.html
+[bart]: https://web.archive.org/web/20151108135453/http://www.idb.me.uk:80/sunhillow/8080.html
 [microcosm]: https://github.com/begoon/i8080-core/blob/master/asm/TEST.ASM
 [zexlax]: https://github.com/agn453/ZEXALL/
