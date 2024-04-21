@@ -25,10 +25,11 @@ not all include source (`.ASM` or `.MAC`).
     exerciser, and runs quickly (a fraction of a second). It will not catch
     all problems that could keep the main exerciser from running, however.
   - `8080EXER` (not included here) is mainly test vectors and a framework
-    to run them. It is _very_ slow (see below). This original version
-    has all expected CRC results set to $00000000.
-  - `8080EXE1` is the 'INTEL 8080A' version from further down the page; this
-    appears to be the same as the 'NEC 8080A' and 'Intel P8080A' versions.
+    to run them. It is _very_ slow (see below). This original version has
+    all expected CRC results set to $00000000.
+  - `8080EXE1` is the 'INTEL 8080A' version from further down the page
+    which has CRC values for the Intel 8080 and many second source
+    manufacturers. For more information see "CRC Values" below.
 
 
 8080EXER
@@ -51,9 +52,19 @@ on a Core i9-9900K, ~7h on an old i5 laptop) it got only this far:
 
 #### CRC Values
 
-The current version here is the "discovery" version that has all-zeros in
-the expected CRC fields. Other versions with CRCs from tests on actual
-hardware are also available.
+The `8080EXER.{MAC,COM}` in the "Basic Exerciser Files" [of the page][bart]
+has all the expected CRCs set to `00000000`, so all the tests will fail.
+This appears to be the "discovery version" of the exerciser, intended to be
+run on an actual CPU to get the correct CRCs against which to test
+simulators or whatever.
+
+The version you want to use is one from the "Results" section below that
+matches the particular CPU you're trying to emulate. Fortunately, most of
+the 8080 CPU implementations (Intel, Nat. Semi., NEC, etc.) all produce the
+same CRC values, even the Russian KR580VM80A clone. The only exception
+seems to be the AMD CPUs, which are said there to have a difference in
+flags implementation for `ANA` (and maybe `ANI`), perhaps more like the
+8085 than the 8080.
 
 
 
