@@ -106,7 +106,7 @@ def test_8080pre(m):
 def test_8080exer(m):
     load_com(m, 'programs/8080EX1.COM')
     while True:
-        m.stepto(stopat=[0x0000, 0x0005], trace=0)
+        m.stepto(stopat=[0x0000, 0x0005], maxsteps=1e11, trace=0)
         if emu_cpm(m): continue
         raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
 
