@@ -182,10 +182,16 @@ def test_microcosm_diag(m):
 
 @pytest.mark.skip('5 min, finds a simulator error.')
 def test_supersoft(m):
-    load_com(m, 'programs/CPUTEST.COM') # Supersoft Diagnostics II v1.2
+    DEBUG_LOG = 'log.supersoft'
     CPUOK = 0xFFFF
     PARTIAL = 0xFFFF
     stops = [0x0000, 0x0005, CPUOK, PARTIAL]
+
+    load_com(m, 'programs/CPUTEST.COM') # Supersoft Diagnostics II v1.2
+    if DEBUG_LOG:
+        DEBUG_LOG = open(DEBUG_LOG, 'w')
+        m.deposit(0x0C78, 1)    # Z80 test
+        m.deposit(0x3B6F, 1)    # 8080/8085 test
     while True:
         #   5e7 > ~0h04, when it was failing early
         #   5e8 ~= 1h12 and timed out on cjs laptop
@@ -194,6 +200,7 @@ def test_supersoft(m):
         if m.pc == CPUOK:   return      # we printed success message
         if emu_cpm(m):      continue    # we handled a BDOS call
         #   We exited for some reason other than success.
+        if DEBUG_LOG: DEBUG_LOG.close()
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
 current_failure = '''   (dec b, expected H=1 got H=0)
     INSTRUCTION SEQUENCE WAS 050000H
