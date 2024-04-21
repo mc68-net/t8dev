@@ -110,6 +110,33 @@ def test_8080exer(m):
         if emu_cpm(m): continue
         raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
 current_results = '''
+#   Commit 734162e   2024.04.21 18:45:14 +0900o8080 instruction exerciser (KR580VM80A CPU)
+dad <b,d,h,sp>................  OK
+aluop nn......................  ERROR **** crc expected:9e922f9e found:bb8cb53b
+aluop <b,c,d,e,h,l,m,a>.......  ERROR **** crc expected:cf762c86 found:3aa103c5
+<daa,cma,stc,cmc>.............  ERROR **** crc expected:bb3f030c found:dfb7ac82
+<inr,dcr> a...................  ERROR **** crc expected:adb6460e found:dd329f16
+<inr,dcr> b...................  ERROR **** crc expected:83ed1345 found:f369ca5d
+<inx,dcx> b...................  OK
+<inr,dcr> c...................  ERROR **** crc expected:e5f6721b found:8cd3ff9f
+<inr,dcr> d...................  ERROR **** crc expected:15b5579a found:7c90da1e
+<inx,dcx> d...................  OK
+<inr,dcr> e...................  ERROR **** crc expected:cf2ab396 found:a60f3e12
+<inr,dcr> h...................  ERROR **** crc expected:12b2952c found:7b9718a8
+<inx,dcx> h...................  OK
+<inr,dcr> l...................  ERROR **** crc expected:ff57d356 found:96725ed2
+<inr,dcr> m...................  ERROR **** crc expected:92e963bd found:fbccee39
+<inx,dcx> sp..................  OK
+lhld nnnn.....................  OK
+shld nnnn.....................  OK
+lxi <b,d,h,sp>,nnnn...........  OK
+ldax <b,d>....................  OK
+mvi <b,c,d,e,h,l,m,a>,nn......  OK
+mov <bcdehla>,<bcdehla>.......  OK
+sta nnnn / lda nnnn...........  OK
+<rlc,rrc,ral,rar>.............  OK
+stax <b,d>....................  OK
+
 #   Commit 7710ddc   2024-04-21 12:45:13 +0900
 8080 instruction exerciser (KR580VM80A CPU)
 dad <b,d,h,sp>................  OK
