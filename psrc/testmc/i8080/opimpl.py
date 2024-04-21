@@ -258,10 +258,10 @@ def dec_m(m):
     m.mem[m.hl] = logicF(m, val, (val & 0xF) == 0xF)
 
 def inx_r(m, reg):
-    setattr(m, reg, logicF(m, incword(getattr(m, reg),  1), m.H))
+    setattr(m, reg, incword(getattr(m, reg),  1))
 
 def dcx_r(m, reg):
-    setattr(m, reg, logicF(m, incword(getattr(m, reg),  -1), m.H))
+    setattr(m, reg, incword(getattr(m, reg),  -1))
 
 def cpl(m):         m.a = m.a ^ 0xFF
 
