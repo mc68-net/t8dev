@@ -198,7 +198,7 @@ def test_supersoft(m):
         m.stepto(stopat=stops, maxsteps=int(5e9), trace=0)
         if m.pc == PARTIAL: return      # stop in middle of program?
         if m.pc == CPUOK:   return      # we printed success message
-        if emu_cpm(m):      continue    # we handled a BDOS call
+        if emu_cpm(m, DEBUG_LOG): continue    # we handled a BDOS call
         #   We exited for some reason other than success.
         if DEBUG_LOG: DEBUG_LOG.close()
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
