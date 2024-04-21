@@ -186,8 +186,10 @@ def test_supersoft(m):
     CPUOK = 0xFFFF
     PARTIAL = 0xFFFF
     stops = [0x0000, 0x0005, CPUOK, PARTIAL]
-    while True:                         # ~4 minutes
-        m.stepto(stopat=stops, maxsteps=int(5e7), trace=0)
+    while True:
+        #   5e7 > ~0h04, when it was failing early
+        #   5e8 ~= 1h12 and timed out on cjs laptop
+        m.stepto(stopat=stops, maxsteps=int(5e9), trace=0)
         if m.pc == PARTIAL: return      # stop in middle of program?
         if m.pc == CPUOK:   return      # we printed success message
         if emu_cpm(m):      continue    # we handled a BDOS call
