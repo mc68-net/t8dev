@@ -6,6 +6,7 @@ from    pathlib  import Path
 import  pytest
 
 from    binary.memimage  import MemImage
+from    testmc  import LB, MB, tmc_tid
 from    testmc.i8080 import  Machine
 from    testmc.i8080.opcodes   import Instructions as I
 
@@ -61,13 +62,34 @@ def emu_cpm(m, file='/dev/null'):
                 terminator = m.mem.find(b'$', m.de)
                 pr(m.bytes(m.de, terminator-m.de).decode('ASCII'))
             else:
-                assert 0, 'Unknown BDOS call: ${:02X}'.format(m.c)
+                assert 0, 'Unknown BDOS call ${:02X} at {}'.format(m.c, m.regs)
             #   Ensure we return from the successful CP/M BDOS call.
             if m.byte(0x0005) != I.RET:
                 m.deposit(0x0005, I.RET)
             return True
 
         return False
+
+def test_emu_cpm(m):
+    BDOS = 0x0005; code = 0x100; data = 0x200
+    m.pc = code; m.deposit(code, [
+        I.LDci,  0x09,
+        I.LXId,  LB(data), MB(data),
+        I.CALL,  LB(BDOS), MB(BDOS),
+        I.LXId,  LB(data+2), MB(data+2),
+        I.CALL,  LB(BDOS), MB(BDOS),
+        I.CALL,  0, 0,
+    ])
+    m.deposit(data, b'1$23\r\n$')
+
+    while True:
+        m.stepto(stopat=[0x0000, 0x0005])
+        if emu_cpm(m): continue
+        break
+
+    #   XXX output should actually be appened to a str or something
+    #   not via an opened file
+    #assert 0
 
 ####################################################################
 #   Tests
