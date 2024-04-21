@@ -2,8 +2,10 @@
     programs that run on the simulator itself.
 '''
 
+from    io  import StringIO
 from    pathlib  import Path
 import  pytest
+import  re
 
 from    binary.memimage  import MemImage
 from    testmc  import LB, MB, tmc_tid
@@ -26,49 +28,49 @@ def load_com(m, filename):
         m.load_memimage(prog, setPC=True)
     m.pc = TPA_ADDR
 
-def emu_cpm(m, file='/dev/null'):
+def emu_cpm(m, outstream=None):
     ''' Emulate, within the test framework, a CPM call. Returns:
         - `True`: the call was successfully handled, and the test should
           continue running.
         - `False`: the call was not handled, and the test should examine
           the machine state and take appropriate action.
 
-        Output is always written to `stdout`; the `file` parameter may be
-        set to a filename (or ``'/dev/tty'``) to also write output to that
-        file.
+        Output is always written to `stdout`. The output will be duplicated
+        on `outstream` if given; this is useful for collecting the output
+        to examine in a test or write to a file.
 
         This handles calls to the following addresses, which must be set
         in the `stopat` list for `Machine.stepto()`:
         - ``CALL $0000``: Writes a message indicating warm start, but
-          returns `False`. (The caller should decide whether it should pass
-          or fail the test.)
+          returns `False`. (The caller should normally exit the loop and
+          then decide whether it should pass or fail the test.)
         - ``CALL $0005``: CP/M BDOS function call. This currently handles
           only printing (which is done to stdout), otherwise an exception
           is raised.
     '''
-    with open(file, 'a') as f:
-        def pr(*args, **kwargs):
-            print(*args, **kwargs)
-            print(*args, file=f, flush=True, **kwargs)
+    def pr(*args, **kwargs):
+        print(*args, **kwargs)
+        if outstream:
+            print(*args, file=outstream, flush=True, **kwargs)
 
-        if m.pc == 0x0000:
-            pr('■CP/M WARM START via $0000')
-            return False
-
-        if m.pc == 0x0005:      # BDOS call
-            if m.c == 0x02:     # write character in E to console
-                pr(f"{chr(m.e)}", end='')
-            elif m.c == 0x09:   # write $-terminated string at DE to console
-                terminator = m.mem.find(b'$', m.de)
-                pr(m.bytes(m.de, terminator-m.de).decode('ASCII'))
-            else:
-                assert 0, 'Unknown BDOS call ${:02X} at {}'.format(m.c, m.regs)
-            #   Ensure we return from the successful CP/M BDOS call.
-            if m.byte(0x0005) != I.RET:
-                m.deposit(0x0005, I.RET)
-            return True
-
+    if m.pc == 0x0000:
+        pr('■CP/M WARM START via $0000')
         return False
+
+    if m.pc == 0x0005:      # BDOS call
+        if m.c == 0x02:     # write character in E to console
+            pr(f"{chr(m.e)}", end='')
+        elif m.c == 0x09:   # write $-terminated string at DE to console
+            terminator = m.mem.find(b'$', m.de)
+            pr(m.bytes(m.de, terminator-m.de).decode('ASCII'), end='')
+        else:
+            assert 0, 'Unknown BDOS call ${:02X} at {}'.format(m.c, m.regs)
+        #   Ensure we return from the successful CP/M BDOS call.
+        if m.byte(0x0005) != I.RET:
+            m.deposit(0x0005, I.RET)
+        return True
+
+    return False
 
 def test_emu_cpm(m):
     BDOS = 0x0005; code = 0x100; data = 0x200
@@ -81,15 +83,12 @@ def test_emu_cpm(m):
         I.CALL,  0, 0,
     ])
     m.deposit(data, b'1$23\r\n$')
+    output = StringIO()
 
     while True:
         m.stepto(stopat=[0x0000, 0x0005])
-        if emu_cpm(m): continue
-        break
-
-    #   XXX output should actually be appened to a str or something
-    #   not via an opened file
-    #assert 0
+        if not emu_cpm(m, output): break
+    assert re.match('^123\r\n', output.getvalue())
 
 ####################################################################
 #   Tests
