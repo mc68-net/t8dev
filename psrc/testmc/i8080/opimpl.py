@@ -246,13 +246,13 @@ def inc_r(m, reg):
     val = incbyte(getattr(m, reg), 1)
     setattr(m, reg, logicF(m, val, H=(val & 0xF) == 0x0))
 
-def dec_r(m, reg):
-    val = incbyte(getattr(m, reg), -1)
-    setattr(m, reg, logicF(m, val, H=(val & 0xF) == 0xF))
-
 def inc_m(m):
     val = incbyte(m.mem[m.hl], 1)
     m.mem[m.hl] = logicF(m, val, H=(val & 0xF) == 0x0)
+
+def dec_r(m, reg):
+    val = incbyte(getattr(m, reg), -1)
+    setattr(m, reg, logicF(m, val, H=(val & 0xF) == 0xF))
 
 def dec_m(m):
     val = incbyte(m.mem[m.hl], -1)
