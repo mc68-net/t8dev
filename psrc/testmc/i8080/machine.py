@@ -32,7 +32,14 @@ class Machine(GenericMachine):
                       Bit(0), Flag('P'), Bit(1), Flag('C') )
         srname    = 'f'     # Flags Register
 
-    _RTS_opcodes    = set([I.RET]) # XXX add conditional RETs
+    #   This is broken for 8080 becuase we also have conditional RET
+    #   instructions. The problem is, when we reach one of those we
+    #   don't yet know if the RET will be taken, but call() currently
+    #   assumes that it will be taken, checks the stack depth, and
+    #   returns if necessary. Possibly call could speculatively execute
+    #   the conditional RET to see if it will return, and then DTRT.
+    _RTS_opcodes    = set([I.RET])
+
     _ABORT_opcodes  = set()     # XXX
 
     def _getpc(self):   return self.pc
