@@ -17,7 +17,7 @@ class InvalidOpcode(RuntimeError):
         super().__init__('op=${:02X}, {}'.format(opcode, regs))
 
 def invalid(m):
-    #   The PC PC has already been advanced past the opcode; undo this.
+    #   The PC has already been advanced past the opcode; undo this.
     pc = incword(m.pc, -1)
     regs = m.regs.clone(pc=pc)
     raise InvalidOpcode(m.mem[pc], regs)

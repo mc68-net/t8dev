@@ -2,9 +2,7 @@ from    itertools  import chain
 
 from    testmc.generic  import *
 from    testmc.i8080.opcodes  import OPCODES, Instructions as I
-from    testmc.i8080.opimpl  import (
-            InvalidOpcode, incword, readbyte, signedbyteat,
-            )
+from    testmc.i8080.opimpl  import InvalidOpcode, incword, readbyte
 
 class Machine(GenericMachine):
 
