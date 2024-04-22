@@ -1,5 +1,8 @@
 #
-#   t8setup.bash - common setup for projects using t8dev
+#   t8setup.bash - common setup/startup for projects using t8dev
+#
+#   This file sets up the environment for a t8dev build/test/run
+#   session. See the list below for more details.
 #
 #   This file should be sourced (`source` or `.`) by the top-level
 #   `Test` script in projects using t8dev. Before sourcing it, the
@@ -14,8 +17,19 @@
 #           || git submodule update --init "$T8_PROJDIR/$t8dir"
 #       . "$T8_PROJDIR"/$t8dir/t8setup.bash
 #
-#   Note that as well as doing setup, this will do some command-line
-#   argument processing for common arguments.
+#   The setup includes:
+#   • Ensures that all submodule directories of this repo have a .git/
+#     directory or file and initialises any that do not.
+#   • Prints a warning about any submodules that are modified from the
+#     version in the head commit.
+#   • Parses any known command line options at the front of $@, removing
+#     them and performing their corresponding actions. (All remaining
+#     command line options are left in $@.)
+#   • Installs the Python virtual environment and packages (if necessary)
+#     and activates it.
+#   • Confirms that the r8format dependency is present.
+#     (XXX: should probably be done by pip.)
+#   • Sets up various other paths and environment variables.
 #
 
 ####################################################################
