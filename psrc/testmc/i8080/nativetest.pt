@@ -110,7 +110,9 @@ def test_8080exer(m):
         if emu_cpm(m): continue
         raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
 current_results = '''
-#   Commit 734162e   2024.04.21 18:45:14 +0900o8080 instruction exerciser (KR580VM80A CPU)
+#   Commit c464fee   2024.04.22 00:16:18 +0900
+#   Commit 734162e   2024.04.21 18:45:14 +0900
+8080 instruction exerciser (KR580VM80A CPU)
 dad <b,d,h,sp>................  OK
 aluop nn......................  ERROR **** crc expected:9e922f9e found:bb8cb53b
 aluop <b,c,d,e,h,l,m,a>.......  ERROR **** crc expected:cf762c86 found:3aa103c5
@@ -207,7 +209,7 @@ def test_microcosm_diag(m):
         #   We exited for some reason other than success.
         raise RuntimeError(f'bad exit at ${m.pc:02X}')
 
-@pytest.mark.skip('5 min, finds a simulator error.')
+@pytest.mark.skip('12-24h, requires DCR always to set H=1')
 def test_supersoft(m):
     DEBUG_LOG = 'log.supersoft'
     CPUOK = 0xFFFF
@@ -222,7 +224,7 @@ def test_supersoft(m):
     while True:
         #   5e7 > ~0h04, when it was failing early
         #   5e8 ~= 1h12 and timed out on cjs laptop
-        m.stepto(stopat=stops, maxsteps=int(5e9), trace=0)
+        m.stepto(stopat=stops, maxsteps=int(1e11), trace=0)
         if m.pc == PARTIAL: return      # stop in middle of program?
         if m.pc == CPUOK:   return      # we printed success message
         if emu_cpm(m, DEBUG_LOG): continue    # we handled a BDOS call
