@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### 0.0.0 (2024-04-23)
+- Initial PyPI release for testing; proper documentation not available.
+
 
 
 <!-------------------------------------------------------------------->
