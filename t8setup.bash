@@ -40,7 +40,7 @@
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
 (return 0 2>/dev/null) \
-    || { echo 1>&2 "source (.) project-setup.bash with Bash."; exit 9; }
+    || { echo 1>&2 "source (.) $0 with Bash."; exit 9; }
 
 ####################################################################
 #   Functions (used here and by the caller)

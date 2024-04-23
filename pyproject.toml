@@ -1,8 +1,8 @@
 [project]
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
-version = '0.0.0'
-dependencies = []
+version = '0.0.1.dev1'
+dependencies = ['r8format',]
 authors = [
     { name = 'Curt J. Sampson', email = 'cjs@cynic.net' },
 ]
