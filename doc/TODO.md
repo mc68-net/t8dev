@@ -23,6 +23,21 @@ To-do List
   should probably instead set the PC to the reset vector, or the first
   address loaded, or something like that.
 
+#### Setup
+
+- `t8setup.bash` should be easily sourceable from the command line when in
+  the project dir. Have it check to see if CWD is a project dir (probably
+  by looking for appropriate stuff in `.build/` and automatically set
+  `T8_PROJDIR` in this instance, rather than making the user specify it.
+- `t8dev` currently must be a submodule because the `t8setup.bash` script,
+  `pactivate`, and anything else it may one day require (e.g. as template
+  files) is not in the built Python distribution package. Ideally a
+  developer should be able just to add `t8dev` to her `requirements.txt`,
+  but this creates a bootstrap problem. Perhaps this could be worked around
+  with a downloadable bootstrap script that could be added to the
+  developer's repo, which would be able to fetch the bare minimum it needs
+  into `.build/bootstrap/t8dev/` and build an environment from there.
+
 #### Build/Test System Fixes
 
 - extract src/mc68/{hello,cjsmon} loadbios() to test framework
