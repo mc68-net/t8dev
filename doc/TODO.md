@@ -1,6 +1,18 @@
 To-do List
 ==========
 
+#### Documentation
+- Move most of the stuff in `README.md` into appropriate files under `doc/`
+  and then add `readme = 'README.md'` to the `pyproject.toml`.
+- Consider whether we should add some sort of [pydoc] support, which might
+  be useful for bringing up API docs in an editor the way `K` does in Vim.
+- Have a look at [Sphinx][] (combined with MyST for Markdown support?),
+  which would let us have documentation on [readthedocs.org].
+
+[pydoc]: https://docs.python.org/3/library/pydoc.html
+[Sphinx]: https://www.sphinx-doc.org/
+[readthedocs.org]: https://readthedocs.org/
+
 #### Cleanup
 
 - scr/tmc68/biocode: use `ds prchar-$` (current PC) to org routine locations
