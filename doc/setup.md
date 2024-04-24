@@ -11,7 +11,7 @@ paths given below are relative to this unless otherwise specified.
 
 #### Configuration Files
 
-- `.gitignore` should contain `/.build/` and `/.download/`.
+- `.gitignore` should contain `__pycache__/`, `/.build/` and `/.download/`.
 - `requirements.txt` is optional, but may contain a list of Python modules
   used by your system. Often this is unused; the setup script (below) will
   install `t8dev[all]` which will bring in all the standard dependencies
