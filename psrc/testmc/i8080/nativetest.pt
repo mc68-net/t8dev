@@ -105,11 +105,14 @@ def test_8080pre(m):
 @pytest.mark.skip('Takes 5-10 hours to run')
 def test_8080exer(m):
     load_com(m, 'programs/8080EX1.COM')
-    while True:
-        m.stepto(stopat=[0x0000, 0x0005], maxsteps=1e11, trace=0)
-        if emu_cpm(m): continue
-        raise RuntimeError(f'Uknown exit at ${m.pc:04X}')
+    with open('8080exer.out', 'w') as log:
+        while True:
+            m.stepto(stopat=[0x0000, 0x0005], maxsteps=1e11, trace=0)
+            if not emu_cpm(m, log): break
+
 current_results = '''
+#   Commit f6edab2    2024-04-25 00:38:54 +0900
+XXX fill me in
 #   Commit c464fee   2024.04.22 00:16:18 +0900
 #   Commit 734162e   2024.04.21 18:45:14 +0900
 8080 instruction exerciser (KR580VM80A CPU)
