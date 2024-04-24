@@ -25,10 +25,6 @@ To-do List
 
 #### Setup
 
-- `t8setup.bash` should be easily sourceable from the command line when in
-  the project dir. Have it check to see if CWD is a project dir (probably
-  by looking for appropriate stuff in `.build/` and automatically set
-  `T8_PROJDIR` in this instance, rather than making the user specify it.
 - `t8dev` currently must be a submodule because the `t8setup.bash` script,
   `pactivate`, and anything else it may one day require (e.g. as template
   files) is not in the built Python distribution package. Ideally a

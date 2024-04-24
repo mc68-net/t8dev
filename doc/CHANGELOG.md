@@ -23,6 +23,9 @@ will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
 ### dev
+- Added: `t8setup.bash` can now be run without setting $T8_PROJDIR if the
+  current or higher directory appears to have a virtualenv with t8dev
+  installed.
 
 ### 0.0.0 (2024-04-23)
 - Initial PyPI release for testing; proper documentation not available.

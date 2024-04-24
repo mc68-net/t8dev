@@ -59,7 +59,7 @@ __t8_submodules_warn_modified() {
     #   an update to new versions of submodules.
     local sms="$(__t8_submodules_list)"
     git -C "$T8_PROJDIR" diff-index --quiet @ $sms || {
-        echo '----- WARNING: submodules are modified:' \
+        echo 1>&2 '----- WARNING: submodules are modified:' \
             "$(git -C "$T8_PROJDIR" status -s $sms | tr -d '\n')"
     }
 }
@@ -124,7 +124,29 @@ except ModuleNotFoundError as ex:
 ####################################################################
 #   Main
 
-[[ -n ${T8_PROJDIR:-} ]] || { echo 2>&1 'ERROR: T8_PROJDIR not set'; return 2; }
+find_t8_project_dir() {
+    #   If the CWD appears to be in or under a T8 project root, we can
+    #   just guess that directory as the root, and save the user the
+    #   effort of explicitly defining it.
+    local dir="$(pwd -P)"
+    local pyvlib=.build/virtualenv/lib  # must not use glob patterns
+    while [[ -n $dir ]]; do
+        #   We check for an executable bin/t8dev or Scripts/t8dev.exe.
+        #   This may not be the best way to do it, but should work in
+        #   most circumstances.
+        local xfile=$(echo "$dir"/.build/virtualenv/[bS]*/t8dev*)
+        [[ -x $xfile ]] && {
+            T8_PROJDIR="$dir"
+            echo 1>&2 "----- WARNING: missing T8_PROJDIR set to '$dir'"
+            return 0
+        }
+        dir=${dir%/*}
+    done
+    echo 1>&2 'ERROR: T8_PROJDIR not set and cannot find installed t8 project'
+    return 2
+}
+
+[[ -n ${T8_PROJDIR:-} ]] || find_t8_project_dir || return $?
 [[ -z ${BUILDDIR:-} ]] && BUILDDIR="$T8_PROJDIR/.build"
 
 #   Exports are separate from setting to ensure that variables set
