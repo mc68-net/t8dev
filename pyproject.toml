@@ -1,11 +1,18 @@
 [project]
 name = 't8dev'
+version = '0.0.1.dev2'
 description = 'Tools for 8-bit cross-development '
-version = '0.0.1.dev1'
-dependencies = ['r8format',]
+requires-python = '>=3.6'
+dependencies = ['r8format']
 authors = [
     { name = 'Curt J. Sampson', email = 'cjs@cynic.net' },
 ]
+
+[project.optional-dependencies]
+extsim  = ['py65',]                     # external CPU simulators
+toolset = ['requests',]                 # toolset installation capability
+pytest  = ['pytest',]                   # user unit test framework
+all     = ['py65',  'requests', 'pytest']
 
 [project.scripts]
 ascii2a2t       = 't8dev.cli.ascii2a2t:main'

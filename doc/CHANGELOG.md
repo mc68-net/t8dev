@@ -26,6 +26,8 @@ commit ID.
 - Added: `t8setup.bash` can now be run without setting $T8_PROJDIR if the
   current or higher directory appears to have a virtualenv with t8dev
   installed.
+- Changed: Use Python packaging dependency management so that the
+  user no longer needs to put t8dev dependencies in `requirements.txt`.
 
 ### 0.0.0 (2024-04-23)
 - Initial PyPI release for testing; proper documentation not available.

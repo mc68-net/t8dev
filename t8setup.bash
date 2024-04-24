@@ -83,10 +83,31 @@ __t8_submodules_pip_install_e() {
     #   should be installed and, further, they should be installed as
     #   editable because that's why they're submodules instead of just in
     #   requirements.txt.
+
+    #   We need a TOML parser for the pyproject.toml files, but tomllib was
+    #   added to the standard library only in Python 3.11. Rather than try
+    #   to detect if we need to find an alternate parser, since we're
+    #   installing all sorts of other stuff anyway, we might just as well
+    #   use an external package for this, too.
+    pip install -q tomli
+
     local sm
     for sm in $(__t8_submodules_list); do
-        dir="$T8_PROJDIR/$sm"
+        local dir="$T8_PROJDIR/$sm"
         [[ -r $dir/pyproject.toml ]] || continue
+        local pkgname=$(python <<_____
+import sys, tomli
+fname = '$dir/pyproject.toml'
+try:
+    print(tomli.load(open(fname, 'rb'))['project']['name'])
+except KeyError:
+    print(f'ERROR: cannot find project.name in {fname}', file=sys.stderr)
+_____
+)
+        [[ -n $pkgname ]] || return 1
+        local extras=
+        [[ $pkgname == t8dev ]] && extras='[all]'
+
         #   XXX The `pip inspect` is slowish (almost a second), but not as slow
         #   as doing the `pip install -e` when it's already been done. Can we
         #   somehow do this check faster?
@@ -94,9 +115,9 @@ __t8_submodules_pip_install_e() {
         #   Also, note that we do not use `grep -q` as this stops reading
         #   on the first match and can thus produce Errno 32 Broken pipe.
         if ! pip inspect | grep >/dev/null ".url.: .file://$dir"; then
-            echo "----- Installing submodule $sm" \
+            echo "----- Installing package $pkgname$extras from submodule $sm" \
                 'as editable into virtual environment.'
-            pip install -q -e "$dir"
+            pip install -q -e "$dir$extras"
         fi
     done
 }
@@ -179,7 +200,7 @@ esac; done
 . "$(dirname "${BASH_SOURCE[0]}")"/pactivate -B "$T8_PROJDIR" -q
 __t8_submodules_init_empty
 __t8_submodules_warn_modified
-__t8_submodules_pip_install_e
+__t8_submodules_pip_install_e  || return $?
 __t8_check_r8format_dependency || return $?
 
 unset \

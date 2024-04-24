@@ -12,9 +12,10 @@ paths given below are relative to this unless otherwise specified.
 #### Configuration Files
 
 - `.gitignore` should contain `/.build/` and `/.download/`.
-- `requirements.txt` should contain a list of Python modules used by your
-  system and t8dev. Typically this will include `requests`, `pytest`, and
-  `py65@git+https://github.com/mnaberez/py65.git`.
+- `requirements.txt` is optional, but may contain a list of Python modules
+  used by your system. Often this is unused; the setup script (below) will
+  install `t8dev[all]` which will bring in all the standard dependencies
+  used by people developing with t8dev (`pytests`, `requests`, `py65`, etc.)
 - `conftest.py` should contain `from pytest_pt import *` to add the pytest
   plugin that discovers unit-test `.pt` files in this repo.
 - `src/conftest.py` should contain `from testmc.conftest import *` to bring
