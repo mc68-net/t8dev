@@ -1,4 +1,7 @@
-from    t8dev  import path, toolset
+#   We do not import t8dev.toolset here because it has a dependency on
+#   `requests`, which package should be optional for those not using
+#   the toolset download/install/build part of t8dev.
+from    t8dev  import path
 
 def buildtoolsets(args):
     ''' This should check the configuration of the project and build
@@ -21,6 +24,7 @@ def buildtoolset(args):
     '''
     assert len(args) == 1, "buildtool() requires an argument"
     tsname = args.pop(0)
+    from t8dev  import toolset
     tool_class = toolset.TOOLSETS[tsname]
     tool_class().main()
 
