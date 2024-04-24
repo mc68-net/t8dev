@@ -250,13 +250,17 @@ def inc_m(m):
     val = incbyte(m.mem[m.hl], 1)
     m.mem[m.hl] = logicF(m, val, H=(val & 0xF) == 0x0)
 
+#   XXX For DCR, half-carry flag is not-half-borrow! This has been tested
+#   by cjs only on an 8085, but that always sets the half-carry flag on a
+#   decrement unless the low nybble rols over from a 0 to an F.
+
 def dec_r(m, reg):
     val = incbyte(getattr(m, reg), -1)
-    setattr(m, reg, logicF(m, val, H=(val & 0xF) == 0xF))
+    setattr(m, reg, logicF(m, val, H=(val & 0xF) != 0xF))
 
 def dec_m(m):
     val = incbyte(m.mem[m.hl], -1)
-    m.mem[m.hl] = logicF(m, val, H=(val & 0xF) == 0xF)
+    m.mem[m.hl] = logicF(m, val, H=(val & 0xF) != 0xF)
 
 def inx_r(m, reg):
     setattr(m, reg, incword(getattr(m, reg),  1))
