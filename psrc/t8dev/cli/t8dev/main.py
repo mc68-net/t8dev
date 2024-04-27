@@ -56,6 +56,8 @@ COMMANDS = {
     'bts':      buildtoolsets, 'buildtoolsets': buildtoolsets,
 
     'pytest':   pytest,
+
+    'e':        emulator, 'emulator': emulator,
 }
 
 def main():
