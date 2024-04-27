@@ -1,0 +1,5 @@
+from    t8dev.cli.t8dev.emulator  import *
+
+def test_suitename():
+    t = RunCPM([])
+    assert 'runcpm' == t.suitename()

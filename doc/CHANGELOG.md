@@ -29,6 +29,7 @@ commit ID.
 - Changed: Use Python packaging dependency management so that the
   user no longer needs to put t8dev dependencies in `requirements.txt`.
 - Added: Add [CSCP] emulators to toolsets.
+- Added: `t8dev emulator` command.
 
 ### 0.0.0 (2024-04-23)
 - Initial PyPI release for testing; proper documentation not available.

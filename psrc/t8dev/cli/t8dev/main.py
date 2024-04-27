@@ -5,9 +5,11 @@ from    site  import addsitedir
 import  os, sys
 
 from    t8dev.cli.t8dev.build  import *
+from    t8dev.cli.t8dev.emulator  import emulator
 from    t8dev.cli.t8dev.execute  import *
 from    t8dev.cli.t8dev.toolset  import buildtoolsets, buildtoolset
 from    t8dev.cli.t8dev.util  import vprint
+from    t8dev.cli import exits
 import  t8dev.cli.t8dev.shared as shared
 
 def parseargs():
@@ -20,27 +22,28 @@ def parseargs():
     a('-E', '--exclude', default=[], action='append',
         help='for commands that do discovery, exclude these files/dirs'
              ' (can be specified multiple times)')
-    a('--help-commands', action='store_true', help='print available commands')
     a('-P', '--project-dir',
         help='project directory; overrides T8_PROJDIR env var')
     a('-v', '--verbose', action='count', default=0,
         help='increase verbosity; may be used multiple times')
-    a('command', nargs='?',
-        help='command; --help-commands for a list')
+    a('command', help="command; 'help' to list commands")
     a('args', nargs='*',
         help="arguments to command (preceed with '--' to use args with '-')")
 
     args = p.parse_args()
-    if args.help_commands:      help_commands(); exit(0)
-    if args.command is None:    p.print_help(); exit(0)
+    if not COMMANDS.get(args.command):
+        exits.arg(f"t8dev: bad command '{args.command!r}';"
+            " use 'help' to list commands")
     return args
 
-def help_commands():
-    print('{}: Command List'.format(sys.argv[0]))
+def help_commands(_):
+    print('Commands:')
     for c in sorted(COMMANDS):
-        print('  {}'.format(c))
+        print('  ', c)
 
 COMMANDS = {
+    'help':     help_commands,
+
     'asl':      asl,                # Assemble single program with ASL
     'asl-testrig':  asl_testrig,    # Create and build source for a pytest
                                     #   module that uses a `test_rig`.
@@ -56,6 +59,8 @@ COMMANDS = {
     'bts':      buildtoolsets, 'buildtoolsets': buildtoolsets,
 
     'pytest':   pytest,
+
+    'e':        emulator, 'emulator': emulator,
 }
 
 def main():
@@ -79,8 +84,5 @@ def main():
     #   to sit down and work out how we really want to deal with it.
     #
     addsitedir(str(path.proj()))
-
     cmdf = COMMANDS.get(shared.ARGS.command)
-    if cmdf is None:
-        help_commands(); exit(2)
     exit(cmdf(shared.ARGS.args))

@@ -5,10 +5,15 @@
 from    contextlib  import contextmanager
 from    itertools  import chain
 from    pathlib  import Path
-import  importlib.util, importlib.machinery, os, sys
+from    sys import stderr
+import  importlib.util, importlib.machinery, os
 
 from    t8dev  import path, run
 import  t8dev.cli.t8dev.shared as shared
+
+def err(*msgs, exitcode=1):
+    for msg in msgs:  print(msg, file=stderr)
+    exit(exitcode)
 
 def vprint(verbosity, prefix, *args, **kwargs):
     ''' Print for a given verbosity level.
@@ -46,7 +51,7 @@ def cwd(target):
         #   XXX Printing here is a hack (see docstring.)
         #   We catch BaseException to ensure that we print this even if
         #   the program is, e.g., trying to exit with a SystemExit.
-        print('Exception with CWD', path.pretty(str(target)), file=sys.stderr)
+        print('Exception with CWD', path.pretty(str(target)), file=stderr)
         raise
     finally:
         os.chdir(str(oldcwd))
