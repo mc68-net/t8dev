@@ -77,10 +77,10 @@ def asl1(src):
 
     runasl(objdir, rsrc.stem, '    include "{}"'.format(rsrc))
 
-def asltest(args):
-    ''' Given a path to a pytest file realtive to T8_PROJDIR, build its
+def asl_testrig(args):
+    ''' Given a path to a Python file relative to T8_PROJDIR, build its
         corresponding assembly-lanugage unit test rig using the
-        Macroassembler AS. The pytest file will be loaded as a module and
+        Macroassembler AS. The Python file will be loaded as a module and
         the string value of its ``test_rig`` global variable will be
         assembled. Typically this would contain, at a minimum, something
         along the lines of:
@@ -98,7 +98,7 @@ def asltest(args):
     '''
     if len(args) != 1:
         #   Can't think of any reason we'd ever want to supply > one arg.
-        raise ValueError('asltest takes only one arg')
+        raise ValueError('asl_testrig takes only one arg')
 
     ptfile_rel  = path.relproj(args[0])     # includes .pt extension
     ptfile      = path.proj(ptfile_rel)
@@ -109,19 +109,20 @@ def asltest(args):
     runasl(objdir, ptfname, sandbox_loadmod(ptfile).test_rig)
 
 def aslauto(paths):
-    ''' Auto-discover and build ASL source files used by ``.pt`` files
-        under `paths`, except for those under sub-paths excluded with the
-        ``--exclude`` option.
+    ''' Auto-discover and build ASL source files and test rigs used by
+        ``.pt`` files under `paths`, except for those under sub-paths
+        excluded with the ``--exclude`` option.
 
         ``.pt`` files will be loaded as Python modules and the final value
-        of the following global variables will be used to build sources:
+        of the following global variables will be used to build sources
+        in one of two ways:
         * ``object_files``: Any one file with the same path and basename
           with any extension other than ``.pt`` is considered to be the
           source file and assembled with `asl1()`. If multiple non-``*.pt``
           files exist or no other file exists, an error will be generated.
-        * ``test_rig``: An object file named for the `.pt` file will be
-          generated using using the code in ``test_rig`` by calling
-          `asltest()`.
+        * ``test_rig``: The `asl_testrig()` function will be called to
+          create a source file containing the code in the ``test_rig``
+          attribute and assemble it.
 
         XXX make this work for individual files
     '''
@@ -136,23 +137,24 @@ def aslauto(paths):
                 return True
         return False
 
-    asl_files = set()
-    asltest_files = set()
+    object_files = set()
+    testrig_files = set()
     ptfiles = chain(*[ path.proj(p).rglob('*.pt') for p in paths ])
     for f in ptfiles:
         excluded = False
         if is_excluded(f): continue
         mod = sandbox_loadmod(f)
         if hasattr(mod, 'test_rig'):
-            asltest_files.add(f)
+            testrig_files.add(f)
         if hasattr(mod, 'object_files'):
             of = getattr(mod, 'object_files', None)
             if isinstance(of, str):   # see conftest.py
-                asl_files.add(of)
+                object_files.add(of)
             else:
-                asl_files.update(of)
+                object_files.update(of)
 
-    for obj in sorted(asl_files):
+    #   For each test module with `object_files`, build the object files.
+    for obj in sorted(object_files):
         stem = Path(obj).stem
         srcs = tuple(path.proj(obj).parent.glob(stem + '.*'))
         #   Remove .pt file from list of files we're considering.
@@ -168,9 +170,12 @@ def aslauto(paths):
             raise RuntimeError('Cannot find source for {} in {}' \
                 .format(obj, prettysrcs))
 
-    for pt in sorted(asltest_files):
-        vprint(2, 'build', 'asltest {}'.format(path.pretty(pt)))
-        asltest([pt])
+    #   For each test module with a `test_rig`, create the source file and
+    #   build it.
+    for pt in sorted(testrig_files):
+        vprint(2, 'build', 'asl_testrig {}'.format(path.pretty(pt)))
+        asl_testrig([pt])
+
 
 ####################################################################
 #   ASxxxx Assembler and Linker

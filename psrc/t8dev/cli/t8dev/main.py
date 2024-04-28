@@ -41,14 +41,20 @@ def help_commands():
         print('  {}'.format(c))
 
 COMMANDS = {
-    'asl':      asl,        # Assemble single program with Macroassembler AS
-    'asltest':  asltest,    # Assemble single unit test with Macroassembler AS
-    'aslauto':  aslauto,    # Discover and build all ASL stuff in given dirs
-    'asx':      asx,        # ASXXXX assembler
-    'asxlink':  asxlink,    # ASXXXX linker
-    'a2dsk':    a2dsk,      # Apple II .dsk image that boots and runs program
+    'asl':      asl,                # Assemble single program with ASL
+    'asl-testrig':  asl_testrig,    # Create and build source for a pytest
+                                    #   module that uses a `test_rig`.
+    'aslauto':  aslauto,            # Discover and build w/ASL all files used by
+                                    # unit tests (`object_files`/`test_rig`)
+    'asx':      asx,                # ASXXXX assembler
+    'asxlink':  asxlink,            # ASXXXX linker
+
+    'a2dsk':    a2dsk,              # Apple II .dsk image that boots
+                                    #   and runs program
+
     'bt':       buildtoolset,  'buildtoolset':  buildtoolset,
     'bts':      buildtoolsets, 'buildtoolsets': buildtoolsets,
+
     'pytest':   pytest,
 }
 
