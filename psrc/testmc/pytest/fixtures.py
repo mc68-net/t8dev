@@ -8,7 +8,7 @@
 import  pytest
 from    t8dev  import path
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def m(request):
     ''' A simulated machine with the object file loaded.
 
@@ -45,7 +45,8 @@ def m(request):
         object_file = path.ptobj(relmodpath).with_suffix('.p')
         m.load(object_file, mergestyle='prefnew')
 
-    return m
+    yield m
+    m.teardown(request)
 
 #   These rely on pytest running the m() fixture only once per test, even
 #   though both these fixtures and the test itself use it. I'm not sure if

@@ -350,6 +350,39 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             maxremain -= self.stepto(stopat=stopat, stopon=allstopon,
                 maxsteps=maxremain, raisetimeout=False, trace=trace)
 
+    def teardown(self, request):
+        ''' This is used in various scenarios, generally testing-related,
+            to indicate that a test run has completed and any execution
+            information that was collected during the run should be
+            recorded.
+
+            The canonical use for this is with pytest, where the
+            `testmc.conftext.m` (Machine) fixture calls this after a test
+            function has completed. However, there's no reason that this
+            couldn't be used elsewhere, such as to record information about
+            the behaviour of a `Machine` instancine when one's completed
+            running a program in a command-line simulator session.
+
+            Currently this takes the pytest `request` object that's
+            passed to a fixture, but we should probably check the type
+            and allow other things to be passed in as well. (And probably
+            accept `None` for those situations where we don't know what
+            to pass in.)
+        '''
+        # request attributes:
+        #   fspath: /home/cjs/co/public/gh/0cjs/8bitdev/src/mc68/qhex.pt
+        #   node: <Function test_qdigit_trace>
+        #   scope: function
+        #   fixturename: m
+        #   fixturenames: ['m', 'R', 'S', 'request']
+        #   fspath: /home/cjs/co/public/gh/0cjs/8bitdev/src/mc68/qhex.pt
+        #   function: <function test_qdigit_trace at 0x7f04b3b38040>
+        #   instance: None
+        #   keywords: <NodeKeywords for node <Function test_qdigit_trace>>
+        #   module: <module 'src.mc68.qhex~pt'
+        #           from '/home/cjs/co/public/gh/0cjs/8bitdev/src/mc68/qhex.pt'>
+        return None
+
     ####################################################################
     #   Tracing and similar information
 
