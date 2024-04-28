@@ -1,6 +1,8 @@
 from    abc  import abstractmethod, abstractproperty
 from    collections.abc   import Container
 from    itertools  import repeat
+import  sys
+
 from    testmc.generic.memory  import MemoryAccess
 from    binary.symtab  import SymTab
 from    binary.tool  import asl, asxxxx
@@ -31,6 +33,7 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             `Registers.srname`, but not both.
         '''
         self.symtab = SymTab()      # symtab initially empty
+        self.tracefiles = {}        # initially no trace output files
 
     @abstractproperty
     def Registers(self):
@@ -230,7 +233,7 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             XXX This should check for stack under/overflow.
         '''
         for _ in repeat(None, count):
-            if trace: print(self.traceline())
+            if trace: self._trace(trace)
             self._step()
 
     def stepto(self, *, stopat=set(), stopon=set(), trace=False,
@@ -381,7 +384,7 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
         #   keywords: <NodeKeywords for node <Function test_qdigit_trace>>
         #   module: <module 'src.mc68.qhex~pt'
         #           from '/home/cjs/co/public/gh/0cjs/8bitdev/src/mc68/qhex.pt'>
-        return None
+        self._endtraces()
 
     ####################################################################
     #   Tracing and similar information
@@ -398,6 +401,28 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
               (return address was not taken from where it was pushed); or
             * Return address at call stack pointer was changed.
         '''
+
+    def _trace(self, tracemode):
+        if not tracemode:                   return  # if caller didn't check...
+        elif tracemode == 'stdout':         fname = None; f = sys.stdout
+        elif tracemode == 'stderr':         fname = None; f = sys.stderr
+        elif tracemode.startswith('file:'): fname = tracemode[5:]
+        elif tracemode == 'objdir':
+            raise NotImplementedError('XXX write objdir tracing')
+        else:
+            raise ValueError(f'Bad trace mode: {repr(tracemode)}')
+
+        if fname:
+            f = self.tracefiles.get(fname, None)
+            if f is None:
+                f = open(fname, 'w')
+                self.tracefiles[fname] = f
+                print(f'{type(self).__module__} started tracefile on {fname}')
+        print(self.traceline(), file=f, flush=True)
+
+    def _endtraces(self):
+        for f in self.tracefiles.values():
+            f.close()
 
     def traceline(self):
         ''' Return a line of tracing information about the current step of
