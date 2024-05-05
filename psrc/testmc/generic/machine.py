@@ -353,7 +353,24 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             maxremain -= self.stepto(stopat=stopat, stopon=allstopon,
                 maxsteps=maxremain, raisetimeout=False, trace=trace)
 
-    def teardown(self, request):
+    ####################################################################
+    #    Test framework support
+
+    def tsetup(self, request):
+        ''' This allows a test framework to store test-related context
+            and information in the `Machine` instance for later use by
+            test-, debugging- and logging-related functions. Typically this
+            will be a pytest `FixtureRequest`_, but it may be anything
+            at all. `Machine` instances with functions that use this
+            information should check to ensure that the object supports
+            what they need.
+
+            .. _FixtureRequest: https://docs.pytest.org/en/stable/reference/reference.html#request
+        '''
+        self.framework_data = request
+        print(f'XXX framework_data={type(request)},{request}')
+
+    def teardown(self):
         ''' This is used in various scenarios, generally testing-related,
             to indicate that a test run has completed and any execution
             information that was collected during the run should be

@@ -45,8 +45,9 @@ def m(request):
         object_file = path.ptobj(relmodpath).with_suffix('.p')
         m.load(object_file, mergestyle='prefnew')
 
+    m.tsetup(request)
     yield m
-    m.teardown(request)
+    m.teardown()
 
 #   These rely on pytest running the m() fixture only once per test, even
 #   though both these fixtures and the test itself use it. I'm not sure if
