@@ -5,6 +5,7 @@ from    site  import addsitedir
 import  os, sys
 
 from    t8dev.cli.t8dev.build  import *
+from    t8dev.cli.t8dev.emulator  import emulator
 from    t8dev.cli.t8dev.execute  import *
 from    t8dev.cli.t8dev.toolset  import buildtoolsets, buildtoolset
 from    t8dev.cli.t8dev.util  import vprint
