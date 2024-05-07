@@ -422,6 +422,7 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
     def _trace(self, tracemode):
         if not tracemode:                   return  # if caller didn't check...
         elif tracemode == 'stdout':         fname = None; f = sys.stdout
+        elif isinstance(tracemode, int):    fname = None; f = sys.stdout
         elif tracemode == 'stderr':         fname = None; f = sys.stderr
         elif tracemode.startswith('file:'): fname = tracemode[5:]
         elif tracemode == 'objdir':
