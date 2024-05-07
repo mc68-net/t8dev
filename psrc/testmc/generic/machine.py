@@ -426,6 +426,14 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
         elif tracemode == 'stderr':         fname = None; f = sys.stderr
         elif tracemode.startswith('file:'): fname = tracemode[5:]
         elif tracemode == 'objdir':
+            print(self.framework_data)
+            print(dir(self.framework_data))
+            print('----------------------------')
+            fd = self.framework_data
+            print('config:', fd.config)
+            print('fspath:', fd.fspath)
+            print('path:', fd.path)
+            print('module:', fd.module)
             raise NotImplementedError('XXX write objdir tracing')
         else:
             raise ValueError(f'Bad trace mode: {repr(tracemode)}')
