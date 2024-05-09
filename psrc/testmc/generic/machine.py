@@ -34,6 +34,7 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
         '''
         self.symtab = SymTab()      # symtab initially empty
         self.tracefiles = {}        # initially no trace output files
+        self.framework_data = None  # ensure attribute exists
 
     @abstractproperty
     def Registers(self):
@@ -368,7 +369,6 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             .. _FixtureRequest: https://docs.pytest.org/en/stable/reference/reference.html#request
         '''
         self.framework_data = request
-        print(f'XXX framework_data={type(request)},{request}')
 
     def teardown(self):
         ''' This is used in various scenarios, generally testing-related,
@@ -426,15 +426,11 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
         elif tracemode == 'stderr':         fname = None; f = sys.stderr
         elif tracemode.startswith('file:'): fname = tracemode[5:]
         elif tracemode == 'objdir':
-            print(self.framework_data)
-            print(dir(self.framework_data))
-            print('----------------------------')
-            fd = self.framework_data
-            print('config:', fd.config)
-            print('fspath:', fd.fspath)
-            print('path:', fd.path)
-            print('module:', fd.module)
-            raise NotImplementedError('XXX write objdir tracing')
+            if not hasattr(self.framework_data, 'objdir'):
+                raise ValueError('Request provided by framework does not have '
+                    f'objdir: {self.framework_data}')
+            objdir = self.framework_data.objdir
+            raise NotImplementedError(f'XXX write objdir tracing: {objdir}')
         else:
             raise ValueError(f'Bad trace mode: {repr(tracemode)}')
 
