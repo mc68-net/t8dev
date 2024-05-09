@@ -19,15 +19,16 @@ def m(request):
         If the module global ``object_files`` is defined, it will be read
         as a path (if `str`) or sequence of paths from which to load
         machine code via `Machine.load()`. Relative paths will be relative
-        to `path.obj()`. Symbol values from earlier loads take preference
-        over later loads.
+        to `path.obj()`. Symbol values from later loads take preference
+        over earlier ones.
 
-        If the module global ``test_rig`` is defined it's assumed that a
-        binary was built with ``t8dev asltest`` and it will be found and
-        loaded based on the path from which the test module was loaded,
-        using the portion relative to `T8_PROJDIR` under `path.ptobj()`.
-        Symbol values from this load will be preferred over those
-        previously loaded via ``object_files``.
+        After the check/load of ``object_files``, if the module global
+        ``test_rig`` is defined it's assumed that a binary was built with
+        ``t8dev asltest`` and it will be found and loaded based on the path
+        from which the test module was loaded, using the portion relative
+        to `T8_PROJDIR` under `path.ptobj()`. Symbol values from this load
+        will be preferred over those previously loaded via
+        ``object_files``.
     '''
     Machine = getattr(request.module, 'Machine')
     m = Machine()
@@ -37,7 +38,7 @@ def m(request):
         if isinstance(objfiles, str):   # because forgetting the comma is such
             objfiles = (objfiles,)      # an easy mistake for devs to make
         for f in objfiles:
-            m.load(path.obj(f), mergestyle='prefcur', setPC=False)
+            m.load(path.obj(f), mergestyle='prefnew', setPC=False)
 
     if hasattr(request.module, 'test_rig'):
         relmodpath = path.relproj(request.module.__file__)
