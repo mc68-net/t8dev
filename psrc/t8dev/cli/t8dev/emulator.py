@@ -51,14 +51,24 @@ class CSCP(Suite):
     def run(self):
         if not self.args:
             argerr("Emulator name required. Use 'list' for list of emulators.")
+        self.set_bindir()
+
         emulator = self.args.pop(0)
         if emulator == 'list':
             self.list_emulators()
             return
         print(f'XXX more cscp emu {emulator}')
 
+    def set_bindir(self):
+        import t8dev.toolset.cscp
+        toolset = t8dev.toolset.cscp.CSCP()
+        toolset.setbuilddir()           # XXX toolset.__init__()
+        toolset.setpath()               # should be doing this?
+        self.bindir = toolset.bindir()
+
     def list_emulators(self):
-        print('XXX print list here')
+        list = [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
+        print(' '.join(list))
 
 class VICE(Suite):
     pass
