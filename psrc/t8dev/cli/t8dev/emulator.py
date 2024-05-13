@@ -12,6 +12,7 @@
 '''
 
 from    sys  import exit, stderr
+from    t8dev.cli.t8dev.util  import runtool
 
 def argerr(*msgs):
     print(*msgs, file=stderr)
@@ -57,7 +58,7 @@ class CSCP(Suite):
         if emulator == 'list':
             self.list_emulators()
             return
-        print(f'XXX more cscp emu {emulator}')
+        runtool('wine', str(self.bindir.joinpath(emulator + '.exe')))
 
     def set_bindir(self):
         import t8dev.toolset.cscp
