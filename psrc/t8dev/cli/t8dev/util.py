@@ -50,7 +50,7 @@ def cwd(target):
         os.chdir(str(oldcwd))
 
 def runtool(toolbin, *args, **kwargs):
-    vprint(2, 'exec', ' '.join(chain([toolbin], args)))
+    vprint(2, 'exec', ' '.join(chain([str(toolbin)], args)))
     run.tool(toolbin, *args, **kwargs)
 
 SANDBOX_MODULES = {}
