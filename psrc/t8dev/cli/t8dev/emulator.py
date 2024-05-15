@@ -51,14 +51,19 @@ class CSCP(Suite):
 
     def run(self):
         if not self.args:
-            argerr("Emulator name required. Use 'list' for list of emulators.")
-        self.set_bindir()
+            argerr("Missing emulator name. Use 'list' for list of emulators.")
 
+        self.set_bindir()
+        emulist = [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
         emulator = self.args.pop(0)
         if emulator == 'list':
-            self.list_emulators()
+            print(' '.join(emulist))
             return
-        runtool('wine', str(self.bindir.joinpath(emulator + '.exe')))
+        elif emulator not in emulist:
+            argerr(f"Bad emulator name '{emulator}'."
+                " Use 'list' for list of emulators.")
+        else:
+            runtool('wine', str(self.bindir.joinpath(emulator + '.exe')))
 
     def set_bindir(self):
         import t8dev.toolset.cscp
@@ -67,9 +72,6 @@ class CSCP(Suite):
         toolset.setpath()               # should be doing this?
         self.bindir = toolset.bindir()
 
-    def list_emulators(self):
-        list = [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
-        print(' '.join(list))
 
 class VICE(Suite):
     pass
