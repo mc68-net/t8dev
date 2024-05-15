@@ -27,17 +27,19 @@ def tool(toolbin, *args, input=None, stdout_path=None, is32bit=False):
         toolbin = t8dev
 
     runargs = (str(toolbin),) + tuple(map(str, args))
-    if stdout_path is None:
-        ret = subprocess.run(runargs, input=input)
-    else:
-        with open(str(stdout_path), 'wb') as f:
-            ret = subprocess.run(runargs, input=input, stdout=f)
+    try:
+        if stdout_path is None:
+            ret = subprocess.run(runargs, input=input)
+        else:
+            with open(str(stdout_path), 'wb') as f:
+                ret = subprocess.run(runargs, input=input, stdout=f)
+        exitcode = ret.returncode
+    except FileNotFoundError:
+        exitcode = 127
 
-    if ret.returncode == 0:
-        return
-    print('FAILED (exit={}): {} {}'.format(ret.returncode, toolbin,
+    if exitcode == 0:  return
+    print('FAILED (exit={}): {} {}'.format(exitcode, toolbin,
         ' '.join(map(path.pretty, args))))
-    if is32bit and ret.returncode == 127:
+    if is32bit and exitcode == 127:
         print('(Do you support 32-bit executables?)', file=sys.stderr)
-    exit(ret.returncode)
-
+    exit(exitcode)
