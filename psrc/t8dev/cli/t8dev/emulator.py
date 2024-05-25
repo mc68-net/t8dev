@@ -12,7 +12,8 @@
 '''
 
 from    sys  import exit, stderr
-from    t8dev.cli.t8dev.util  import runtool
+from    t8dev.cli.t8dev.util  import cwd, runtool
+from    t8dev.path  import build
 
 def argerr(*msgs):
     print(*msgs, file=stderr)
@@ -63,7 +64,9 @@ class CSCP(Suite):
             argerr(f"Bad emulator name '{emulator}'."
                 " Use 'list' for list of emulators.")
         else:
-            runtool('wine', str(self.bindir.joinpath(emulator + '.exe')))
+            emudir = build('emulator', emulator)
+            with cwd(emudir):
+                runtool('wine', str(self.bindir.joinpath(emulator + '.exe')))
 
     def set_bindir(self):
         import t8dev.toolset.cscp
