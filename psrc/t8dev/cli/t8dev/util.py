@@ -34,6 +34,8 @@ def cwd(target):
         exception is raised. (The exception will be re-raised after
         printing.) This is a hack; the caller should control all printing.
     '''
+    if not isinstance(target, Path):
+        target = Path(target)
     oldcwd = Path.cwd()
     target.mkdir(parents=True, exist_ok=True)
     vprint(2, 'chdir', str(target))
