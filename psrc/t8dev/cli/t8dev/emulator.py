@@ -11,9 +11,11 @@
     e runcpm
 '''
 
+from    pathlib  import Path
 from    sys  import exit, stderr
 from    t8dev.cli.t8dev.util  import cwd, runtool
 from    t8dev.path  import build
+from    shutil  import copyfile
 
 def argerr(*msgs):
     print(*msgs, file=stderr)
@@ -66,7 +68,12 @@ class CSCP(Suite):
         else:
             emudir = build('emulator', emulator)
             with cwd(emudir):
-                runtool('wine', str(self.bindir.joinpath(emulator + '.exe')))
+                emuexe = emulator + '.exe'
+                Path(emuexe).unlink(missing_ok=True)
+                #   Wine emulates Windows *really* well and throws up on
+                #   symlinks, so we must copy the binary.
+                copyfile(f'../../tool/bin/cscp/{emuexe}', emuexe)
+            runtool('wine', str(emudir.joinpath(emulator + '.exe')))
 
     def set_bindir(self):
         import t8dev.toolset.cscp
