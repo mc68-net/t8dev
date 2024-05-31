@@ -214,19 +214,7 @@ class Setup(metaclass=abc.ABCMeta):
                 .resolve().joinpath(self.toolset_name())
 
     def downloaddir(self):
-        ''' Return the cache directory for downloaded software. It will be
-            created if it does not exist.
-
-            This is at the same level as `builddir`, not underneath it,
-            because we don't normally want to re-download these when
-            doing a clean build.
-        '''
-        dir = self.builddir.parent.joinpath('.download')
-        #   This should fail if builddir doesn't exist because that
-        #   indicates that something likely went wrong earlier in our
-        #   setup.
-        dir.mkdir(exist_ok=True)
-        return dir
+        return path.download()
 
     def setbuilddir(self):
         ''' Locate build and target directories.
