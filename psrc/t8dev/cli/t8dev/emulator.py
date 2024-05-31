@@ -52,6 +52,12 @@ class Suite:
 
 class CSCP(Suite):
 
+    VENDOR_ROM = {
+        'tk85': {
+            'T85.ROM': 'https://gitlab.com/retroabandon/tk80-re/-/blob/main/rom/TK80.bin'
+        }
+    }
+
     def run(self):
         if not self.args:
             argerr("Missing emulator name. Use 'list' for list of emulators.")
@@ -67,6 +73,7 @@ class CSCP(Suite):
                 " Use 'list' for list of emulators.")
         else:
             emudir = build('emulator', emulator)
+            romdir = None # XXX
             with cwd(emudir):
                 emuexe = emulator + '.exe'
                 Path(emuexe).unlink(missing_ok=True)
