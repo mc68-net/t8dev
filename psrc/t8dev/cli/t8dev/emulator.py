@@ -12,9 +12,9 @@
 '''
 
 from    pathlib  import Path
-from    shutil  import copyfile, copyfileobj
+from    shutil  import  copyfile, copyfileobj, get_terminal_size
 from    sys  import exit, stderr
-from    urllib.request import HTTPError, urlopen
+from    urllib.request  import HTTPError, urlopen
 import  textwrap
 
 from    t8dev.cli.t8dev.util  import cwd, runtool
@@ -72,7 +72,11 @@ class CSCP(Suite):
     VENDOR_ROM = {
         'tk85': {
             'TK85.ROM': 'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK85.bin'
-        }
+        },
+        'pc8001': {
+            'N80.ROM': 'https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/N80_11.bin',
+            'KANJI1.ROM': 'https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/FONT80.bin',
+        },
     }
 
     def run(self):
@@ -83,7 +87,8 @@ class CSCP(Suite):
         emulist = [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
         emulator = self.args.pop(0)
         if emulator == 'list':
-            print(textwrap.fill(' '.join(emulist)))
+            cols = get_terminal_size().columns - 1
+            print(textwrap.fill(' '.join(emulist), width=cols))
             return
         elif emulator not in emulist:
             argerr(f"Bad emulator name '{emulator}'."
@@ -108,10 +113,24 @@ class CSCP(Suite):
                 try:
                     with urlopen(url) as response:
                         with open(dlrom, 'wb') as f:
+                            self.padrom(emulator, filename, f)
                             copyfileobj(response, f)
                 except HTTPError as ex:
                     err(f'{ex} for {filename!r} from {url!r}')
             copyfile(dlrom, filename)
+
+    def padrom(self, emulator, filename, f):
+        ''' Certain files for certain emulators in the CSCP suite need to
+            have padding in front of the ROM data because they're sort of
+            pretending that it's a different kind of ROM (one that doesn't
+            even exist for the original machine, in the case of the PC-8001
+            "kanji ROM"). For the moment we just special case each instance
+            here, but if we detect a pattern we may be able to generalise
+            this.
+        '''
+        if emulator == 'pc8001':
+            if filename == 'KANJI1.ROM':
+                f.write(b'\x00' * 0x1000)
 
     def set_bindir(self):
         import t8dev.toolset.cscp
@@ -131,7 +150,22 @@ class Linapple(Suite):
     pass
 
 class RunCPM(Suite):
-    pass
+
+    def run(self):
+        emudir = path.build('emulator', self.suitename())
+        emu = emudir.joinpath('RunCPM')
+        with cwd(emudir):  self.setup_emudir(emu)
+        runtool(emu)
+
+    def setup_emudir(self, emu):
+        emu.unlink(missing_ok=True)
+        #   XXX link instead of copy? This doesn't run on Windows, so....
+        emu.symlink_to(f'../../tool/bin/{emu.name}')
+
+        Path('./A/0').mkdir(exist_ok=True, parents=True)
+        Path('./B/0').mkdir(exist_ok=True, parents=True)
+
+####################################################################
 
 SUITES = dict([ (s.suitename(), s) for s in [
     CSCP, Linapple, OpenMSX, RunCPM, VICE]])
