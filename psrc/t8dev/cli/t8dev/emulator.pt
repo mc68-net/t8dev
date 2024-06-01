@@ -1,0 +1,10 @@
+from    t8dev.cli.t8dev.emulator  import *
+
+def test_suitename():
+    t = RunCPM([])
+    assert 'runcpm' == t.suitename()
+
+def test_romsrc():
+    t = CSCP([])
+    assert str(t.romsrc('unit-test', 'romsrc', mkdir=False)) \
+        .endswith('/.download/emulator/rom/cscp/unit-test/romsrc')

@@ -12,10 +12,10 @@
 '''
 
 from    pathlib  import Path
+from    shutil  import copyfile
 from    sys  import exit, stderr
 from    t8dev.cli.t8dev.util  import cwd, runtool
-from    t8dev.path  import build
-from    shutil  import copyfile
+import  t8dev.path  as path
 
 def argerr(*msgs):
     print(*msgs, file=stderr)
@@ -50,6 +50,14 @@ class Suite:
     def run(self):
         argerr(f'{self}: unimplemented (args={self.args})')
 
+    @classmethod
+    def suitename(cls):
+        return cls.__name__.lower()
+
+    def romsrc(self, *components, mkdir=True):
+        return path.download(
+            'emulator/rom', self.suitename(), *components, mkdir=mkdir)
+
 class CSCP(Suite):
 
     VENDOR_ROM = {
@@ -72,8 +80,7 @@ class CSCP(Suite):
             argerr(f"Bad emulator name '{emulator}'."
                 " Use 'list' for list of emulators.")
         else:
-            emudir = build('emulator', emulator)
-            romdir = None # XXX
+            emudir = path.build('emulator', emulator)
             with cwd(emudir):
                 emuexe = emulator + '.exe'
                 Path(emuexe).unlink(missing_ok=True)
@@ -102,10 +109,5 @@ class Linapple(Suite):
 class RunCPM(Suite):
     pass
 
-SUITES = {
-    'cscp':         CSCP,
-    'linapple':     Linapple,
-    'openmsx':      OpenMSX,
-    'runcpm':       RunCPM,
-    'vice':         VICE,
-}
+SUITES = dict([ (s.suitename(), s) for s in [
+    CSCP, Linapple, OpenMSX, RunCPM, VICE]])
