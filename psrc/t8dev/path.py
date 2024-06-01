@@ -95,19 +95,20 @@ def addbin(*components, environ=os.environ):
         path = bindir
     environ['PATH'] = path
 
-def download(*components):
+def download(*components, mkdir=True):
     ''' Return the cache directory for downloaded software. It will be
-        created if it does not exist.
+        created if it does not exist, unless `mkdir` is explicitly set
+        to `False`.
 
         This is at the same level as `builddir`, not underneath it,
         because we don't normally want to re-download these when
         doing a clean build.
     '''
-    dir = build().parent.joinpath('.download')
+    dir = build().parent.joinpath('.download', *components)
     #   This should fail if builddir doesn't exist because that
     #   indicates that something likely went wrong earlier in our
     #   setup.
-    dir.mkdir(exist_ok=True)
+    if mkdir: dir.mkdir(exist_ok=True, parents=True)
     return dir
 
 def build(*components):
