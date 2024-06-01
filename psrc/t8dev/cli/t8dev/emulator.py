@@ -12,10 +12,19 @@
 '''
 
 from    pathlib  import Path
-from    shutil  import copyfile
+from    shutil  import copyfile, copyfileobj
 from    sys  import exit, stderr
+from    urllib.request import HTTPError, urlopen
+import  textwrap
+
 from    t8dev.cli.t8dev.util  import cwd, runtool
 import  t8dev.path  as path
+
+####################################################################
+
+def err(*msgs):
+    print(*msgs, file=stderr)
+    exit(1)
 
 def argerr(*msgs):
     print(*msgs, file=stderr)
@@ -54,7 +63,7 @@ class Suite:
     def suitename(cls):
         return cls.__name__.lower()
 
-    def romsrc(self, *components, mkdir=True):
+    def romsrcdir(self, *components, mkdir=True):
         return path.download(
             'emulator/rom', self.suitename(), *components, mkdir=mkdir)
 
@@ -62,7 +71,7 @@ class CSCP(Suite):
 
     VENDOR_ROM = {
         'tk85': {
-            'T85.ROM': 'https://gitlab.com/retroabandon/tk80-re/-/blob/main/rom/TK80.bin'
+            'TK85.ROM': 'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK85.bin'
         }
     }
 
@@ -74,20 +83,35 @@ class CSCP(Suite):
         emulist = [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
         emulator = self.args.pop(0)
         if emulator == 'list':
-            print(' '.join(emulist))
+            print(textwrap.fill(' '.join(emulist)))
             return
         elif emulator not in emulist:
             argerr(f"Bad emulator name '{emulator}'."
                 " Use 'list' for list of emulators.")
         else:
             emudir = path.build('emulator', emulator)
-            with cwd(emudir):
-                emuexe = emulator + '.exe'
-                Path(emuexe).unlink(missing_ok=True)
-                #   Wine emulates Windows *really* well and throws up on
-                #   symlinks, so we must copy the binary.
-                copyfile(f'../../tool/bin/cscp/{emuexe}', emuexe)
+            with cwd(emudir):  self.setup_emudir(emulator)
             runtool('wine', str(emudir.joinpath(emulator + '.exe')))
+
+    def setup_emudir(self, emulator):
+        ' Called with CWD set to the dir for this emulation run. '
+        emuexe = emulator + '.exe'
+        Path(emuexe).unlink(missing_ok=True)
+        #   Wine emulates Windows *really* well and throws up on
+        #   symlinks, so we must copy the binary.
+        copyfile(f'../../tool/bin/cscp/{emuexe}', emuexe)
+
+        romsrcdir = self.romsrcdir(emulator)
+        for filename, url in self.VENDOR_ROM[emulator].items():
+            dlrom = romsrcdir.joinpath(filename)
+            if not dlrom.exists():
+                try:
+                    with urlopen(url) as response:
+                        with open(dlrom, 'wb') as f:
+                            copyfileobj(response, f)
+                except HTTPError as ex:
+                    err(f'{ex} for {filename!r} from {url!r}')
+            copyfile(dlrom, filename)
 
     def set_bindir(self):
         import t8dev.toolset.cscp

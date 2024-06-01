@@ -4,7 +4,7 @@ def test_suitename():
     t = RunCPM([])
     assert 'runcpm' == t.suitename()
 
-def test_romsrc():
+def test_romsrcdir():
     t = CSCP([])
-    assert str(t.romsrc('unit-test', 'romsrc', mkdir=False)) \
-        .endswith('/.download/emulator/rom/cscp/unit-test/romsrc')
+    assert str(t.romsrcdir('unit-test', 'romsrcdir', mkdir=False)) \
+        .endswith('/.download/emulator/rom/cscp/unit-test/romsrcdir')
