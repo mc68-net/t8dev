@@ -36,12 +36,14 @@ def parseargs():
     if args.command is None:    p.print_help(); exit(0)
     return args
 
-def help_commands():
-    print('{}: Command List'.format(sys.argv[0]))
+def help_commands(_):
+    print('Commands:')
     for c in sorted(COMMANDS):
-        print('  {}'.format(c))
+        print('  ', c)
 
 COMMANDS = {
+    'help':     help_commands,
+
     'asl':      asl,                # Assemble single program with ASL
     'asl-testrig':  asl_testrig,    # Create and build source for a pytest
                                     #   module that uses a `test_rig`.
@@ -85,5 +87,8 @@ def main():
 
     cmdf = COMMANDS.get(shared.ARGS.command)
     if cmdf is None:
-        help_commands(); exit(2)
+        argerr(f'Bad command: {shared.ARGS.command!r};' \
+            " use 'help' to list commands")
+        help_commands()
+        exit(2)
     exit(cmdf(shared.ARGS.args))

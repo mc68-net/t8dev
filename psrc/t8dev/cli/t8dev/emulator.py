@@ -17,18 +17,10 @@ from    sys  import exit, stderr
 from    urllib.request  import HTTPError, urlopen
 import  textwrap
 
-from    t8dev.cli.t8dev.util  import cwd, runtool
+from    t8dev.cli.t8dev.util  import err, argerr, cwd, runtool
 import  t8dev.path  as path
 
 ####################################################################
-
-def err(*msgs):
-    print(*msgs, file=stderr)
-    exit(1)
-
-def argerr(*msgs):
-    print(*msgs, file=stderr)
-    exit(2)
 
 def emulator(args):
     '''
