@@ -77,7 +77,7 @@ class CSCP(Suite):
 
         self.set_bindir()
         emulist = [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
-        emulator = self.args.pop(0)
+        self.emulator = emulator = self.args.pop(0)
         if emulator == 'list':
             cols = get_terminal_size().columns - 1
             print(textwrap.fill(' '.join(emulist), width=cols))
@@ -86,21 +86,28 @@ class CSCP(Suite):
             argerr(f"Bad emulator name '{emulator}'."
                 " Use 'list' for list of emulators.")
         else:
-            emudir = path.build('emulator', emulator)
-            with cwd(emudir):  self.setup_emudir(emulator)
-            runtool('wine', str(emudir.joinpath(emulator + '.exe')))
+            self.setup_emudir(emulator)
+            runtool('wine', str(self.emudir(emulator + '.exe')))
+
+    def emudir(self, *components):
+        ' Return a `Path` in the directory for this emulation run. '
+        emudir = path.build('emulator', self.emulator)
+        emudir.mkdir(exist_ok=True, parents=True)
+        return emudir.joinpath(*components)
 
     def setup_emudir(self, emulator):
         ' Called with CWD set to the dir for this emulation run. '
         emuexe = emulator + '.exe'
-        Path(emuexe).unlink(missing_ok=True)
+        self.emudir(emuexe).unlink(missing_ok=True)
         #   Wine emulates Windows *really* well and throws up on
         #   symlinks, so we must copy the binary.
-        copyfile(f'../../tool/bin/cscp/{emuexe}', emuexe)
+        copyfile(path.tool('bin/cscp', emuexe), self.emudir(emuexe))
 
         romsrcdir = self.romsrcdir(emulator)
         for filename, url in self.VENDOR_ROM[emulator].items():
             dlrom = romsrcdir.joinpath(filename)
+            print(filename)
+            print(dlrom)
             if not dlrom.exists():
                 try:
                     with urlopen(url) as response:
@@ -109,7 +116,7 @@ class CSCP(Suite):
                             copyfileobj(response, f)
                 except HTTPError as ex:
                     err(f'{ex} for {filename!r} from {url!r}')
-            copyfile(dlrom, filename)
+            copyfile(dlrom, self.emudir(filename))
 
     def padrom(self, emulator, filename, f):
         ''' Certain files for certain emulators in the CSCP suite need to
