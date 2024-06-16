@@ -1,0 +1,15 @@
+'''
+
+    For N80.ROM
+        n80=foo.bin
+        n80=@6000:bar.bin
+        n80=@6000:file:bar.bin
+        n80=@6000:file://tmp/bar.bin
+        n80=https://gitlab.com/…/-/raw/main/rom/80/N80_102.bin
+        n80=@0000:https://gitlab.com/…/-/raw/main/rom/80/N80_102.bin
+        n80=@aslp:baz.p       # ASL output file w/internal offset info
+
+    Downloaded ROM cache:
+        .download/rom/https/gitlab.com/…/-/raw/main/rom/80/N80_102.bin
+
+'''

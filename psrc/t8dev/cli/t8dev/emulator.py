@@ -17,8 +17,10 @@ from    sys  import exit, stderr
 from    urllib.request  import HTTPError, urlopen
 import  textwrap
 
+from    t8dev.cli.t8dev.romimage  import RomImage   # XXX r8format
 from    t8dev.cli.t8dev.util  import err, argerr, cwd, runtool
 import  t8dev.path  as path
+
 
 ####################################################################
 
@@ -55,10 +57,6 @@ class Suite:
     def suitename(cls):
         return cls.__name__.lower()
 
-    def romsrcdir(self, *components, mkdir=True):
-        return path.download(
-            'emulator/rom', self.suitename(), *components, mkdir=mkdir)
-
 class CSCP(Suite):
 
     VENDOR_ROM = {
@@ -67,7 +65,7 @@ class CSCP(Suite):
         },
         'pc8001': {
             'N80.ROM': 'https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/N80_11.bin',
-            'KANJI1.ROM': 'https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/FONT80.bin',
+            'KANJI1.ROM': '@1000:https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/FONT80.bin',
         },
     }
 
@@ -103,31 +101,12 @@ class CSCP(Suite):
         #   symlinks, so we must copy the binary.
         copyfile(path.tool('bin/cscp', emuexe), self.emudir(emuexe))
 
-        romsrcdir = self.romsrcdir(emulator)
         for filename, url in self.VENDOR_ROM[emulator].items():
-            dlrom = romsrcdir.joinpath(filename)
-            if not dlrom.exists():
-                try:
-                    with urlopen(url) as response:
-                        with open(dlrom, 'wb') as f:
-                            self.padrom(emulator, filename, f)
-                            copyfileobj(response, f)
-                except HTTPError as ex:
-                    err(f'{ex} for {filename!r} from {url!r}')
-            copyfile(dlrom, self.emudir(filename))
-
-    def padrom(self, emulator, filename, f):
-        ''' Certain files for certain emulators in the CSCP suite need to
-            have padding in front of the ROM data because they're sort of
-            pretending that it's a different kind of ROM (one that doesn't
-            even exist for the original machine, in the case of the PC-8001
-            "kanji ROM"). For the moment we just special case each instance
-            here, but if we detect a pattern we may be able to generalise
-            this.
-        '''
-        if emulator == 'pc8001':
-            if filename == 'KANJI1.ROM':
-                f.write(b'\x00' * 0x1000)
+            ri = RomImage(filename, url)
+            ri.patches(self.args)   # removes args it used and patched
+            ri.writefile(self.emudir(filename))
+        if self.args:
+            argerr('Unknown arguments:', *[ f'  {arg}' for arg in self.args ])
 
     def set_bindir(self):
         import t8dev.toolset.cscp
