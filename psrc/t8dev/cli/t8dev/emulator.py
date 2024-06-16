@@ -101,8 +101,8 @@ class CSCP(Suite):
         #   symlinks, so we must copy the binary.
         copyfile(path.tool('bin/cscp', emuexe), self.emudir(emuexe))
 
-        for filename, url in self.VENDOR_ROM[emulator].items():
-            ri = RomImage(filename, url)
+        for filename, loadspec in self.VENDOR_ROM[emulator].items():
+            ri = RomImage(filename, loadspec)
             ri.patches(self.args)   # removes args it used and patched
             ri.writefile(self.emudir(filename))
         if self.args:

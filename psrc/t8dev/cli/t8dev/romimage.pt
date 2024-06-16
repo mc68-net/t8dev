@@ -1,15 +1,29 @@
-'''
+from    io  import BytesIO
+from    t8dev.cli.t8dev.romimage  import *      # XXX move to r8format
 
-    For N80.ROM
-        n80=foo.bin
-        n80=@6000:bar.bin
-        n80=@6000:file:bar.bin
-        n80=@6000:file://tmp/bar.bin
-        n80=https://gitlab.com/…/-/raw/main/rom/80/N80_102.bin
-        n80=@0000:https://gitlab.com/…/-/raw/main/rom/80/N80_102.bin
-        n80=@aslp:baz.p       # ASL output file w/internal offset info
+def tdpath(filename):
+    return Path(__file__).parent.joinpath('testdata', filename)
 
-    Downloaded ROM cache:
-        .download/rom/https/gitlab.com/…/-/raw/main/rom/80/N80_102.bin
+def test_write():
+    ri = RomImage('t_write');
+    with BytesIO() as f:
+        ri.writefd(f);  assert b'' == f.getvalue()
 
-'''
+    ri.image = b'\x00\x01\x02'
+    with BytesIO() as f:
+        ri.writefd(f);  assert b'\x00\x01\x02' == f.getvalue()
+
+def test_load_file():
+    ri = RomImage('t_load_file')
+    assert b'' == ri.image
+    ri.path = tdpath('romimage.bin')
+    ri.load()
+    assert b'RomImage Test Data\n' == ri.image
+
+def test_load_url():
+    ri = RomImage('t_load_url')
+    assert b'' == ri.image
+    ri.path = tdpath('non/existent')
+    ri.url  = 'file:/' + str(tdpath('romimage.bin'))
+    ri.load(cache=False)
+    assert b'RomImage Test Data\n' == ri.image
