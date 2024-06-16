@@ -106,8 +106,6 @@ class CSCP(Suite):
         romsrcdir = self.romsrcdir(emulator)
         for filename, url in self.VENDOR_ROM[emulator].items():
             dlrom = romsrcdir.joinpath(filename)
-            print(filename)
-            print(dlrom)
             if not dlrom.exists():
                 try:
                     with urlopen(url) as response:
