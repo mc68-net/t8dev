@@ -21,6 +21,7 @@
 '''
 
 from    pathlib  import Path
+from    urllib.request  import HTTPError, urlopen
 
 class RomImage:
     ''' XXX image of a ROM
@@ -73,12 +74,17 @@ class RomImage:
         with open(self.path, 'rb') as f:  self.image = f.read()
 
     def download(self):
-        ...
+        try:
+            with urlopen(self.url) as response:
+                self.image = response.read()
+        except HTTPError as ex:
+            err(f'{ex} for {filename!r} from {self.url!r}')
 
     def patches(self, patchspecs):
         ''' XXX takes name=... specs
             XXX return whether we used any? Or don't care?
         '''
+        raise NotImplementedError('patches()')
 
 
 '''

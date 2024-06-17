@@ -17,13 +17,13 @@ def test_load_file():
     ri = RomImage('t_load_file')
     assert b'' == ri.image
     ri.path = tdpath('romimage.bin')
-    ri.load()
+    ri.load(cache=False)    # tests readfile()
     assert b'RomImage Test Data\n' == ri.image
 
 def test_load_url():
     ri = RomImage('t_load_url')
     assert b'' == ri.image
     ri.path = tdpath('non/existent')
-    ri.url  = 'file:/' + str(tdpath('romimage.bin'))
-    ri.load(cache=False)
+    ri.url  = 'file://' + str(tdpath('romimage.bin'))
+    ri.load(cache=False)    # tests download()
     assert b'RomImage Test Data\n' == ri.image
