@@ -1,8 +1,29 @@
 from    io  import BytesIO
 from    t8dev.cli.t8dev.romimage  import *      # XXX move to r8format
+import  pytest
 
 def tdpath(filename):
     return Path(__file__).parent.joinpath('testdata', filename)
+
+
+@pytest.mark.parametrize('s', [ 'http://usr@pw:ex.com/', 'http:', 'a2+-.:', ])
+def test_SCHEME_true(s):  assert RomImage.SCHEME.match(s)
+
+@pytest.mark.parametrize('s', [ 'a', '', '2:', ])
+def test_SCHEME_false(s):  assert not RomImage.SCHEME.match(s)
+
+@pytest.mark.parametrize('loadspec, startaddr, url, path', [
+    ('@1F2E:foo/bar',               0x1F2E, None, 'foo/bar'),
+    ('@1F2E/foo/bar',                    0, None, '@1F2E/foo/bar'),
+    ('foo/bar',                          0, None, 'foo/bar'),
+    ('@12:file://foo/bar',          0x0012, 'file://foo/bar', 'YYY'),
+    ('https://bin.com/foo/bar.bin',      0,
+            'https://bin.com/foo/bar.bin', 'YYY'),
+])
+def test_set_loadspec(loadspec, startaddr, url, path):
+    ri = RomImage(None)
+    ri.set_loadspec(loadspec)
+    assert (startaddr, url, path) == (ri.startaddr, ri.url, ri.path)
 
 def test_write():
     ri = RomImage('t_write');

@@ -22,6 +22,7 @@
 
 from    pathlib  import Path
 from    urllib.request  import HTTPError, urlopen
+import  re
 
 class RomImage:
     ''' XXX image of a ROM
@@ -29,16 +30,37 @@ class RomImage:
     '''
 
     def __init__(self, name, loadspec=None, doload=True):
-        self.name  = name
-        self.url   = None
-        self.path  = None
-        self.image = b''
+        self.name       = name
+        self.url        = None
+        self.path       = None
+        self.startaddr  = 0x0000
+        self.image      = b''
         if loadspec is not None:  self.set_loadspec(loadspec)
         if self.path and doload:  self.load()
 
+    LOADSPEC = re.compile(r'(@[0-9A-Fa-f]+:)?(.*)')
+    SCHEME   = re.compile(r'^[A-Za-z][A-Za-z0-9+.-]*:')
+
     def set_loadspec(self, loadspec):
-        self.url = 'XXX'
-        self.path = Path('/XXX')
+        ''' Given a *loadspec*, set:
+            - `startaddr` to the start address given in the loadspec,
+              or $0000 if not present.
+            - `url` to the URL given in the loadspec, if present
+            - `path` to the local path at which we cache the data
+              downloaded from that URL, or the given path if it's
+              not a URL, and
+        '''
+        addr, rhs = self.LOADSPEC.fullmatch(loadspec).group(1, 2)
+        if addr:
+            self.startaddr = int(addr[1:-1], 16)
+        if not self.SCHEME.match(rhs):
+            self.path = rhs
+        else:
+            self.url = rhs
+            self.path = self.cache_file(self.url)
+
+    def cache_file(self, url):
+        return 'XXX'
 
     def writefile(self, path):
         ' Write this binary image to the given filename. '
