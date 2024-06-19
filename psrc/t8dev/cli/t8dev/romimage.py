@@ -23,6 +23,7 @@
 from    pathlib  import Path
 from    urllib.request  import HTTPError, urlopen
 import  re
+import  t8dev.path as path
 
 class RomImage:
     ''' XXX image of a ROM
@@ -53,14 +54,14 @@ class RomImage:
         addr, rhs = self.LOADSPEC.fullmatch(loadspec).group(1, 2)
         if addr:
             self.startaddr = int(addr[1:-1], 16)
-        if not self.SCHEME.match(rhs):
-            self.path = rhs
-        else:
+        if self.SCHEME.match(rhs):
             self.url = rhs
             self.path = self.cache_file(self.url)
+        else:
+            self.path = rhs
 
     def cache_file(self, url):
-        return 'XXX'
+        return path.download('rom-image')
 
     def writefile(self, path):
         ' Write this binary image to the given filename. '
