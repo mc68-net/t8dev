@@ -26,14 +26,16 @@ def test_cache_file(url, expected):
     ('@1F2E:foo/bar',               0x1F2E, None, 'foo/bar'),
     ('@1F2E/foo/bar',                    0, None, '@1F2E/foo/bar'),
     ('foo/bar',                          0, None, 'foo/bar'),
-    ('@12:file://foo/bar',          0x0012, 'file://foo/bar', 'YYY'),
+    ('@12:file://foo/bar',          0x0012, 'file://foo/bar', 'file/foo/bar'),
     ('https://bin.com/foo/bar.bin',      0,
-            'https://bin.com/foo/bar.bin', 'YYY'),
+            'https://bin.com/foo/bar.bin', 'https/bin.com/foo/bar.bin'),
 ])
 def test_set_loadspec(loadspec, startaddr, url, path):
     ri = RomImage(None)
     ri.set_loadspec(loadspec)
-    assert (startaddr, url, path) == (ri.startaddr, ri.url, ri.path)
+    assert (startaddr, url) == (ri.startaddr, ri.url)
+    if ri.url:  assert str(ri.path).endswith('/' + path)
+    else:       assert path == ri.path
 
 def test_write():
     ri = RomImage('t_write');

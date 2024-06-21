@@ -22,6 +22,7 @@
 
 from    pathlib  import Path
 from    urllib.request  import HTTPError, urlopen
+from    urllib.parse  import urlparse
 import  re
 import  t8dev.path as path
 
@@ -61,7 +62,30 @@ class RomImage:
             self.path = rhs
 
     def cache_file(self, url):
-        return path.download('rom-image')
+        ''' Given a URL return a (hopefully) unique filesystem path in which
+            to cache the downloaded ROM image.
+
+            There are two instances that can cause collisions that we
+            (currently) don't deal with:
+
+            1. We remove any leading and trailing slashes to avoid "blank"
+               path components, but this also strips information about
+               whether it was a relative or absolute path, which can create
+               collisions.
+
+            2. We entirely ignore any URL parameters, and so collide if we
+               are downloading something such as ``/rom/foo?ver=1.1``
+               versus ``ver=1.2``.
+
+            Both of these problems We ignore for the moment because they
+            are difficult to handle and relatively unlikely and hard to
+            handle.
+        '''
+        p = urlparse(url)
+        c = ['rom-image', p.scheme, p.hostname ]
+        if p.port: c.append(p.port)
+        c += p.path.strip('/').split('/')
+        return path.download(*c)
 
     def writefile(self, path):
         ' Write this binary image to the given filename. '
