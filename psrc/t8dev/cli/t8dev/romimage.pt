@@ -61,3 +61,13 @@ def test_load_url():
     ri.startaddr = 2
     ri.load(2, url, cache=False)    # tests download()
     assert b'\x00\x00RomImage Test Data\n' == ri.image
+
+@pm('romname, expected, patchname', [
+    ('N80.BIN',     True,  'N80.BIN'),
+    ('N80.BIN',     False, 'N81.BIN'),
+    ('N80.BIN',     True,  'n80.bin'),
+    ('N80.BIN',     True,  'n80'),
+])
+def test_matchname(expected, romname, patchname):
+    assert expected == RomImage(romname).matchname(patchname)
+

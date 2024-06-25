@@ -27,14 +27,25 @@ import  re
 import  t8dev.path as path
 
 class RomImage:
-    ''' A `RomImage` is a sequence of bytes always starting at address $0000.
-        (That is the first address in the *ROM,* these are not necessarily
-        the addresses to which the ROM is mapped in the system's memory, if
-        indeed it is mapped into the CPU's address space at all.)
+    ''' A `RomImage` is a sequence of bytes always starting at address
+        $0000. (That is the first address in the *ROM,* these are not
+        necessarily the addresses to which the ROM is mapped in the
+        system's memory, if indeed it is mapped into the CPU's address
+        space at all.)
 
-        Each `RomImage` has an initial `source` (a URL or a path to a file)
-        whence it is loaded at a given offset; it then may be patched from
-        further sources each of which is loaded at its own offset.
+        Each RomImage has an optional *loadspec* for loading the initial
+        data, and may be patched with additional *patchspecs* that load
+        further data.
+
+        A loadspec is a path or URL, called a *source*, optionally prefixed
+        by ``@hhhh:`` where *hhhh* is any number of hexadecimal digits
+        specifying an offset in this ROM image at which to load the source.
+
+        A patchspec is a loadspec prefixed by ``name=`` where *name*
+        matches the name assigned to this RomImage at instantiation, as
+        determined by the `matchname()` function. Patches will overwrite
+        the existing RomImage data only from the patchspec's start address
+        to the length of the retrieved data.
     '''
 
     def __init__(self, name, loadspec=None, doload=True):
@@ -135,9 +146,20 @@ class RomImage:
         if cache:
             with open(cf, 'wb') as f: f.write(romdata)
 
+    def matchname(self, name):
+        ''' Return `True` if `name` matches this RomImage's name. The the
+            match is case-insensitive and the patchspec name need not
+            include the file extension, so e.g. ``n80=...`` will match a
+            RomImage named ``N80.ROM``.
+        '''
+        r = self.name.lower()
+        return r == name.lower() or r.rsplit('.', 1)[0] == name.lower()
+
     def patches(self, patchspecs):
-        ''' XXX takes name=... specs
-            XXX return whether we used any? Or don't care?
+        ''' This takes a sequence of *patchspecs* in the format
+            ``name=[@hhhh:]source`` and applies them to this ROM image. Any
+            patchspecs that are applied are removed from the sequence; any
+            that don't match this RomImage's name are ignored.
         '''
         return
         raise NotImplementedError('patches()')
