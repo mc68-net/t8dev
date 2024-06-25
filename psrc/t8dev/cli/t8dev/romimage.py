@@ -27,40 +27,36 @@ import  re
 import  t8dev.path as path
 
 class RomImage:
-    ''' XXX image of a ROM
-        XXX uses ROM address space (not CPU), i.e., starting at $0000
+    ''' A `RomImage` is a sequence of bytes always starting at address $0000.
+        (That is the first address in the *ROM,* these are not necessarily
+        the addresses to which the ROM is mapped in the system's memory, if
+        indeed it is mapped into the CPU's address space at all.)
+
+        Each `RomImage` has an initial `source` (a URL or a path to a file)
+        whence it is loaded at a given offset; it then may be patched from
+        further sources each of which is loaded at its own offset.
     '''
 
     def __init__(self, name, loadspec=None, doload=True):
         self.name       = name
-        self.source     = None
-        self.startaddr  = 0x0000
         self.image      = bytearray()
         if loadspec is not None:
-            self._set_loadspec(loadspec)
-            if doload:  self.load(self.startaddr, self.source)
+            if doload:  self.load(*self.parse_loadspec(loadspec))
 
     LOADSPEC = re.compile(r'(@[0-9A-Fa-f]+:)?(.*)')
     SCHEME   = re.compile(r'^[A-Za-z][A-Za-z0-9+.-]*:')
 
-    def _set_loadspec(self, loadspec):
-        ''' Given a *loadspec*, set:
-            - `startaddr` to the start address given in the loadspec,
-              or $0000 if not present.
-            - `url` to the URL given in the loadspec, if present
-            - `path` to the local path at which we cache the data
-              downloaded from that URL, or the given path if it's
-              not a URL, and
+    @staticmethod
+    def parse_loadspec(loadspec):
+        ''' Given a `loadspec` in the format ``[@hhhh:]path-or-URL``, return
+            the startaddr (hex digits _hhhh_ above; $0000 if not present)
+            and the path or URL.
         '''
-        addr, rhs = self.LOADSPEC.fullmatch(loadspec).group(1, 2)
-        if addr:  self.startaddr = int(addr[1:-1], 16)
-        self.url = rhs
-
-    def set_image(self, offset, bs):
-        ' Set our in-memory image bytes starting at `offset` to bytes `bs`. '
-        if offset > len(self.image):
-            self.image += b'\x00' * (offset - len(self.image))
-        self.image[offset:offset+len(bs)] = bs
+        addr, rhs = RomImage.LOADSPEC.fullmatch(loadspec).group(1, 2)
+        if addr:
+            return (int(addr[1:-1], 16), rhs)
+        else:
+            return (0, rhs)
 
     @staticmethod
     def cache_file(url):
@@ -91,6 +87,12 @@ class RomImage:
         p.parent.mkdir(exist_ok=True, parents=True)
         return p
 
+    def set_image(self, offset, bs):
+        ' Set our in-memory image bytes starting at `offset` to bytes `bs`. '
+        if offset > len(self.image):
+            self.image += b'\x00' * (offset - len(self.image))
+        self.image[offset:offset+len(bs)] = bs
+
     def writefile(self, path):
         ' Write this binary image to the given filename. '
         with open(path, 'wb') as f:  self.writefd(f)
@@ -114,22 +116,22 @@ class RomImage:
             doesn't exist, the downloaded data will be saved in
             `cache_file(source)`.
         '''
-        if not self.SCHEME.match(source):           # is path to a file?
-            self.readfile(self.startaddr, source)
+        if not self.SCHEME.match(str(source)):      # is path to a file?
+            self.readfile(offset, source)
             return
 
         if cache:
-            cf = self.cache_file(url)
+            cf = self.cache_file(source)
             if cf.exists():
                 self.readfile(self.startaddr, cf)
                 return
 
         try:
-            with urlopen(url) as response:
+            with urlopen(source) as response:
                 romdata = response.read()
                 self.set_image(offset, romdata)
         except HTTPError as ex:
-            err(f'{ex} for {filename!r} from {url!r}')
+            err(f'{ex} for {source!r}')
         if cache:
             with open(cf, 'wb') as f: f.write(romdata)
 

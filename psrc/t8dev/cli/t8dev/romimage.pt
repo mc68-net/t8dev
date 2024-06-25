@@ -21,6 +21,16 @@ def test_SCHEME_true(s):  assert RomImage.SCHEME.match(s)
 @pm('s', [ 'a', '', '2:', ])
 def test_SCHEME_false(s):  assert not RomImage.SCHEME.match(s)
 
+@pm('loadspec, startaddr, source', [
+    ('@1F2E:foo/bar',               0x1F2E, 'foo/bar'),
+    ('@1F2E/foo/bar',                    0, '@1F2E/foo/bar'),
+    ('foo/bar',                          0, 'foo/bar'),
+    ('@12:file://foo/bar',          0x0012, 'file://foo/bar'),
+    ('https://bin.com/foo/bar.bin',      0, 'https://bin.com/foo/bar.bin'),
+])
+def test_parse_loadspec(loadspec, startaddr, source):
+    assert (startaddr, source) == RomImage.parse_loadspec(loadspec)
+
 @pm('url, expected', [
     ['file://foo/bar/baz.bin',          'file/foo/bar/baz.bin'],
     ['https://example.com/bar/woz.bin', 'https/example.com/bar/woz.bin'],
@@ -28,21 +38,6 @@ def test_SCHEME_false(s):  assert not RomImage.SCHEME.match(s)
 def test_cache_file(url, expected):
     path = RomImage(None).cache_file(url)
     assert str(path).endswith('/.download/rom-image/' + expected)
-
-@pm('loadspec, startaddr, url, path', [
-    ('@1F2E:foo/bar',               0x1F2E, None, 'foo/bar'),
-    ('@1F2E/foo/bar',                    0, None, '@1F2E/foo/bar'),
-    ('foo/bar',                          0, None, 'foo/bar'),
-    ('@12:file://foo/bar',          0x0012, 'file://foo/bar', 'file/foo/bar'),
-    ('https://bin.com/foo/bar.bin',      0,
-            'https://bin.com/foo/bar.bin', 'https/bin.com/foo/bar.bin'),
-])
-def test_set_loadspec(loadspec, startaddr, url, path):
-    ri = RomImage(None)
-    ri._set_loadspec(loadspec)
-    assert (startaddr, url) == (ri.startaddr, ri.url)
-    if ri.url:  assert str(ri.path).endswith('/' + path)
-    else:       assert path == ri.path
 
 def test_write():
     ri = RomImage('t_write');
@@ -56,15 +51,13 @@ def test_write():
 def test_load_file():
     ri = RomImage('t_load_file')
     assert b'' == ri.image
-    ri.path = tdpath('romimage.bin')
-    ri.load(cache=False)    # tests readfile()
+    ri.load(0, tdpath('romimage.bin'), cache=False)    # tests readfile()
     assert b'RomImage Test Data\n' == ri.image
 
 def test_load_url():
     ri = RomImage('t_load_url')
     assert b'' == ri.image
-    ri.path = tdpath('non/existent')
-    ri.url  = 'file://' + str(tdpath('romimage.bin'))
+    url  = 'file://' + str(tdpath('romimage.bin'))
     ri.startaddr = 2
-    ri.load(cache=False)    # tests download()
+    ri.load(2, url, cache=False)    # tests download()
     assert b'\x00\x00RomImage Test Data\n' == ri.image
