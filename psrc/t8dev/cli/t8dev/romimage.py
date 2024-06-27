@@ -1,16 +1,4 @@
-'''
-
-    For N80.ROM
-        n80=foo.bin
-        n80=@6000:bar.bin
-        n80=@6000:file:bar.bin
-        n80=@6000:file://tmp/bar.bin
-        n80=https://gitlab.com/…/-/raw/main/rom/80/N80_102.bin
-        n80=@0000:https://gitlab.com/…/-/raw/main/rom/80/N80_102.bin
-        n80=@aslp:baz.p       # ASL output file w/internal offset info
-
-    Downloaded ROM cache:
-        .download/rom/https/gitlab.com/…/-/raw/main/rom/80/N80_102.bin
+''' Download and build ROM images.
 '''
 
 from    pathlib  import Path
@@ -41,11 +29,14 @@ class RomImage:
         to the length of the retrieved data.
     '''
 
-    def __init__(self, name, loadspec=None, doload=True):
+    def __init__(self, name, loadspec=None):
+        ''' Create a new `RomImage` named `name`, optionally loading
+            `loadspec` into the image.
+        '''
         self.name       = name
         self.image      = bytearray()
         if loadspec is not None:
-            if doload:  self.load(*self.parse_loadspec(loadspec))
+            self.load(*self.parse_loadspec(loadspec))
 
     LOADSPEC = re.compile(r'(@[0-9A-Fa-f]+:)?(.*)')
     SCHEME   = re.compile(r'^[A-Za-z][A-Za-z0-9+.-]*:')
@@ -55,6 +46,9 @@ class RomImage:
         ''' Given a `loadspec` in the format ``[@hhhh:]path-or-URL``, return
             the startaddr (hex digits _hhhh_ above; $0000 if not present)
             and the path or URL.
+
+            This never fails, though it may return an odd "path" if you
+            e.g. include a non-hex-digit in the ``@hhhh:`` part.
         '''
         addr, rhs = RomImage.LOADSPEC.fullmatch(loadspec).group(1, 2)
         if addr:
@@ -149,6 +143,7 @@ class RomImage:
         return r == name.lower() or r.rsplit('.', 1)[0] == name.lower()
 
     def matchpatchspec(self, patchspec):
+        if not '=' in  patchspec:  return False
         name, _ = patchspec.split('=', 1)
         return self.matchname(name)
 
@@ -162,5 +157,4 @@ class RomImage:
                       if self.matchpatchspec(patchspecs[i]) ]
         for i in matches:
             name, loadspec = patchspecs.pop(i).split('=', 1)
-            print(f'XXX MATCHED at ={i} name={name} loadspec={loadspec!r}')
             self.load(*self.parse_loadspec(loadspec))

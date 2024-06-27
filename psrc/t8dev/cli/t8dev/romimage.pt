@@ -1,6 +1,8 @@
 from    io  import BytesIO
-from    t8dev.cli.t8dev.romimage  import *      # XXX move to r8format
+from    urllib.error  import URLError
 import  pytest
+
+from    t8dev.cli.t8dev.romimage  import *      # XXX move to r8format
 
 pm = pytest.mark.parametrize
 
@@ -62,12 +64,32 @@ def test_load_url():
     ri.load(2, url, cache=False)    # tests download()
     assert b'\x00\x00RomImage Test Data\n' == ri.image
 
+def test_load_url_bad():
+    ri = RomImage('t_load_url')
+    with pytest.raises(URLError):
+        ri.load(0, 'file:///this/is/a/bad/path', cache=False)
+
 @pm('romname, expected, patchname', [
     ('N80.BIN',     True,  'N80.BIN'),
     ('N80.BIN',     False, 'N81.BIN'),
     ('N80.BIN',     True,  'n80.bin'),
     ('N80.BIN',     True,  'n80'),
+    ('foo',         False, 'foo.bin'),
 ])
 def test_matchname(expected, romname, patchname):
     assert expected == RomImage(romname).matchname(patchname)
 
+def test_matchpatchspec():
+    ri = RomImage('')
+    assert not ri.matchpatchspec('foo=bar')
+    assert not ri.matchpatchspec('foo')
+
+def test_patches():
+    ri = RomImage('ABC.def')
+    patchspecs = ['foo=bar', 'baz=quux', 'justbad', ]
+    ri.patches(patchspecs)
+    assert 3 == len(patchspecs)
+
+    patchspecs[1] = 'abc=/dev/null'
+    ri.patches(patchspecs)
+    assert 2 == len(patchspecs)
