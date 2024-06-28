@@ -5,7 +5,6 @@ from    pathlib  import Path
 from    urllib.request  import HTTPError, urlopen
 from    urllib.parse  import urlparse
 import  re
-import  t8dev.path as path
 
 class RomImage:
     ''' A `RomImage` is a sequence of bytes always starting at address
@@ -29,11 +28,20 @@ class RomImage:
         to the length of the retrieved data.
     '''
 
-    def __init__(self, name, loadspec=None):
+    def __init__(self, name, cachedir, loadspec=None):
         ''' Create a new `RomImage` named `name`, optionally loading
             `loadspec` into the image.
+
+            If `cachedir` is `None` any URLs given to `load()` or similar
+            will always be fetched. Otherwise `cachedir` must be a
+            path-like object in which local copies of the downloaded URLs
+            will be stored to be read the next time the same URL is
+            encountered. (The subdirectories under this will be generated
+            with `cache_file(url)`)
         '''
         self.name       = name
+        if cachedir is None:    self.cachedir = None
+        else:                   self.cachedir = Path(cachedir)
         self.image      = bytearray()
         if loadspec is not None:
             self.load(*self.parse_loadspec(loadspec))
@@ -56,8 +64,7 @@ class RomImage:
         else:
             return (0, rhs)
 
-    @staticmethod
-    def cache_file(url):
+    def cache_file(self, url, mkdir=True):
         ''' Given a URL return a (hopefully) unique filesystem path in which
             to cache the downloaded ROM image.
 
@@ -78,11 +85,11 @@ class RomImage:
             handle.
         '''
         u = urlparse(url)
-        c = ['rom-image', u.scheme, u.hostname ]
+        c = [u.scheme, u.hostname ]
         if u.port: c.append(u.port)
         c += u.path.strip('/').split('/')
-        p = path.download(*c, mkdir=False)
-        p.parent.mkdir(exist_ok=True, parents=True)
+        p = self.cachedir.joinpath(*c)
+        if mkdir:  p.parent.mkdir(exist_ok=True, parents=True)
         return p
 
     def set_image(self, offset, bs):
@@ -102,23 +109,15 @@ class RomImage:
     def readfile(self, startaddr, path):
         with open(path, 'rb') as f:  self.set_image(startaddr, f.read())
 
-    def load(self, offset, source, cache=True):
+    def load(self, offset, source):
         ''' Load the data from `source` (a URL or path) into this RomImage,
             at offset `offset`.
-
-            If `cache` is `False` or if `source` is a file, a load from
-            `source` will always be done.
-
-            If `cache` is `True` and `source` is a URL, the data will be
-            taken from `cache_file(source)` if that file exists. If it
-            doesn't exist, the downloaded data will be saved in
-            `cache_file(source)`.
         '''
         if not self.SCHEME.match(str(source)):      # is path to a file?
             self.readfile(offset, source)
             return
 
-        if cache:
+        if self.cachedir:
             cf = self.cache_file(source)
             if cf.exists():
                 self.readfile(offset, cf)
@@ -130,7 +129,7 @@ class RomImage:
                 self.set_image(offset, romdata)
         except HTTPError as ex:
             err(f'{ex} for {source!r}')
-        if cache:
+        if self.cachedir:
             with open(cf, 'wb') as f: f.write(romdata)
 
     def matchname(self, name):

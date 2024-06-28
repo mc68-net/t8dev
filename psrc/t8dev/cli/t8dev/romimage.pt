@@ -10,7 +10,7 @@ def tdpath(filename):
     return Path(__file__).parent.joinpath('testdata', filename)
 
 def test_set_image():
-    ri = RomImage('set_image')
+    ri = RomImage('set_image', cachedir=None)
 
     ...;                            assert b''              == ri.image
     ri.set_image(0, b'AB');         assert b'AB'            == ri.image
@@ -38,11 +38,11 @@ def test_parse_loadspec(loadspec, startaddr, source):
     ['https://example.com/bar/woz.bin', 'https/example.com/bar/woz.bin'],
 ])
 def test_cache_file(url, expected):
-    path = RomImage(None).cache_file(url)
-    assert str(path).endswith('/.download/rom-image/' + expected)
+    path = RomImage(None, cachedir='/foo/bar').cache_file(url, mkdir=False)
+    assert '/foo/bar/' + expected == str(path)
 
 def test_write():
-    ri = RomImage('t_write');
+    ri = RomImage('t_write', cachedir=None);
     with BytesIO() as f:
         ri.writefd(f);  assert b'' == f.getvalue()
 
@@ -51,23 +51,23 @@ def test_write():
         ri.writefd(f);  assert b'\x00\x01\x02' == f.getvalue()
 
 def test_load_file():
-    ri = RomImage('t_load_file')
+    ri = RomImage('t_load_file', cachedir=None)
     assert b'' == ri.image
-    ri.load(0, tdpath('romimage.bin'), cache=False)    # tests readfile()
+    ri.load(0, tdpath('romimage.bin'))    # tests readfile()
     assert b'RomImage Test Data\n' == ri.image
 
 def test_load_url():
-    ri = RomImage('t_load_url')
+    ri = RomImage('t_load_url', cachedir=None)
     assert b'' == ri.image
     url  = 'file://' + str(tdpath('romimage.bin'))
     ri.startaddr = 2
-    ri.load(2, url, cache=False)    # tests download()
+    ri.load(2, url)    # tests download()
     assert b'\x00\x00RomImage Test Data\n' == ri.image
 
 def test_load_url_bad():
-    ri = RomImage('t_load_url')
+    ri = RomImage('t_load_url', cachedir=None)
     with pytest.raises(URLError):
-        ri.load(0, 'file:///this/is/a/bad/path', cache=False)
+        ri.load(0, 'file:///this/is/a/bad/path')
 
 @pm('romname, expected, patchname', [
     ('N80.BIN',     True,  'N80.BIN'),
@@ -77,15 +77,15 @@ def test_load_url_bad():
     ('foo',         False, 'foo.bin'),
 ])
 def test_matchname(expected, romname, patchname):
-    assert expected == RomImage(romname).matchname(patchname)
+    assert expected == RomImage(romname, cachedir=None).matchname(patchname)
 
 def test_matchpatchspec():
-    ri = RomImage('')
+    ri = RomImage('', cachedir=None)
     assert not ri.matchpatchspec('foo=bar')
     assert not ri.matchpatchspec('foo')
 
 def test_patches():
-    ri = RomImage('ABC.def')
+    ri = RomImage('ABC.def', cachedir=None)
     patchspecs = ['foo=bar', 'baz=quux', 'justbad', ]
     ri.patches(patchspecs)
     assert 3 == len(patchspecs)

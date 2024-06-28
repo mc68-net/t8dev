@@ -102,7 +102,7 @@ class CSCP(Suite):
         copyfile(path.tool('bin/cscp', emuexe), self.emudir(emuexe))
 
         for filename, loadspec in self.VENDOR_ROM[emulator].items():
-            ri = RomImage(filename, loadspec)
+            ri = RomImage(filename, path.download('rom-image'), loadspec)
             ri.patches(self.args)   # removes args it used and patched
             ri.writefile(self.emudir(filename))
         if self.args:
