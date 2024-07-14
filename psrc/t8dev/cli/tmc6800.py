@@ -3,12 +3,13 @@
 #  tmc6800 - load an AS .p file into the testmc.mc6800 simulator and run it
 #
 
-from    sys  import argv, stdin, stdout, stderr
+from    sys  import argv, stdin, stdout
 from    os  import isatty
 from    traceback  import print_exception
 import  termios, tty
 
 from    t8dev  import path
+from    t8dev.cli  import exits
 from    testmc.mc6800  import Machine
 from    binary.tool.asl  import parse_obj_fromfile
 
@@ -68,10 +69,6 @@ def exec(fname):
         tb = None   # Traceback not usually useful. Add option to print it?
         print_exception(None, ex, tb)
 
-def usage():
-    print('Usage: tmc6800 <file>', file=stderr)
-    exit(2)
-
 def main():
-    if len(argv) != 2: usage()
+    if len(argv) != 2: exits.usage('Usage: tmc6800 <file>')
     exec(binname(argv[1]))

@@ -9,6 +9,7 @@
 from    sys  import argv, stderr
 
 from    t8dev  import path
+from    t8dev.cli  import exits
 from    t8dev.run  import tool
 
 def binname(fname):
@@ -60,16 +61,12 @@ def parseargs(args):
         args.pop(0)
 
     if len(args) > 0:
-        usage()
+        exits.usage('mb6885 [-n] <file.p>')
 
     #   XXX HACK: we should be extracting this from srec_file.
     entrypoint = 0x3000
 
     return rom_dir, srec_file, entrypoint
-
-def usage():
-    print('Usage: mb6885 [-n] <file.p>', file=stderr)
-    exit(2)
 
 def main():
     runbm2(*parseargs(argv[1:]))

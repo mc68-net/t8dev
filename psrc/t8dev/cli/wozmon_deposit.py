@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from    sys  import argv, stderr
+from    sys  import argv
+from    t8dev.cli  import exits
 from    binary.tool.asl  import parse_obj_fromfile
 
 def load_image(fname):
@@ -26,13 +27,11 @@ def print_wozinput(eol, mi):
             addr += BYTES
             index += BYTES
 
-def usage():
-    print('Usage: wozmon-deposit -c|-n <file>', file=stderr)
-    exit(2)
+USAGE = 'wozmon-deposit -c|-n <file>'
 
 def main():
-    if len(argv) < 3: usage()
+    if len(argv) < 3: exits.usage(USAGE)
     if   argv[1] == '-c': eol = '\r'
     elif argv[1] == '-n': eol = '\n'
-    else                : usage()
+    else                : exits.usage(USAGE)
     print_wozinput(eol, load_image(argv[2]))

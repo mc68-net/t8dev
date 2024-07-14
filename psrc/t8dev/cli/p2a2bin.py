@@ -7,9 +7,10 @@
 
 from    os  import fdopen
 from    struct  import pack
-from    sys  import argv, stdout, stderr
+from    sys  import argv, stdout
 
 from    t8dev  import path
+from    t8dev.cli  import exits
 from    binary.tool.asl  import parse_obj_fromfile
 
 
@@ -34,10 +35,6 @@ def print_a2bin(mi):
     output.write(pack('<h', mi.contiglen()))
     output.write(mi.contigbytes())
 
-def usage():
-    print('Usage: p2a2bin <file>', file=stderr)
-    exit(2)
-
 def main():
-    if len(argv) != 2: usage()
+    if len(argv) != 2:  exits.usage('p2a2bin <file>')
     print_a2bin(load_image(argv[1]))
