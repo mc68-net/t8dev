@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from    sys  import argv
+from    t8dev  import path
 from    t8dev.cli  import exits
 from    binary.tool.asl  import parse_obj_fromfile
 
