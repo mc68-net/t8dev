@@ -37,6 +37,7 @@
       when one is available from the environment.
 '''
 
+from    multiprocessing  import cpu_count
 from    pathlib  import Path
 import  abc, hashlib, os, pathlib, requests, shutil, subprocess, sys, traceback
 
@@ -353,7 +354,8 @@ class Setup(metaclass=abc.ABCMeta):
             definition. Further arguments may be passed as `*makeargs`.
         '''
         prefix = 'PREFIX=' + str(self.pdir())
-        cmd = ('make', '-j8', prefix) + makeargs
+        jobs = '-j' + str(cpu_count() * 2)
+        cmd = ('make', jobs, prefix) + makeargs
         self.printaction(*cmd)
         runcmd(cmd, cwd=self.srcdir().joinpath(subdir))
 
