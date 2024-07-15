@@ -117,7 +117,8 @@ _____
         if ! pip inspect | grep >/dev/null ".url.: .file://$dir"; then
             echo "----- Installing package $pkgname$extras from submodule $sm" \
                 'as editable into virtual environment.'
-            pip install -q -e "$dir$extras"
+            pip install -q -e "$dir$extras" || {
+                echo 1>&2 'Package install failed.'; return 3; }
         fi
     done
 }
