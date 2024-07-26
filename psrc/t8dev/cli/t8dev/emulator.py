@@ -61,8 +61,34 @@ class Suite:
 class CSCP(Suite):
 
     VENDOR_ROM = {
+        #   Currently our default is to load TK80.ROM and not load BSMON.ROM,
+        #   which produces a "normal" unexpanded TK-80.
+        #   - If BSMON.ROM is supplied, the emulator patches the start
+        #     vector (RST 0) to jump to the BSMON start (`jp $F000`). This
+        #     will give an expanded TK80BS running in BASIC mode.
+        #   - If TK80.ROM is _not_ supplied, the emulator patches the start
+        #     vector as above and RST 7 to `jp $83DD` (for the hardware
+        #     interrupt?), giving a TK80BS in BASIC without original TK-80
+        #     ROM functionality.
+        #   We need to update r8format's binary.romimage to allow us to
+        #   supply patch specs like `tk80=-` to clear the ROM image (thus
+        #   removing any loaded defaults) so we can supply nice defaults
+        #   here but easily allow users to undo them.
+        'tk80bs': {
+            #   If this ROM is _not_ present (file size 0) the emulator sets
+            #   `jp $F000` at RST 0 and `jp $83DD` at RST 7.
+            'TK80.ROM':         # $0000-$07FF fill $FF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK80.bin',
+            'EXT.ROM': None,    # $0C00-$7BFF
+            #   If this ROM _is_ present (file size >0) the emulator sets
+            #   `jp $83DD` at RST 7.
+            'BSMON.ROM':        # $F000-$FFFF
+                None,
+        },
         'tk85': {
-            'TK85.ROM': 'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK85.bin'
+            'TK85.ROM':         # $0000-$07FF fill $FF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK85.bin',
+            'EXT.ROM': None,    # $0C00-$7BFF
         },
         'pc8001': {
             'N80.ROM': 'https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/N80_11.bin',
