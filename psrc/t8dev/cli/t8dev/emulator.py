@@ -102,7 +102,10 @@ class CSCP(Suite):
         #   symlinks, so we must copy the binary.
         copyfile(path.tool('bin/cscp', emuexe), self.emudir(emuexe))
 
-        for filename, loadspec in self.VENDOR_ROM[emulator].items():
+        roms = self.VENDOR_ROM.get(emulator, {})
+        if not roms:  exits.warn(
+            f'WARNING: CSCP emulator {emulator} has no ROM configuration.')
+        for filename, loadspec in roms.items():
             ri = RomImage(filename, path.download('rom-image'), loadspec)
             ri.patches(self.args)   # removes args it used and patched
             ri.writefile(self.emudir(filename))
