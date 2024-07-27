@@ -132,9 +132,13 @@ class CSCP(Suite):
         if not roms:  exits.warn(
             f'WARNING: CSCP emulator {emulator} has no ROM configuration.')
         for filename, loadspec in roms.items():
-            ri = RomImage(filename, path.download('rom-image'), loadspec)
-            try:  ri.patches(self.args)   # removes args it used and patched
-            except FileNotFoundError as ex:  exits.err(ex)
+            try:
+                ri = RomImage(filename, path.download('rom-image'), loadspec)
+                ri.patches(self.args)   # removes args it used and patched
+            except FileNotFoundError as ex:
+                exits.err(ex)
+            except HTTPError as ex:
+                exits.err(f'{ex}: {ex.url}')
             ri.writefile(self.emudir(filename))
         if self.args:
             exits.arg('Unknown arguments:', *[ f'  {arg}' for arg in self.args ])
