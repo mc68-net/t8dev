@@ -60,39 +60,46 @@ class Suite:
 
 class CSCP(Suite):
 
+    #   VENDOR_ROM entries may be for an actual CSCP emulator name, or may
+    #   be alternate configurations that load a different set of ROMs
+    #   (e.g., `tk80` below). The alternate ROM configurations include an
+    #   `_emulator` entry which is not a ROM image but indicates the actual
+    #   name of the emulator to use (e.g., `tk80bs` for the `tk80` entry
+    #   below).
     VENDOR_ROM = {
-        #   Currently our default is to load TK80.ROM and not load BSMON.ROM,
-        #   which produces a "normal" unexpanded TK-80.
-        #   - If BSMON.ROM is supplied, the emulator patches the start
-        #     vector (RST 0) to jump to the BSMON start (`jp $F000`). This
-        #     will give an expanded TK80BS running in BASIC mode.
-        #   - If TK80.ROM is _not_ supplied, the emulator patches the start
-        #     vector as above and RST 7 to `jp $83DD` (for the hardware
-        #     interrupt?), giving a TK80BS in BASIC without original TK-80
-        #     ROM functionality.
-        #   We need to update r8format's binary.romimage to allow us to
-        #   supply patch specs like `tk80=-` to clear the ROM image (thus
-        #   removing any loaded defaults) so we can supply nice defaults
-        #   here but easily allow users to undo them.
-        'tk80bs': {
-            #   If this ROM is _not_ present (file size 0) the emulator sets
-            #   `jp $F000` at RST 0 and `jp $83DD` at RST 7.
-            'TK80.ROM':         # $0000-$07FF fill $FF
-                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK80.bin',
-            'EXT.ROM': None,    # $0C00-$7BFF
-            #   If this ROM _is_ present (file size >0) the emulator sets
-            #   `jp $83DD` at RST 7.
-            'BSMON.ROM':        # $F000-$FFFF
-                None,
-        },
-        'tk85': {
-            'TK85.ROM':         # $0000-$07FF fill $FF
-                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK85.bin',
-            'EXT.ROM': None,    # $0C00-$7BFF
-        },
         'pc8001': {
             'N80.ROM': 'https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/N80_11.bin',
             'KANJI1.ROM': '@1000:https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/FONT80.bin',
+        },
+        'tk80': {
+            '_emulator': 'tk80bs',
+            'TK80.ROM':             # $0000-$07FF fill $FF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK80.bin',
+            'EXT.ROM': None,        # $0C00-$7BFF
+            'BSMON.ROM': None,      # $F000-$FFFF
+        },
+        'tk80bs': {
+            #   With TK80.ROM not present (file size 0) the emulator sets
+            #   `jp $F000` at RST 0 and `jp $83DD` at RST 7, like the
+            #   `tk80.dummy` ROM that MAME uses.
+            'TK80.ROM': None,       # $0000-$07FF fill $FF
+            'EXT.ROM':              # $0C00-$7BFF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/ext.11',
+            #   If this ROM _is_ present (file size >0) the emulator sets
+            #   `jp $83DD` at RST 7 (patching TK80.ROM if present).
+            'BSMON.ROM':            # $F000-$FFFF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/bsmon.11',
+            #   Only one of LV[12]BASIC.ROM is read based on the boot mode.
+            'LV1BASIC.ROM': None,   # $E000-$EFFF
+            'LV2BASIC.ROM':         # $D000-$EFFF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/lv2basic.11',
+            'FONT.ROM':             # chargen addr space
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/font.rom',
+        },
+        'tk85': {
+            'TK85.ROM':             # $0000-$07FF fill $FF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/TK85.bin',
+            'EXT.ROM': None,        # $0C00-$7BFF
         },
     }
 
@@ -101,18 +108,39 @@ class CSCP(Suite):
             exits.arg("Missing emulator name. Use 'list' for list of emulators.")
 
         self.set_bindir()
-        emulist = [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
         self.emulator = emulator = self.args.pop(0)
         if emulator == 'list':
-            cols = get_terminal_size().columns - 1
-            print(textwrap.fill(' '.join(emulist), width=cols))
+            self.print_emulators()
             return
-        elif emulator not in emulist:
+        elif emulator not in (self.emulator_exes() + list(self.VENDOR_ROM)):
             exits.arg(f"Bad emulator name '{emulator}'."
                 " Use 'list' for list of emulators.")
         else:
-            self.setup_emudir(emulator)
-            runtool('wine', str(self.emudir(emulator + '.exe')))
+            emuexe = self.setup_emudir(emulator)
+            runtool('wine', str(self.emudir(emuexe)))
+
+    def emulator_exes(self):
+        return [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]
+
+    def print_emulators(self):
+        rom_configs = [ name
+            for name, roms in self.VENDOR_ROM.items()
+            if not roms.get('_emulator') ]
+        print('With ROM configurations:'); self.format_list(rom_configs)
+
+        alt_configs = [ f"{name} ({roms.get('_emulator')})"
+            for name, roms in self.VENDOR_ROM.items()
+            if roms.get('_emulator') ]
+        print('Alternate ROM configurations:'); self.format_list(alt_configs)
+
+        exes = filter(lambda x: x not in rom_configs, self.emulator_exes())
+        print('Without ROM configurations:'); self.format_list(exes)
+
+    @staticmethod
+    def format_list(l):
+        cols = get_terminal_size().columns - 3
+        print(textwrap.fill(' '.join(l), width=cols,
+            initial_indent='  ', subsequent_indent='  '))
 
     def emudir(self, *components):
         ' Return a `Path` in the directory for this emulation run. '
@@ -122,16 +150,17 @@ class CSCP(Suite):
 
     def setup_emudir(self, emulator):
         ' Called with CWD set to the dir for this emulation run. '
+
+        # This may be overridden by VENDOR_ROM '_emulator' entry.
         emuexe = emulator + '.exe'
-        self.emudir(emuexe).unlink(missing_ok=True)
-        #   Wine emulates Windows *really* well and throws up on
-        #   symlinks, so we must copy the binary.
-        copyfile(path.tool('bin/cscp', emuexe), self.emudir(emuexe))
 
         roms = self.VENDOR_ROM.get(emulator, {})
         if not roms:  exits.warn(
             f'WARNING: CSCP emulator {emulator} has no ROM configuration.')
         for filename, loadspec in roms.items():
+            if filename == '_emulator':
+                emuexe = loadspec + '.exe'
+                continue
             try:
                 ri = RomImage(filename, path.download('rom-image'), loadspec)
                 ri.patches(self.args)   # removes args it used and patched
@@ -142,6 +171,13 @@ class CSCP(Suite):
             ri.writefile(self.emudir(filename))
         if self.args:
             exits.arg('Unknown arguments:', *[ f'  {arg}' for arg in self.args ])
+
+        self.emudir(emuexe).unlink(missing_ok=True)
+        #   Wine emulates Windows *really* well and throws up on
+        #   symlinks, so we must copy the binary.
+        copyfile(path.tool('bin/cscp', emuexe), self.emudir(emuexe))
+
+        return emuexe
 
     def set_bindir(self):
         import t8dev.toolset.cscp
