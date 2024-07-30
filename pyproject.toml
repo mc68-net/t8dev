@@ -11,7 +11,7 @@ urls.source = 'https://github.com/mc68-net/t8dev'
 urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
 requires-python = '>=3.6'
-dependencies = ['r8format>=0.0.5', 'patool']
+dependencies = ['r8format>=0.0.6', 'patool']
 
 [project.optional-dependencies]
 extsim  = ['py65',]                     # external CPU simulators
