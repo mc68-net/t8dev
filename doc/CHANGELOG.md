@@ -23,6 +23,8 @@ will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
 ### dev
+
+### 0.0.2 (2024-07-30)
 - Added: CSCP emulator suite `tk80bs` ROM configuration (BASIC SYSTEM) and
   `tk80` alternate ROM configuration (base system).
 - Fixed: Various `t8dev emulator cscp` UI improvements.
