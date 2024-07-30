@@ -23,6 +23,9 @@ will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
 ### dev
+- Added: CSCP emulator suite `tk80bs` ROM configuration (BASIC SYSTEM) and
+  `tk80` alternate ROM configuration (base system).
+- Fixed: Various `t8dev emulator cscp` UI improvements.
 
 ### 0.0.1 (2024-07-21)
 - Added: `t8setup.bash` can now be run without setting $T8_PROJDIR if the
