@@ -23,6 +23,10 @@ will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
 ### dev
+- Changed: When building ASL from `asl-releases`, use branch `upstream`
+  instead of `dev/cjs/master`; thus you now always get the latest version.
+  (There is currently no facility to request an earlier version except to
+  tweak the source code.)
 
 ### 0.0.2 (2024-07-30)
 - Added: CSCP emulator suite `tk80bs` ROM configuration (BASIC SYSTEM) and
