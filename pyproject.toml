@@ -1,5 +1,5 @@
 [project]
-version = '0.0.2'
+version = '0.0.2.dev1'
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
 authors = [
@@ -11,7 +11,11 @@ urls.source = 'https://github.com/mc68-net/t8dev'
 urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
 requires-python = '>=3.6'
-dependencies = ['r8format>=0.0.6', 'patool']
+dependencies = ['r8format>=0.0.6', 'patool', 'pytest_pt', ]
+#   `pytest_pt` is not strictly a runtime dependency, since we need it
+#   only to run our tests, but it's usual for repos using this package
+#   to want it for their own tests and, when this package is a submodule,
+#   to run this package's tests too.
 
 [project.optional-dependencies]
 extsim  = ['py65',]                     # external CPU simulators

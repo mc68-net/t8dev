@@ -23,6 +23,9 @@ will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
 ### dev
+- Changed: The `pytest_pt` module is no longer included under `psrc/`;
+  instead it's now a runtime dependency. (See `pyproject.toml` for an
+  explanation of why it's a runtime instead of development dependency.)
 - Changed: When building ASL from `asl-releases`, use branch `upstream`
   instead of `dev/cjs/master`; thus you now always get the latest version.
   (There is currently no facility to request an earlier version except to
