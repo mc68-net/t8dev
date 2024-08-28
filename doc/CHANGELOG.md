@@ -30,6 +30,7 @@ commit ID.
   instead of `dev/cjs/master`; thus you now always get the latest version.
   (There is currently no facility to request an earlier version except to
   tweak the source code.)
+- Fixed: The locations whence to download TK-80BS ROM images have changed.
 
 ### 0.0.2 (2024-07-30)
 - Added: CSCP emulator suite `tk80bs` ROM configuration (BASIC SYSTEM) and

@@ -84,17 +84,18 @@ class CSCP(Suite):
             #   `tk80.dummy` ROM that MAME uses.
             'TK80.ROM': None,       # $0000-$07FF fill $FF
             'EXT.ROM':              # $0C00-$7BFF
-                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/ext.11',
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS-clone/etkroms3/Ext.rom',
             #   If this ROM _is_ present (file size >0) the emulator sets
             #   `jp $83DD` at RST 7 (patching TK80.ROM if present).
             'BSMON.ROM':            # $F000-$FFFF
-                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/bsmon.11',
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS-clone/etkroms3/bsmon.rom',
             #   Only one of LV[12]BASIC.ROM is read based on the boot mode.
-            'LV1BASIC.ROM': None,   # $E000-$EFFF
+            'LV1BASIC.ROM':         # $E000-$EFFF
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS-clone/etkroms/L1CB.ROM',
             'LV2BASIC.ROM':         # $D000-$EFFF
-                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/lv2basic.11',
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS-clone/etkroms3/LV2BASIC.ROM',
             'FONT.ROM':             # chargen addr space
-                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS/font.rom',
+                'https://gitlab.com/retroabandon/tk80-re/-/raw/main/rom/80BS-clone/etkroms3/font.rom',
         },
         'tk85': {
             'TK85.ROM':             # $0000-$07FF fill $FF
