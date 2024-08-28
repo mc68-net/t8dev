@@ -1,9 +1,9 @@
 __pycache__/
 
+/.build/
 /tmp/
 
 #   setuptools output files.
-/dist/
 /psrc/t8dev.egg-info/
 
 #   developer stuff

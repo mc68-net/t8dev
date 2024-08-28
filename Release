@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+#   Release script for a generic Python project using pyproject.toml
+#
+#   Run this from the root directory of the project to be released.
+#   Generally used in conjunction with the instructions in r8format:
+#     https://github.com/mc68-net/r8format/blob/main/doc/release.md
+#
+#   This is currently a hack that still needs a good bit of manual work
+#   and checking, but it helps.
+#
+set -Eeuo pipefail
+trap 'echo 1>&2 "INTERNAL ERROR exitcode=$? line=$LINENO"' ERR
+
+die() { local ec=$?; shift; echo 1>&2 "$(basename "$0"):" "$@"; exit $ec; }
+
+[[ -r pyproject.toml ]] || die 1 'pyproject.toml not found'
+if grep '^version = ' pyproject.toml | grep -q dev; then
+    die 1 'pyproject.toml version number includes "dev"'
+fi
+#   XXX test that doc/CHANGELOG.md includes version number above and
+#   current date
+
+. ./pactivate -q
+pip -q install build twine
+rm -rf .build/release; mkdir -p .build/release/dist
+echo '• pyproject-build (output to .build/release/build.log)'
+pyproject-build --outdir .build/release/dist/ >.build/release/build.log
+echo '• twine check'
+twine check --strict .build/release/dist/*
+echo '• OK'
