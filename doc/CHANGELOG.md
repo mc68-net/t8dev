@@ -23,6 +23,9 @@ will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
 ### dev
+
+### 0.0.3 (2024-08-28)
+- Fixed: The locations whence to download TK-80BS ROM images have changed.
 - Changed: The `pytest_pt` module is no longer included under `psrc/`;
   instead it's now a runtime dependency. (See `pyproject.toml` for an
   explanation of why it's a runtime instead of development dependency.)
@@ -30,7 +33,6 @@ commit ID.
   instead of `dev/cjs/master`; thus you now always get the latest version.
   (There is currently no facility to request an earlier version except to
   tweak the source code.)
-- Fixed: The locations whence to download TK-80BS ROM images have changed.
 
 ### 0.0.2 (2024-07-30)
 - Added: CSCP emulator suite `tk80bs` ROM configuration (BASIC SYSTEM) and
