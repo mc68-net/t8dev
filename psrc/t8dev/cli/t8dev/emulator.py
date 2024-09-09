@@ -15,6 +15,7 @@ from    pathlib  import Path
 from    shutil  import  copyfile, copyfileobj, get_terminal_size
 from    sys  import exit, stderr
 from    urllib.request  import HTTPError, urlopen
+import  os
 import  textwrap
 
 from    binary.romimage  import RomImage
@@ -118,7 +119,9 @@ class CSCP(Suite):
                 " Use 'list' for list of emulators.")
         else:
             emuexe = self.setup_emudir(emulator)
-            runtool('wine', str(self.emudir(emuexe)))
+            cmd = [str(self.emudir(emuexe))]
+            if os.name != 'nt':  cmd = ['wine'] + cmd
+            runtool(*cmd)
 
     def emulator_exes(self):
         return [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]

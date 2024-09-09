@@ -23,6 +23,7 @@ will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
 ### dev
+- Fixed: `t8dev emu` no longer tries to use `wine` on Windows
 
 ### 0.0.3 (2024-08-28)
 - Fixed: The locations whence to download TK-80BS ROM images have changed.
