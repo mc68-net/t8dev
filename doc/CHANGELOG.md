@@ -26,6 +26,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+
+### 0.0.4 (2024-09-22)
 - Fixed: `t8dev emu` no longer tries to use `wine` on Windows
 
 ### 0.0.3 (2024-08-28)
