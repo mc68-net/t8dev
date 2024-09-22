@@ -22,6 +22,9 @@ Releases are usually tagged with `vN.N.N`. Potentially not all releases
 will be tagged, but specific releases can also be fetched via the Git
 commit ID.
 
+For release instructions, see [cynic-net/pypi-release] on GitHub.
+
+
 ### dev
 - Fixed: `t8dev emu` no longer tries to use `wine` on Windows
 
@@ -56,6 +59,7 @@ commit ID.
 
 <!-------------------------------------------------------------------->
 [ISO dates]: https://xkcd.com/1179/
+[cynic-net/pypi-release]: https://github.com/cynic-net/pypi-release
 [keepachangelog.com]: https://keepachangelog.com/
 [pyver]: https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers
 [semver]: https://en.wikipedia.org/wiki/Software_versioning#Semantic_versioning
