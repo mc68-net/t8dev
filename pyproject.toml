@@ -1,5 +1,5 @@
 [project]
-version = '0.0.4'
+version = '0.0.5.dev0'
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
 authors = [
@@ -10,7 +10,7 @@ urls.homepage = 'https://github.com/mc68-net/t8dev'
 urls.source = 'https://github.com/mc68-net/t8dev'
 urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
-requires-python = '>=3.6'
+requires-python = '>=3.9'
 dependencies = ['r8format>=0.0.6', 'patool', 'pytest_pt', ]
 #   `pytest_pt` is not strictly a runtime dependency, since we need it
 #   only to run our tests, but it's usual for repos using this package
@@ -32,7 +32,10 @@ tmc6800         = 't8dev.cli.tmc6800:main'
 wozmon-deposit  = 't8dev.cli.wozmon_deposit:main'
 
 [build-system]
-requires = ['setuptools']
+#   setuptools-scm includes all files tracked by Git in the sdist, so
+#   that our data files under psrc/ are also included in the binary
+#   package. Paths to them are found with importlib.resources.files().
+requires = ['setuptools', 'setuptools-scm']
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools.packages.find]

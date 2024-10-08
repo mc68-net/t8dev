@@ -73,10 +73,10 @@ def loadbios(m, S):
         and output streams.
 
         The first parameter is the BIOS system name; the BIOS is the object
-        output of ``src/SYSNAME/bioscode.a??`. This assumes that the BIOS
-        will define ``charinport`` and ``charoutport`` symbols, both set to
-        the same value, that define the address in the memory map to set up
-        to read and write for I/O to the streams below.
+        output of assembling ``testmc/SYSNAME/tmc/bioscode.asm``. This
+        assumes that the BIOS will define ``charinport`` and ``charoutport``
+        symbols, both set to the same value, that define the address in the
+        memory map to set up to read and write for I/O to the streams below.
 
         `input`, `output` and the return values all are passed to and come
         from `testmc.generic.iomem.setiostreams()`, which is used to to
@@ -92,12 +92,13 @@ def loadbios(m, S):
 
         Sample usage::
 
-            _, ostream = loadbios('tmc68', b'some input\n')
+            _, ostream = loadbios('mc6800', b'some input\n')
             ...
             assert b'Hello, world!' == ostream.getvalue()
     '''
     def loadbios(biosname, input=None, output=None):
-        bioscode = path.obj('src', biosname, 'bioscode.p')
+        bioscode = path.obj('testmc/', biosname, 'tmc/bioscode.p')
+        print('XXX', bioscode)
         m.load(bioscode, mergestyle='prefcur', setPC=False)
         assert S['charinport'] == S['charoutport']
         return m.setiostreams(S.charinport, input, output)

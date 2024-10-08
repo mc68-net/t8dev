@@ -23,9 +23,11 @@
 
 '''
 
+from    importlib.resources  import files as resfiles
 from    pathlib  import Path
 from    platform import python_version
 import  os
+import  t8dev, testmc
 
 def strict_resolve(p):
     ''' Handle various forms of input for T8_PROJDIR and similar paths.
@@ -49,6 +51,32 @@ T8_PROJDIR = strict_resolve(os.environ.get('T8_PROJDIR'))
 
 ####################################################################
 #   Public API for getting/creating paths
+
+def t8include() -> Path:
+    ''' Return the path under which we can find the t8dev import packages.
+        This is intended to be added to the include path of build tools
+        so that code can e.g. ``include testmc/mc6800/tmc/bios.a68``.
+
+        This should *not* be used to search for t8dev data files, as in
+        a normal installation this will be a python ``site-packages``
+        directory with many other modules there as well. (Instead use
+        `t8srcs()` for a list of directories you can search.)
+
+        This relies on the Python distribution package files being unpacked
+        to the filesystem; it will not work if they're using an alternate
+        loader such as ZIP.
+    '''
+    return resfiles(t8dev).parent
+
+def t8srcs() -> tuple[Path]:
+    ''' Return the root paths to t8dev import packages under which we can
+        find the assembly include and source code files included with t8dev.
+
+        This relies on the Python distribution package files being unpacked
+        to the filesystem; it will not work if they're using an alternate
+        loader such as ZIP.
+    '''
+    return map(resfiles, [t8dev, testmc])
 
 def proj(*components):
     ''' Return absolute `Path` for path `components` relative to `T8_PROJDIR`.

@@ -51,7 +51,7 @@ def setupIO(m):
     ''' Load the BIOS and set up `charoutport` for writes to stdout and
         `charinport` for blocking reads from stdin.
     '''
-    bioscode = path.obj('src/tmc68/bioscode.p')
+    bioscode = path.obj('testmc/mc6800/tmc/bioscode.p')
     m.load(bioscode, mergestyle='prefcur', setPC=False)
     m.setio(0xC000, consoleio)
 

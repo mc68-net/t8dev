@@ -49,6 +49,8 @@ COMMANDS = {
                                     #   module that uses a `test_rig`.
     'aslauto':  aslauto,            # Discover and build w/ASL all files used by
                                     # unit tests (`object_files`/`test_rig`)
+    'aslt8dev': aslt8dev,           # Build assembly code included with t8dev.
+
     'asx':      asx,                # ASXXXX assembler
     'asxlink':  asxlink,            # ASXXXX linker
 

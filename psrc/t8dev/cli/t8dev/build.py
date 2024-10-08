@@ -45,6 +45,7 @@ def runasl(objdir, name, sourcecode):
         '-U',                   # Case-sensitive symbols. This can be set
                                 # only with a command-line option.
         '-i', str(path.proj()),
+        '-i', str(path.t8include()),
         ]
     endopts = [ '-L', '-s', '-g', ]
 
@@ -175,6 +176,16 @@ def aslauto(paths):
     for pt in sorted(testrig_files):
         vprint(2, 'build', 'asl_testrig {}'.format(path.pretty(pt)))
         asl_testrig([pt])
+
+def aslt8dev(args):
+    ' Build all .asm files included with t8dev. '
+    if len(args) != 0:
+        raise RuntimeError('len(args) != 0')
+
+    for dir in path.t8srcs():
+        for file in dir.glob('**/*.asm'):
+            relpath = file.relative_to(dir.parent)
+            asl1(relpath)
 
 
 ####################################################################
