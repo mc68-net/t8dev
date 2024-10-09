@@ -75,7 +75,7 @@ def asl1(src):
     objdir  = path.obj(rsrc.parent)
     objfile = objdir.joinpath(rsrc.name).with_suffix('.p')
 
-    runasl(objdir, rsrc.stem, '    include "{}"'.format(rsrc))
+    runasl(objdir, rsrc.stem, '    include "{}"\n'.format(rsrc))
 
 def asl_testrig(args):
     ''' Given a path to a Python file relative to T8_PROJDIR, build its
