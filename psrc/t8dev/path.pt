@@ -6,12 +6,15 @@ def test_relproj():
     assert Path('foo/bar')   == relproj(proj('foo/bar'))
     assert Path('/absolute') == relproj(proj('/absolute'))
 
-def test_pretty():
-    assert '/ff/bar' == pretty('/ff/bar')
-    assert 'foo/bar' == pretty('foo/bar')
-    assert 'foo/bar' == pretty(proj('foo/bar'))
-    assert 'None'    == pretty(None)
-    assert '3'       == pretty(3)
+@pytest.mark.parametrize('input, expected', [
+    ('/ff/bar',         '/ff/bar'),
+    ('foo/bar',         'foo/bar'),
+    (proj('foo/bar'),   '…/foo/bar'),
+    (None,              'None'),
+    (3,                 '3'),
+])
+def test_pretty(input, expected):
+    assert expected == pretty(input)
 
 @pytest.mark.parametrize('expected, environ', [
     ('/a/bin',              {}),

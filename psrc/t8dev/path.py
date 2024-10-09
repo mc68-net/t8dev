@@ -80,7 +80,9 @@ def pretty(path):
         fails.
     '''
     try:
-        return str(Path(path).relative_to(T8_PROJDIR))
+        p = Path(path); q = p.relative_to(T8_PROJDIR)
+        if p == q:  return p
+        else:       return '…/' + str(q)
     except (TypeError, ValueError):
         #   TypeError: T8_PROJDIR (or possibly path) is None
         #   ValueError: Path(path) is not below T8_PROJDIR
