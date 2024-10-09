@@ -27,6 +27,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
 - Added: Simulator/unit test BIOS source code and `t8dev aslt8dev` command
+- Added: `tmc` program for command line simulation of any CPU simulator,
+  replacing `tmc6800` which did only mc6800 simulation.
 
 ### 0.0.4 (2024-09-22)
 - Fixed: `t8dev emu` no longer tries to use `wine` on Windows

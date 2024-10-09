@@ -1,9 +1,16 @@
 ''' testmc -- test framework for microcomputer systems
 '''
-
 from    numbers  import Number
+import  testmc.i8080, testmc.mc6800, testmc.mos65
 
-__all__ = ['LB', 'MB', 'tmc_tid', 'sym_tid']
+__all__ = ['SIMULATORS', 'LB', 'MB', 'tmc_tid', 'sym_tid']
+
+#   tmc.matchcpu() gives the first match in this list, so order is important!
+SIMULATORS = {
+    'i8080':    testmc.i8080,
+    'mos65':    testmc.mos65,
+    'mc6800':   testmc.mc6800,
+}
 
 def LB(n):
     ' Return the lowest byte (LSB) of a value. '

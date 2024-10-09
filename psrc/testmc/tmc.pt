@@ -1,0 +1,23 @@
+from    testmc.tmc  import *
+import  testmc.i8080, testmc.mc6800, testmc.mos65
+from    testmc  import SIMULATORS
+import  pytest
+
+@pytest.mark.parametrize('input, expected', [
+    ('i8080',       ('i8080',  testmc.i8080)),
+    ('80',          ('i8080',  testmc.i8080)),
+    ('65',          ('mos65',  testmc.mos65)),
+    ('68',          ('mc6800', testmc.mc6800)),
+    ('xyz',         None),
+])
+def test_matchcpu(input, expected):
+    assert expected == matchcpu(input)
+
+@pytest.mark.parametrize('cpu, path, expected', [
+    ('i8080',   'foo/bar.p',   'foo/bar.p'),
+    ('i8080',   'foo/bar',     'foo/bar.p'),
+    ('i8080',   'foo.p',       '.build/obj/exe/tmc/i8080/foo.p'),
+    ('mc6800',  'foo',         '.build/obj/exe/tmc/mc6800/foo.p'),
+])
+def test_binname(cpu, path, expected):
+    assert str(binpath(cpu, path)).endswith(expected)
