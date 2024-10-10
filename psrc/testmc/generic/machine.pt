@@ -28,6 +28,8 @@ def m():
         is_little_endian            = False
         def get_memory_seq(self):   return self.mem
 
+        def reset(self):    raise NotImplementedError()
+
         def _getpc(self):
             return self.pc
 

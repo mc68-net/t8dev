@@ -185,6 +185,19 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
         '''
 
     @abstractmethod
+    def reset(self):
+        ''' Update the internal set of the simulated CPU as it is when the
+            ``RESET`` signal is asserted, up to the point where it would
+            start executing instructions.
+
+            This should *not* change any state that the CPU itself does not
+            update on reset, i.e., it should leave at the current values
+            any registers, memory or other state that the ``RESET`` signal
+            does not change. Typically, this just loads the PC with the
+            reset vector (reading it from current memory if necessary)
+        '''
+
+    @abstractmethod
     def _getpc(self):
         ''' Efficiently return the current program counter value.
 

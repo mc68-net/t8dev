@@ -48,6 +48,12 @@ def test_cc(m):
     r = r.clone()
     assert 0b11101010 == r.cc   # new properly sets top two bits from flags
 
+def test_resetvector(m):
+    m.mem[0xFFFE] = 0xAB
+    m.mem[0xFFFF] = 0xCD
+    m.reset()
+    assert 0xABCD == m.pc
+
 ####################################################################
 #   Instruction Execution
 

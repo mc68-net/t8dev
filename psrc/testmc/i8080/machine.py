@@ -42,6 +42,8 @@ class Machine(GenericMachine):
 
     _ABORT_opcodes  = set()     # XXX
 
+    def reset(self):    self.pc = 0
+
     def _getpc(self):   return self.pc
     def _getsp(self):   return self.sp
 

@@ -25,3 +25,8 @@ def test_regs(m):
 
 def test_narrow_regs():
     assert R(b=1, c=2) == R(bc=0x0102)
+
+def test_reset(m):
+    m.pc = 0x1234
+    m.reset()
+    assert 0 == m.pc

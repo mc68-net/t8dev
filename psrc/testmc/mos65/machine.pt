@@ -86,6 +86,12 @@ def test_Machine_examine_stack(m):
     with pytest.raises(IndexError): m.spbyte(0xFFFF)
     with pytest.raises(IndexError): m.spword(0xFFFF)
 
+def test_resetvector(m):
+    m.mpu.memory[0xFFFD] = 0xAB
+    m.mpu.memory[0xFFFC] = 0xCD
+    m.reset()
+    assert 0xABCD == m.pc
+
 ####################################################################
 #   Machine execution
 
