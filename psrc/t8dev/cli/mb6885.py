@@ -13,8 +13,7 @@ from    t8dev.cli  import exits
 from    t8dev.run  import tool
 
 def binname(fname):
-    #   XXX similar to the bin/tmc6800 one; these need to be merged
-    #   and pulled up
+    #   XXX similar to the testmc.tmc one; these need to be merged and pulled up
     if '.' not in fname: fname += '.p'
     if '/' not in fname: fname = path.obj('exe', 'mb6885', fname)
     return fname
