@@ -8,7 +8,7 @@
 ;   It may also be useful to merge their symbols, so we use a separate section
 ;   for this file's symbols to help avoid conflicts.
 ;
-            section  tmc68_BIOS
+            section  tmc_mc6800_BIOS
 
 ; ----------------------------------------------------------------------
 ;   We use this assertdef after every routine to confirm that our local
@@ -59,4 +59,4 @@ errbeep     lda A,#$07              ; BEL
             bra prchar              ; RTS
             assertdef errbeep
 
-            endsection  ; tmc68_BIOS
+            endsection  ; tmc_mc6800_BIOS
