@@ -85,7 +85,7 @@ def setupIO(m, cpuname):
     '''
     bioscode = path.obj('testmc', cpuname, 'tmc/bioscode.p')
     m.load(bioscode, mergestyle='prefcur', setPC=False)
-    m.setio(0xC000, consoleio)
+    m.setio(m.symtab.charinport, consoleio)
 
 def consoleio(_addr, char):
     if char is None:

@@ -1,0 +1,12 @@
+;   Public interface for testmc/i8080/tmc/bioscode, which is loaded separately.
+
+prchar      equ     $0080       ; ♡ABX send char in A to output
+rdchar      equ     $0088       ; ♠A ♡AX blocking read of char from input
+prnl        equ     $0090       ; ♣A ♡BX print platform-appropriate newline
+errbeep     equ     $0098       ; ♣A ♡BX sound the console bell
+
+;   These are not used by the programs themselves, but the symbols are
+;   required here so that the test and run frameworks can find out where to
+;   hook in their side of the I/O routines.
+charoutport equ $00FF               ; character output port
+charinport  equ $00FF               ; blocking input char read
