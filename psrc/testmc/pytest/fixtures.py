@@ -77,6 +77,8 @@ def loadbios(m, S):
         assumes that the BIOS will define ``charinport`` and ``charoutport``
         symbols, both set to the same value, that define the address in the
         memory map to set up to read and write for I/O to the streams below.
+        (Note that this does not work for a separate I/O address space,
+        if the CPU has one. This should be fixed to allow this somehow.)
 
         `input`, `output` and the return values all are passed to and come
         from `testmc.generic.iomem.setiostreams()`, which is used to to
@@ -98,9 +100,9 @@ def loadbios(m, S):
     '''
     def loadbios(biosname, input=None, output=None):
         bioscode = path.obj('testmc/', biosname, 'tmc/bioscode.p')
-        print('XXX', bioscode)
         m.load(bioscode, mergestyle='prefcur', setPC=False)
         assert S['charinport'] == S['charoutport']
+        #   XXX Doesn't work for I/O address spaces.
         return m.setiostreams(S.charinport, input, output)
     return loadbios
 
