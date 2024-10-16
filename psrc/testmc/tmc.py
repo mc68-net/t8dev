@@ -84,7 +84,6 @@ def setupIO(m, cpuname):
         `charinport` for blocking reads from stdin.
     '''
     bioscode = path.obj('testmc', cpuname, 'tmc/bioscode.p')
-    print('XXX', bioscode)
     m.load(bioscode, mergestyle='prefcur', setPC=False)
     m.setio(0xC000, consoleio)
 
