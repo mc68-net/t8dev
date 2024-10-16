@@ -10,3 +10,8 @@ errbeep     equ     $0098       ; ♣A ♡BX sound the console bell
 ;   hook in their side of the I/O routines.
 charoutport equ $00FF               ; character output port
 charinport  equ $00FF               ; blocking input char read
+
+;   This is used by the command line simulator `tmc`. Writing value
+;   `exitportcmd` to location `exitport` will cause the simulator to exit.
+exitport    equ $00FE
+exitportcmd equ $EF

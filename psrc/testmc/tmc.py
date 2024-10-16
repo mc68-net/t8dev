@@ -6,6 +6,7 @@
 '''
 
 from    importlib.resources  import files as resfiles
+from    functools  import partial
 from    os  import isatty
 from    pathlib  import Path
 from    sys  import stdin, stdout
@@ -80,12 +81,14 @@ def exec(cpuname:str, cpumodule:module, exepath:Path):
         print_exception(None, ex, tb)
 
 def setupIO(m, cpuname):
-    ''' Load the BIOS and set up `charoutport` for writes to stdout and
-        `charinport` for blocking reads from stdin.
+    ''' Load the BIOS, set up `charoutport` for writes to stdout,
+        `charinport` for blocking reads from stdin, and `exitport`
+        for exiting the process.
     '''
     bioscode = path.obj('testmc', cpuname, 'tmc/bioscode.p')
     m.load(bioscode, mergestyle='prefcur', setPC=False)
     m.setio(m.symtab.charinport, consoleio)
+    m.setio(m.symtab.exitport, partial(exitport, exitcmd=m.symtab.exitportcmd))
 
 def consoleio(_addr, char):
     if char is None:
@@ -93,6 +96,10 @@ def consoleio(_addr, char):
     else:
         stdout.buffer.write(bytes([char]))
         stdout.buffer.flush()
+
+def exitport(_addr, val, exitcmd=None):
+    if val == exitcmd:
+        exit(0)
 
 def getchar():
     ''' Blocking read of a charater from stdin, in raw mode.
