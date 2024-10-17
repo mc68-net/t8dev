@@ -16,12 +16,17 @@ from    t8dev.toolset.setup  import *
 
 class BM2(Setup):
 
+    #   Old version was 'bm2src_20161113.tgz' with SHA
+    #     '478afb8d2afbfbc0cf229431f032bc89395250efeb590f19d1993bdaa0b5fda7'
+    #   Further old versions can be found by searching `bm2` at
+    #     https://web.archive.org/web/*/https://ver0.sakura.ne.jp/pc/*
+
     def __init__(self):
         super().__init__()
-        self.source_archive = 'bm2src_20161113.tgz'
         self.source_url = 'http://ver0.sakura.ne.jp/pc/'
+        self.source_archive = 'bm2src_20240817.tgz'
         self.source_sha = \
-            '478afb8d2afbfbc0cf229431f032bc89395250efeb590f19d1993bdaa0b5fda7'
+            '1eeec77742099a89c231d02c2bebf801ba6ba7b9476a194e20f8e76f9b7d50bc'
         self.source_tar_strip = 1   # drop top-level `bm2/` in tarfile
 
     def check_installed(self):

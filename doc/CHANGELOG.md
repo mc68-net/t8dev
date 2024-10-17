@@ -30,6 +30,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Added: `tmc` program for command line simulation of any CPU simulator,
   replacing `tmc6800` which did only mc6800 simulation.
 - Changed: `tmc` simulator now uses output to a port to request exit.
+- Updated: New version of `bm2` Basic Master Jr. emulator
+  (old version no longer downloadable from that site).
 
 ### 0.0.4 (2024-09-22)
 - Fixed: `t8dev emu` no longer tries to use `wine` on Windows
