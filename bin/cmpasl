@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+#
+#   cmpasl - assemble a disassembled binary and compare with the original
+#
+#   See usage() below for details.
+#
+set -Eeuo pipefail
+trap 'ec=$?; echo 1>&2 "INTERNAL ERROR: ec=$ec line=$LINENO cmd=$BASH_COMMAND";
+      exit $ec;' ERR
+
+die() { local ec="$1"; shift; echo 1>&2 "$(basename "$0"):" "$@"; exit "$ec"; }
+
+fail() { ec=$?; echo 1>&2 "FAILED (code=$ec)"; exit $ec; }
+
+vecho() { [[ -n $quiet ]] || echo "$@"; }
+
+ifexists() { [[ -r $1 ]] && echo "$1" || echo /dev/null; }
+
+####################################################################
+
+find_asl() {
+    asl -version >/dev/null 2>&1 || {
+        for bin in \
+            $projdir/.build/tool/bin \
+            /opt/asl/bin \
+            /usr/local/bin \
+            /c/Program\ \
+            Files*/asl/bin \
+        ; do
+            [[ -x $bin/asl ]] && export PATH="$bin:$PATH"
+        done
+    }
+    asl -version >/dev/null || die 3 "asl not found in path"
+}
+
+z80dasm_clean() {
+    local addsed=/dev/null
+    [[ $# -gt 0 ]] && addsed="$1"
+    sed -E -e '
+            /^[^\t;].*:$/{N;s/\n//}     # join labels to next line
+            s/l([0-9a-f]{4})h/unk\U\1/g # more readable label format
+            s/sub_([0-9a-f]{4})h/sub_\U\1/g
+            s/0x([0-9a-f]{4})/$\U\1/    # number format 0xnnnn → $NNNN
+            s/0([0-9a-f]{4})h/$\U\1/    # number format 0nnnnh → $NNNN
+            s/0([0-9a-f]{2})h/$\U\1/    # number format 0nnh → $NN
+            s/\t[a-z][a-z] /&  /        # indent operand after 2-letter mnemonic
+            s/\t[a-z]{3} /& /           # indent operand after 3-letter mnemonic
+            s/^\t/\t    /               # indent non-label lines
+            s/:\t/\t    /               # indent menmonic on label lines, remove :
+            s/ defb / db    /           # ASL syntax
+            s/ defw / dw    /           # ASL syntax
+            ' -f "$addsed" \
+        | sed -E -e 's/[ \t]+$//  # remove any trailing whitesapce' \
+        | expand
+    #   Notes:
+    #   • Trailing whitespace removal is done as a separate command because
+    #     when incuded at the end of the original sed script it will not affect
+    #     lines that were split (e.g., to add a blank line after another).
+}
+
+disassmble_z80dasm() {
+    local outsed=$(ifexists "$asmdir/fname.sed")
+    (
+        [[ -r $asmdir/common.header ]] \
+            && cat "$asmdir/common.header" \
+            || echo '            relaxed on'
+        [[ -r $asmdir/$fname.header ]] \
+            && cat "$asmdir/$fname.header" \
+            || echo -e "            cpu $cpu\n" \
+                        '           z80syntax exclusive'
+
+        blockfile=$(ifexists "$asmdir/$fname.block")
+        comsym=$(   ifexists "$asmdir/common.sym")
+        symfile=$(  ifexists "$asmdir/$fname.sym")
+        z80dasm -a -l -g "$start_addr" \
+            -b $blockfile -S <(cat "$comsym" "$symfile") \
+            "$binfile" "$@"
+    ) | z80dasm_clean "$(ifexists "$asmdir/$fname.sed")" >"$asmfile"
+}
+
+assemble_asl() {
+    echo "───── asl: $asmfile → ${objdir}/"
+    local incpath="$projdir"
+    cygpath --version >/dev/null 2>&1 && {
+        #   MINGW Bash should be converting the /c/… path to Windows
+        #   format but is not, possibly because we quote it below?
+        incpath=$(cygpath -w "$incpath")
+    }
+    (   cd "$objdir"
+        #   • XXX A command-line -cpu option (no-op because overridden by the
+        #     file contents) is required to deal with ASL list output formatting
+        #     issues at the start of the file in versions > bld247.
+        #   • We always use -q with asl because the non-quiet output isn't
+        #     useful (it just gives pass/line/etc. counts).
+        #   • $aslsyms must be unquoted to pass `-D` and the symdef as
+        #     separate args; this means symdefs cannot have spaces in them.
+        asl -q -L -i "$incpath" ${aslsyms[@]/#/-D } \
+          -cpu 8080 \
+          -o "$fname.p" -olist "$fname.lst" "$projdir/$asmfile" \
+        && vecho "• p2bin:" \
+        && p2bin $quiet -l 0x00 "$fname.p" "$fname.bin"
+        #   XXX Already starts at first addr w/code, so we're not using $start_addr.
+        #   XXX need to start at start_addr above; use -r 0-$((start_addr-1) ???
+    ) || die 1 "asl assembly error"
+}
+
+compare() {
+    echo "───── cmp: $binfile → ${objdir#$projdir/}/$fname.bin"
+    if cmp "$binfile" "$objdir/$fname.bin"; then
+        echo OK identical
+    else
+        if [[ -n ${DISPLAY:-} ]]; then
+            meld <(xxd -g1 "$binfile") <(xxd -g1 "$objdir/$fname.bin") || fail
+        else
+            diff -U1 <(xxd -g1 "$binfile") <(xxd -g1 "$objdir/$fname.bin") || fail
+        fi
+    fi
+}
+
+####################################################################
+#   Usage
+
+#   Notes:
+#   • The ability to leave a filename off of ASMPATH or just leave it off
+#     entirely is possibly too complex; it might be better just to always
+#     have to give a filename, rather than allowing a default.
+#   • We don't have an option just to assemble, without a compare. It's
+#     not clear if adding that would be useful enough to justify the
+#     additional complexity.
+
+usage() {
+    cat <<_____
+Usage: $(basename "$0") [OPTIONS] BINFILE [ASMPATH]
+- BINFILE is the original binary to which to compare the assembled output,
+  and also the file to disassemble if -d is specified.
+- ASMPATH is the input file to be assembled, and also the output file for
+  the disassembly if -d is specified. Disassembly meta-data (block files,
+  symbol files, etc.) will be taken from ASMPATH's directory. (If ASMPATH
+  is a directory, the assembly file will be given a default name.)
+- OPTIONS:
+  • -c/--cpu CPU        select CPU (default 8080) for disassembler
+  • -D sym,sym=…        predefine symbols for ASL build
+  • -d/--dasm DASM ADDR first disassemble binary with DASM disassembler,
+                        starting at ADDR (0xNNNN for hexadecimal)
+  • -p/--projdir DIR  set project dir (all files must be under this)
+  • -v/--verbose      verbose mode
+- Environment variables:
+  • T8_PROJDIR is default value of project dir if -p not supplied
+_____
+}
+
+####################################################################
+#   Argument Parsing
+
+projdir=
+quiet=-q
+disassembler=
+start_addr=
+cpu=8080
+aslsyms=()
+while [[ $# -gt 0 ]]; do case "$1" in
+    -h|--help)      usage; exit 0;;
+    -c|--cpu)       shift; cpu="$1"; shift;;
+    -D)             shift; aslsyms+=("$1"); shift;;
+    -d|--dasm)      shift; disassembler="$1"; shift; start_addr="$1"; shift;;
+    -p|--projdir)   shift; projdir="$1"; shift;;
+    -v|--verbose)   shift; quiet='';;
+    -*)             die 2 "Bad option $1. Use '-h' for help.";;
+    *)              break;;
+esac; done
+
+[[ -z $projdir ]] && projdir="${T8_PROJDIR:-}"
+[[ -n $projdir ]] || \
+    die 3 'T8_PROJDIR must be set or -p option used to define project dir'
+
+[[ $# -ge 2 ]] || { usage 2>&1; die 2 "Not enough parameters"; }
+
+#   NOTE: We *must* use single brackets on -ge, and ignore any 0x prefix.
+[[ -z $start_addr ]] \
+    || [ $(($start_addr)) -ge 0 ] 2>/dev/null \
+    || die 2 "ADDR must be an integer"
+
+binfile="$1"; shift
+
+[[ $# -gt 0 ]] && { asmpath="$1"; shift; } \
+               || { asmpath="${binfile%.*}.dis"; }
+
+[[ $# -eq 0 ]] || { usage 2>&1; die 2 "Too many parameters:"; }
+
+####################################################################
+#   Set up/canonicalize path arguments relative to projdir
+#   This helps with ASL, where we must build in the output dir,
+#   and also gives nicer paths (relative to $projdir) for messages.
+
+vecho "───── $(basename "$0")"
+[[ -d $projdir ]] || die 2 "not a directory: $projdir"
+projdir=$(cd "$projdir" && pwd -P)  # canonicalize
+vecho "projdir=$projdir"
+find_asl
+
+[[ -r $binfile ]] || die 2 "cannot read $binfile"
+bindir=$(cd "$(dirname "$binfile")" && d=$(pwd -P) && echo ${d#$projdir/})
+binfile="$bindir/$(basename "$binfile")"
+vecho "binfile=$binfile"
+
+if [[ -d $asmpath ]]; then
+    asmdir=$(cd "$asmpath" && d=$(pwd -P) && echo ${d#$projdir/})
+    asmfile="$asmdir/$(basename "${binfile%.*}.dis")"
+else
+    asmdir=$(dirname "$asmpath")
+    [[ -d $asmdir ]] || die 2 "not a directory: $asmdir"
+    asmdir=$(cd "$asmdir" && d=$(pwd -P) && echo ${d#$projdir/})
+    asmfile="$asmdir/$(basename "$asmpath")"
+fi
+vecho "asmdir=$asmdir"
+vecho "asmfile=$asmfile"
+
+fname=$(basename "${asmfile%.*}")
+vecho "fname=$fname"
+
+cd "$projdir"
+
+####################################################################
+#   Main
+
+[[ -z $disassembler ]] || {
+    case "$disassembler" in
+        z*)     disassembler=z80dasm;;
+        *)      die "Unknown disassembler: $disassembler"
+    esac
+    echo "───── $disassembler: $binfile → $asmfile"
+    disassmble_$disassembler
+}
+
+objdir=".build/obj/$asmdir"; mkdir -p "$objdir"
+assemble_asl
+compare
