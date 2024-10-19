@@ -5,6 +5,8 @@
        from testmc.pytest import *
 '''
 
+#   This is tested by testmc/*/tmc/bioscode.pt.
+
 import  pytest
 from    t8dev  import path
 
@@ -72,13 +74,17 @@ def loadbios(m, S):
     ''' Return a function that loads a unit test BIOS and connects input
         and output streams.
 
-        The first parameter is the BIOS system name; the BIOS is the object
-        output of assembling ``testmc/SYSNAME/tmc/bioscode.asm``. This
-        assumes that the BIOS will define ``charinport`` and ``charoutport``
-        symbols, both set to the same value, that define the address in the
-        memory map to set up to read and write for I/O to the streams below.
-        (Note that this does not work for a separate I/O address space,
-        if the CPU has one. This should be fixed to allow this somehow.)
+        All parameters are optional, and must be specified by name if used.
+
+        The `biosname` parameter specifies the name of the BIOS; if `None`
+        the `Machine` subclass's `biosname()` will be used. (Normally this
+        never need be specified.) The BIOS is the object output of
+        assembling ``testmc/BIOSNAME/tmc/bioscode.asm``. This assumes that
+        the BIOS will define ``charinport`` and ``charoutport`` symbols,
+        both set to the same value, that define the address in the memory
+        map to set up to read and write for I/O to the streams below. (Note
+        that this does not work for a separate I/O address space, if the
+        CPU has one. This should be fixed to allow this somehow.)
 
         `input`, `output` and the return values all are passed to and come
         from `testmc.generic.iomem.setiostreams()`, which is used to to
@@ -98,7 +104,8 @@ def loadbios(m, S):
             ...
             assert b'Hello, world!' == ostream.getvalue()
     '''
-    def loadbios(biosname, input=None, output=None):
+    def loadbios(*, input=None, output=None, biosname=None):
+        biosname = biosname or m.biosname()
         bioscode = path.obj('testmc/', biosname, 'tmc/bioscode.p')
         m.load(bioscode, mergestyle='prefcur', setPC=False)
         assert S['charinport'] == S['charoutport']

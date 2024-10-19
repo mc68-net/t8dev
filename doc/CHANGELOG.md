@@ -26,6 +26,9 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- Breaking API change: testmc.pytest.fixtures.loadbios() now does not
+  require (though still can optionally accept) a BIOS name. See commit
+  messge for full details.
 
 ### 0.0.6 (2024-10-20)
 - Fixed: mos65 simulator throws ModuleNotFoundError for py65 only if it's
