@@ -8,7 +8,7 @@ def TM():
         made to a Machine or Registers class in a test are not leaked to
         other tests.
     '''
-    class Machine(GenericMachine):
+    class TestMachine(GenericMachine):
 
         class Registers(GenericRegisters):
             registers = (Reg('pc', 16), Reg('hl', 16, split8=1))
@@ -49,7 +49,7 @@ def TM():
 
         _RTS_opcodes = _ABORT_opcodes = None
 
-    return Machine
+    return TestMachine
 
 @pytest.fixture
 def R(TM):
@@ -77,6 +77,11 @@ def test_instantiation(TM):
     assert type is type(TM.Registers)
     r = TM.Registers(pc=3); assert    3 == r.pc
     r = TM().Registers();   assert None is r.pc
+
+def test_biosname(TM):
+    from testmc.mc6800.machine import Machine as MC68
+    assert ('generic',       'mc6800') \
+        == (TM().biosname(), MC68().biosname())
 
 ####################################################################
 #   Usage

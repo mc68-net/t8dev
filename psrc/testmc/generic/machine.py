@@ -22,6 +22,16 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
         - `setregs()`: Set some or all machine registers and flags.
     '''
 
+    def biosname(self):
+        ''' Many `Machine` subclasses include a simple BIOS used for unit
+            testing and by the `testmc.tmc` command-line simulator. This
+            is usually the (not qualified) name of the package in which
+            that `Machine` subclass resides, which this returns, but this
+            can be overridden for `Machine`s that share a BIOS with another
+            `Machine`, e.g., ``i8085`` might use the ``i8080`` BIOS.
+        '''
+        return self.__class__.__module__.split('.')[-2]
+
     def __init__(self):
         ''' The subclass `__init__()` should call `super().__init__()` and
             initialize memory, registers and flags. The registers and flags
