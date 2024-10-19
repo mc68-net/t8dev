@@ -3,7 +3,7 @@ from    binary.memimage  import MemImage
 import  pytest
 
 @pytest.fixture
-def m():
+def TM():
     ''' Create a new Machine class and return it. This ensures that changes
         made to a Machine or Registers class in a test are not leaked to
         other tests.
@@ -52,44 +52,44 @@ def m():
     return Machine
 
 @pytest.fixture
-def R(m):
-    ''' Registers class of the Machine created by the `m()` fixture.
+def R(TM):
+    ''' Registers class of the Machine created by the `TM()` fixture.
 
         This assumes that the default for the Machine class has not
         been overridden in an instance. If you do override it, you must
         use the `Registers` attribute from that instance.
     '''
-    return m.Registers
+    return TM.Registers
 
 ####################################################################
 #   Instantiation
 
 def test_abc():
-    class m(GenericMachine):
+    class A(GenericMachine):
         is_little_endian = None
         def get_memory_seq(): pass
     with pytest.raises(TypeError) as ex:
-        m()
-    assert ex.match(r"Can't instantiate abstract class m")
+        A()
+    assert ex.match(r"Can't instantiate abstract class A")
     assert ex.match(r'Registers')
 
-def test_instantiation(m):
-    assert type is type(m.Registers)
-    r = m.Registers(pc=3);  assert    3 == r.pc
-    r = m().Registers();    assert None is r.pc
+def test_instantiation(TM):
+    assert type is type(TM.Registers)
+    r = TM.Registers(pc=3); assert    3 == r.pc
+    r = TM().Registers();   assert None is r.pc
 
 ####################################################################
 #   Usage
 
-def test_memory(m):
+def test_memory(TM):
     ' Smoke test: make sure the functions are there. '
-    m = m()
+    m = TM()
     assert  0 == m.byte(3)
     m.deposit(3, 42)
     assert 42 == m.byte(3)
 
-def test_regs_flag_attributes(m, R):
-    m = m(); m.B = False
+def test_regs_flag_attributes(TM, R):
+    m = TM(); m.B = False
     assert R() == m.regs
     assert R(pc=0, B=0) == m.regs
 
@@ -101,10 +101,10 @@ def test_regs_flag_attributes(m, R):
     R.srname = 'psr'
     assert R(pc=3, B=1) == m.regs
 
-def test_regs_status_register(m, R):
+def test_regs_status_register(TM, R):
     R.srname = 'psr'
 
-    m = m(); m.psr = 0b1001
+    m = TM(); m.psr = 0b1001
     assert R() == m.regs
     assert R(pc=0, psr=0b1001) == m.regs
     assert R(B=False) == m.regs
@@ -113,8 +113,8 @@ def test_regs_status_register(m, R):
     assert R(pc=4, psr=0b1011) == m.regs
     assert R(B=True) == m.regs
 
-def test_setregs_flag_attributes(m, R):
-    m = m(); m.B = False;       assert (     0, False) == (m.pc, m.B)
+def test_setregs_flag_attributes(TM, R):
+    m = TM(); m.B = False;       assert (     0, False) == (m.pc, m.B)
     m.setregs(R(pc=0xF000));    assert (0xF000, False) == (m.pc, m.B)
     m.setregs(R(B=1));          assert (0xF000,  True) == (m.pc, m.B)
     m.setregs(R(pc=4, B=0));    assert (     4, False) == (m.pc, m.B)
@@ -125,10 +125,10 @@ def test_setregs_flag_attributes(m, R):
     m.setregs(R(B=0));          assert not m.B
     m.setregs(R(B=1));          assert m.B
 
-def test_setregs_status_register(m, R):
+def test_setregs_status_register(TM, R):
     R.srname = 'psr'
 
-    m = m(); m.psr = 0b1001;    assert (0, 0b1001) == (m.pc, m.psr)
+    m = TM(); m.psr = 0b1001;   assert (0, 0b1001) == (m.pc, m.psr)
     m.setregs(R(pc=6));         assert (6, 0b1001) == (m.pc, m.psr)
     m.setregs(R(B=1));          assert (6, 0b1011) == (m.pc, m.psr)
     m.setregs(R(pc=7, B=0));    assert (7, 0b1001) == (m.pc, m.psr)
@@ -137,13 +137,13 @@ def test_setregs_status_register(m, R):
     #   as constant bits rather than flags.
     m.setregs(R(psr=0b0110));   assert (7, 0b1011) == (m.pc, m.psr)
 
-def test_regs_setregs_regsattr(m, R):
+def test_regs_setregs_regsattr(TM, R):
     ' Test using a separate object to hold the register values. '
     class RegHolder(): pass
     rh = RegHolder()
     rh.pc = 99;  rh.hl = 0; rh.B = True
 
-    m = m();  del m.pc;  m.regsobj = rh
+    m = TM();  del m.pc;  m.regsobj = rh
     assert not hasattr(m, 'pc')
     assert not hasattr(m, 'B')
     assert not hasattr(m, 'srname')
@@ -159,10 +159,10 @@ def test_regs_setregs_regsattr(m, R):
 ####################################################################
 #   Object code loading
 
-def test__load_memimage(m, R):
+def test__load_memimage(TM, R):
     memlen = 0x800
 
-    m = m()
+    m = TM()
     m.B = False
     m.mem = [0] * memlen
 
@@ -194,9 +194,9 @@ def test_load():
 ####################################################################
 #   Execution
 
-def test_underscore_step(m):
+def test_underscore_step(TM):
     ' Test that our test _step() function is doing what it should. '
-    m = m()
+    m = TM()
     m.deposit(m.pc, b''.join((
         b'\x00', b'\x01' * 2, b'\x02' * 3, b'\x03' * 4, b'\x04', )))
 
@@ -210,13 +210,13 @@ def test_underscore_step(m):
 ####################################################################
 #   Execution - step(), stepto()
 
-def test_step(m):
-    m = m();    assert 0 == m._steps_taken
+def test_step(TM):
+    m = TM();    assert 0 == m._steps_taken
     m.step();   assert 1 == m._steps_taken
     m.step(3);  assert 4 == m._steps_taken
 
-def test_step_trace(m, capsys):
-    m = m(); m.B = False
+def test_step_trace(TM, capsys):
+    m = TM(); m.B = False
     m.step(2, trace=1)
     out, err = capsys.readouterr()
     assert '' == err
@@ -226,16 +226,16 @@ def test_step_trace(m, capsys):
         ))
     assert tracelines == out
 
-def test_stepto_maxsteps_withexception(m):
-    m = m(); m.B = False
+def test_stepto_maxsteps_withexception(TM):
+    m = TM(); m.B = False
     m.deposit(m.pc, b'\x00\x01\xFD\xFD\x00\x00')
     with pytest.raises(m.Timeout) as ex:
         m.stepto(maxsteps=3, trace=True)
     assert (3, 5) == (m._steps_taken, m.pc)
     assert ex.match('after 3 opcodes: CPU pc=0005')
 
-def test_stepto_maxsteps_noexception(m):
-    m = m(); m.B = False
+def test_stepto_maxsteps_noexception(TM):
+    m = TM(); m.B = False
     stepsret = m.stepto(maxsteps=3, raisetimeout=False, trace=True)
     assert (3, 3, 3) == (m._steps_taken, stepsret, m.pc)
 
@@ -245,8 +245,8 @@ def test_stepto_maxsteps_noexception(m):
     (set([0x02, 0xFE, 0xFD, 0xFC]), 2, 3),
     (                      [0x00],  3, 5),  # always execute first op
 ))
-def test_stepto_stopon(m, stopon, steps, pc):
-    m = m(); m.B = False
+def test_stepto_stopon(TM, stopon, steps, pc):
+    m = TM(); m.B = False
     m.deposit(m.pc, b'\x00\x01\xFD\xFD\x00\x00')
     print('stop on', type(stopon), stopon)   # test name not obvious
     stepsret = m.stepto(stopon=stopon)
@@ -262,8 +262,8 @@ def test_stepto_stopon(m, stopon, steps, pc):
     (  0x00,  2, 0x08,  [0x03, 0x05, 0x06, 0x07, 0x08, 0x09]),
     (  0x00,  2, 0x08,  range(0x05, 0x10)),
 ))
-def test_stepto_stopat(m, R, initpc, steps, finalpc, stopat):
-    m = m(); m.B = False
+def test_stepto_stopat(TM, R, initpc, steps, finalpc, stopat):
+    m = TM(); m.B = False
     m.deposit(0, b''.join([
         b'\x03\xFF\xFF\xFF' * 2,    # 4-byte ops
         b'\x01\xFF'         * 2,    # 2-byte ops
