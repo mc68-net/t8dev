@@ -1,5 +1,5 @@
 [project]
-version = '0.0.5'
+version = '0.0.6.dev1'
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
 authors = [
@@ -18,6 +18,8 @@ dependencies = ['r8format>=0.0.6', 'patool', 'pytest_pt', ]
 #   to run this package's tests too.
 
 [project.optional-dependencies]
+#   XXX We should really have some tests that make sure that less-than-all
+#   installs actually work; these have failed before.
 extsim  = ['py65',]                     # external CPU simulators
 toolset = ['requests',]                 # toolset installation capability
 pytest  = ['pytest',]                   # user unit test framework

@@ -2,12 +2,22 @@
     Wraps py65 in an API suitable for use in unit tests.
 '''
 
+try:
+    from py65.devices.mpu6502 import MPU
+except ModuleNotFoundError:
+    #   Delay the ModuleNotFoundError until someone actually tries to use the
+    #   Machine class, rather than just loading it. This allows people to
+    #   load the framework (where __init__.py loads all these modules) and
+    #   use the parts that are supported.
+    class MPU:
+        def __init__(self):
+            raise ModuleNotFoundError('mos65 simulator requires py65 module')
+
 from    numbers  import Integral
-from    py65.devices.mpu6502  import MPU
-from    testmc.generic.iomem  import IOMem
 from    sys import stderr
 
 from    testmc.generic  import *
+from    testmc.generic.iomem  import IOMem
 from    testmc.mos65.instructions  import Instructions
 
 from    binary.tool import asl, asxxxx

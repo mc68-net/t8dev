@@ -26,6 +26,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- Fixed: mos65 simulator throws ModuleNotFoundError for py65 only if it's
+  actually used. (This fixes `t8dev[toolset]` and similar installs.)
 
 ### 0.0.5 (2024-10-20)
 - Added: Simulator/unit test BIOS source code and `t8dev aslt8dev` command
