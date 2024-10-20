@@ -26,6 +26,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+
+### 0.1.0 (2024-10-20)
 - Breaking API change: testmc.pytest.fixtures.loadbios() now does not
   require (though still can optionally accept) a BIOS name. See commit
   messge for full details.
