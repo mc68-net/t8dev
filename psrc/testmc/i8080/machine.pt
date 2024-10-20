@@ -1,4 +1,5 @@
 from    testmc.i8080  import *
+from    testmc.i8080.opcodes  import Instructions as I
 from    testmc  import LB, MB
 import  pytest
 
@@ -30,3 +31,10 @@ def test_reset(m):
     m.pc = 0x1234
     m.reset()
     assert 0 == m.pc
+
+@pytest.mark.xfail(strict=True)
+def test_conditional_ret(m):
+    ' Ensure that conditional returns are handled properly. '
+    m.deposit(0x100, [I.RETnz, I.RETz])
+    m.call(0x100, R(Z=1), maxsteps=4, trace=1)
+    assert 0x101 == m.pc
