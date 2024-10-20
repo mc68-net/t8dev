@@ -89,7 +89,6 @@ class Machine(GenericMachine):
     ####################################################################
     #   Execution
 
-    _RTS_opcodes        = set([Instructions.RTS])
     _ABORT_opcodes      = set([Instructions.BRK])
 
     def reset(self):    self.pc = self.word(0xFFFC)

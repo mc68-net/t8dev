@@ -26,6 +26,9 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- API change: `testmc.*.Machine.call()` now executes return instructions,
+  rather stopping on them. This should not affect most users, but it
+  can be a breaking API change for certain kinds of tests.
 
 ### 0.1.0 (2024-10-20)
 - Breaking API change: testmc.pytest.fixtures.loadbios() now does not
