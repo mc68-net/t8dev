@@ -175,13 +175,6 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
     #   Execution - abstract methods
 
     @abstractproperty
-    def _RTS_opcodes(self):
-        ''' Opcodes that execute an unconditional return from a called
-            subroutine. This must be a `set()` or other object that
-            supports the `|` operator for set union.
-        '''
-
-    @abstractproperty
     def _ABORT_opcodes(self):
         ''' The default set of opcodes that should abort the execution of
             `call()`. This must be a `set()` or other object that supports
@@ -297,34 +290,30 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             'Timeout after {} opcodes: {} opcode={}' \
             .format(n, self.regs, self.byte(self._getpc())))
 
-    def call(self, addr, regs=None, *, retaddr=0xFFFD,
+    CALL_DEFAULT_RETADDR = 0xFFFD
+
+    def call(self, addr, regs=None, *, retaddr=CALL_DEFAULT_RETADDR,
             stopat=None, stopon=None, maxsteps=MAXSTEPS, trace=False):
         ''' Set the given registers, push `retaddr` on the stack, and start
             execution at `addr`. Execution stops when:
-            - `maxsteps` instructions have been executed, raising `Timeout`,
-            - an opcode in `stopon` is about to be executed, raising `Abort`,
-            - an `RTS` is about to be executed and either the return address on
-              the stack is `retaddr` or the SP is the starting SP after
-              call()'s initial push of `retaddr`. If both are the case this
-              function returns normally, otherwise it raises
-              `UnexpectedCallStack`.
+            - we are about to execute an address in `stopat`
+            - we are about to execute at `retaddr` and the stack has
+              nothing on it (i.e., it points to the same location as when
+              this function was called)
+            - `maxsteps` instructions have been executed, raising `Timeout`
+            - we are about to execute an opcode in `stopon`, raising `Abort`
 
             On successful exit:
-            - The program counter will be left at the final (unexecuted) RTS
-              opcode. Thus, unlike `step()`, this may execute no opcodes if the
-              PC is initially pointing to an RTS or an instruction in the abort
-              list.
-            - The stack pointer, however, will be restored to the value before
-              call() pushed the sentinel return address `retaddr`. This avoids
-              overflowing the stack if call() is used multiple times on a
-              single Machine instance.
+            - The program counter will be left at `retaddr`.
+            - The stack pointer will be left at the location it was when
+              this function was called.
 
             Default parameter values are:
             - Stack pointer: the the `Machine.Registers`'s default initial
               stack pointer value, which should have been set to something
               usable at initialization.
-            - `retaddr`: an address unlikely to be a valid return address,
-              such as one within the CPU's vector table.
+            - `retaddr`: `CALL_DEFAULT_RETADDR`, an address (hopefully)
+              unlikely to be used by the program under test,
             - `stopon`: the set of instructions in `_ABORT_opcodes`.
             - `trace`: False; `step()` tracing will be enabled if True.
 
@@ -340,39 +329,31 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             self.setregs(self.Registers(pc=addr))
 
         if stopat is None:  stopat = set()
+        else:               stopat = set(stopat)
+        stopat.add(retaddr)
 
         if stopon is None:                      stopon = self._ABORT_opcodes
         if not isinstance(stopon, Container):   stopon = (stopon,)
         stopon = set(stopon)                    # should be faster lookup
 
-        allstopon = self._RTS_opcodes | set(stopon)
+        allstopon = set(stopon)
         maxremain = maxsteps
-        self.pushretaddr(retaddr)
         initsp = self._getsp()
+        self.pushretaddr(retaddr)
         while True:
             pc = self._getpc()
             if pc in stopat:  return
-            opcode = self.byte(pc)
+            if pc == retaddr and self._getsp() == initsp:
+                #   We're about to execute at the return address we pushed
+                #   on the stack, and the stack is empty, so this means
+                #   that the program under test returned.
+                return
             if maxremain <= 0:
                 self._raiseTimeout(maxsteps)
+            opcode = self.byte(pc)
             if opcode in stopon:
                 raise self.Abort('Abort on opcode=${:02X}: {}' \
                     .format(self.byte(pc), self.regs))
-            if opcode in self._RTS_opcodes:
-                isretsp   = self._getsp() == initsp
-                isretaddr = self.getretaddr() == retaddr
-                if isretsp or isretaddr:
-                    if isretsp and isretaddr:
-                        #   Restore stack pointer to original value.
-                        self.setregs(self.Registers(sp=self._getsp()+2))
-                        return
-                    #   We considered making this a warning, but it most likely
-                    #   indicates a problem with the code under test and, when
-                    #   it's expected, it can fairly easily be caught.
-                    raise self.UnexpectedCallStack('initsp={:04X} sp={:04X}'
-                        ' retaddr={:04X} spretaddr={:04X}'
-                        .format(initsp, self._getsp(), retaddr,
-                            self.getretaddr()))
             maxremain -= self.stepto(stopat=stopat, stopon=allstopon,
                 maxsteps=maxremain, raisetimeout=False, trace=trace)
 
@@ -384,13 +365,6 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
 
     class Abort(RuntimeError):
         ' The emulator encoutered an instruction on which to abort.'
-
-    class UnexpectedCallStack(RuntimeError):
-        ''' The stack after a call() was in an unpexected state, either:
-            * Stack pointer at return was not stack pointer at call
-              (return address was not taken from where it was pushed); or
-            * Return address at call stack pointer was changed.
-        '''
 
     def traceline(self):
         ''' Return a line of tracing information about the current step of

@@ -32,9 +32,28 @@ def test_reset(m):
     m.reset()
     assert 0 == m.pc
 
-@pytest.mark.xfail(strict=True)
+def test_pushretaddr(m):
+    m.sp=0x200
+    m.pushretaddr(0x1234)
+    assert (0x1FE, b'\x34\x12') == (m.sp, m.bytes(0x1FE, 2))
+
+def test_getretaddr(m):
+    m.deposit(0x202, [0x78, 0x56])
+    m.sp=0x202
+    a = m.getretaddr()
+    assert (0x202, 0x5678) == (m.sp, a)
+
+####################################################################
+
+CALLRET = Machine.CALL_DEFAULT_RETADDR
+
+def test_unconditional_ret(m):
+    m.deposit(0x100, [I.RET])
+    m.call(0x100, maxsteps=4, trace=1)
+    assert CALLRET == m._getpc()
+
 def test_conditional_ret(m):
     ' Ensure that conditional returns are handled properly. '
     m.deposit(0x100, [I.RETnz, I.RETz])
     m.call(0x100, R(Z=1), maxsteps=4, trace=1)
-    assert 0x101 == m.pc
+    assert CALLRET == m._getpc()

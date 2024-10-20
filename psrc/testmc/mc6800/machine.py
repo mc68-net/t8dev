@@ -43,7 +43,6 @@ class Machine(GenericMachine):
     ####################################################################
     #   Instruction Execution
 
-    _RTS_opcodes    = set([Instructions.RTS])
     _ABORT_opcodes  = set([0x00])   # not an opcode and test mem init'd to this
 
     def reset(self):    self.pc = self.word(0xFFFE)
