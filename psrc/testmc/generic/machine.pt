@@ -47,7 +47,7 @@ def TM():
         def pushretaddr(self, _):   raise RuntimeError('Tested in subclasses.')
         def getretaddr(self):       raise RuntimeError('Tested in subclasses.')
 
-        _RTS_opcodes = _ABORT_opcodes = None
+        _ABORT_opcodes = None
 
     return TestMachine
 
