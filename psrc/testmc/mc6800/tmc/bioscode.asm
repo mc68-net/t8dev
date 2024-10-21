@@ -2,7 +2,7 @@
 ;   Used for unit tests and command-line use.
 
             cpu 6800
-            include "testmc/mc6800/tmc/bios.a68"
+            include "testmc/mc6800/tmc/biosdef.a68"
 
 ;   This file will be loaded into memory along with the code under test.
 ;   It may also be useful to merge their symbols, so we use a separate section

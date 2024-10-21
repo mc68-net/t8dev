@@ -29,6 +29,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
   stopping on them. This should not affect most users, but it can be a
   breaking API change for certain kinds of tests.
+- API: `bios.*` files renamed to `biosdef.*`.
 
 ### 0.1.2. (2024-10-24)
 - Fixed: t8setup.bash no longer adds `[all]` to local `t8dev` install
