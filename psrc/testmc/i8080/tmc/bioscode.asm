@@ -4,7 +4,7 @@
             relaxed on
             cpu 8080
             z80syntax exclusive
-            include "testmc/i8080/tmc/bios.i80"
+            include "testmc/i8080/tmc/biosdef.i80"
 
 ;   This file will be loaded into memory along with the code under test.
 ;   It may also be useful to merge their symbols, so we use a separate section

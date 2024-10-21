@@ -2,7 +2,7 @@
 ;   Used for unit tests and command-line use.
 
             cpu 6502
-            include "testmc/mos65/tmc/bios.a65"
+            include "testmc/mos65/tmc/biosdef.a65"
 
 ;   This file will be loaded into memory along with the code under test.
 ;   It may also be useful to merge their symbols, so we use a separate section

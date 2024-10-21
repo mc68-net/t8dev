@@ -29,6 +29,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
   stopping on them. This should not affect most users, but it can be a
   breaking API change for certain kinds of tests.
+- API: `bios.*` files renamed to `biosdef.*`.
 
 ### 0.1.3 (2024-11-04)
 - Fixed: testmc.i8080 INC r/DEC r now correctly preserves CY flag instead
