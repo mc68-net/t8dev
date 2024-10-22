@@ -26,6 +26,10 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- Added: iomem now throws an exception if an I/O function attached to a
+  memory addess returns a bad value (not int or int out of range) on read.
+- Fixed: tmc now returns exitvalue if exitport is read so that the
+  command-line simulator doesn't die if you read that address.
 
 ### 0.1.0 (2024-10-20)
 - Breaking API change: testmc.pytest.fixtures.loadbios() now does not

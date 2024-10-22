@@ -98,8 +98,8 @@ def consoleio(_addr, char):
         stdout.buffer.flush()
 
 def exitport(_addr, val, exitcmd=None):
-    if val == exitcmd:
-        exit(0)
+    if val == exitcmd: exit(0)
+    return exitcmd
 
 def getchar():
     ''' Blocking read of a charater from stdin, in raw mode.

@@ -23,8 +23,9 @@ def test_binname(cpu, path, expected):
     assert str(binpath(cpu, path)).endswith(expected)
 
 def test_exitport():
-    #   Value other than `exitcmd` does nothing.
-    assert None is exitport(None, 0x01, 0x02)
+    #   Value other than `exitcmd` just returns `exitcmd`
+    exitcmd = 2
+    assert exitcmd is exitport(None, 0x01, exitcmd)
     #   Correct `exitcmd` value exits the process.
     with pytest.raises(SystemExit):
         exitport(None, 0x03, 0x03)
