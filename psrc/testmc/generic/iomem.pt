@@ -82,6 +82,16 @@ def test_setio_no_overlaps(mem):
         mem.setio(3, iof)
     assert ex.match(r'address \$0003')
 
+@pytest.mark.parametrize('retval, extype', [
+    (None, TypeError), (object, TypeError), ('0', TypeError),
+    (-1, ValueError), (0x100, ValueError),
+])
+def test_setio_badread(mem, retval, extype):
+    ' Ensure that an exception is thrown for bad values returned on a read. '
+    def testiof(addr, value): return retval
+    mem.setio(2, testiof)
+    with pytest.raises(extype): print(mem[2])
+
 def test_setiostreams(mem):
     ' This also tests streamiof() and setio(). '
     mem[4] = 0xEA

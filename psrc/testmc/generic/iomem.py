@@ -154,7 +154,15 @@ class IOMem(bytearray):
 
         self._check_index(key)
         if key in self.iofs:
-            return self.iofs[key](key, None)
+            iof = self.iofs[key]
+            val = iof(key, None)
+            if not isinstance(val, int):
+                raise TypeError(f'I/O address ${key:04X}: non-int {val!r}'
+                    f" returned by {iof!r}")
+            if val < 0 or val > 0xFF:
+                raise ValueError(f'I/O address ${key:04X}: bad int ${val:02X}'
+                    f' (<0 or >$FF) by {iof!r}')
+            return val
         return super().__getitem__(key)
 
     def _badlen(self, alen, vlen):
