@@ -26,6 +26,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- Changed: No more need for `t8dev[all]`; all optional req's now standard.
 - Added: iomem now throws an exception if an I/O function attached to a
   memory addess returns a bad value (not int or int out of range) on read.
 - Fixed: tmc now returns exitvalue if exitport is read so that the

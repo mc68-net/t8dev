@@ -1,5 +1,5 @@
 [project]
-version = '0.1.1.dev0'
+version = '0.1.1.dev1'
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
 authors = [
@@ -11,19 +11,16 @@ urls.source = 'https://github.com/mc68-net/t8dev'
 urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
 requires-python = '>=3.9'
-dependencies = ['r8format>=0.0.6', 'patool', 'pytest_pt', ]
-#   `pytest_pt` is not strictly a runtime dependency, since we need it
-#   only to run our tests, but it's usual for repos using this package
-#   to want it for their own tests and, when this package is a submodule,
-#   to run this package's tests too.
-
-[project.optional-dependencies]
-#   XXX We should really have some tests that make sure that less-than-all
-#   installs actually work; these have failed before.
-extsim  = ['py65',]                     # external CPU simulators
-toolset = ['requests',]                 # toolset installation capability
-pytest  = ['pytest',]                   # user unit test framework
-all     = ['py65',  'requests', 'pytest']
+dependencies = [
+    'r8format>=0.0.6',
+    'pytest', 'pytest_pt',
+    'requests', 'patool',               #   toolset installation support
+    'py65',                             #   external CPU simulators
+]
+#   `pytest` and `pytest_pt` are not strictly a runtime dependencies, since
+#   we need them only to run our tests, but it's usual for repos using this
+#   package to want it for their own tests too, and to run our tests when
+#   this package is a submodule in the Git repo.
 
 [project.scripts]
 ascii2a2t       = 't8dev.cli.ascii2a2t:main'
