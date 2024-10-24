@@ -30,6 +30,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
   stopping on them. This should not affect most users, but it can be a
   breaking API change for certain kinds of tests.
 - API: `bios.*` files renamed to `biosdef.*`.
+- API: `t8setup.bash` no longer installs Python packages in subdirs.
+  Instead add them explicitly to your `requirements.txt`
 
 ### 0.1.3 (2024-11-04)
 - Fixed: testmc.i8080 INC r/DEC r now correctly preserves CY flag instead
