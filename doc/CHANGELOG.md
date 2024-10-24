@@ -16,7 +16,7 @@ On any change to the programs or libraries (not, generally, the tests), the
 previous release version number is bumped and `.devN` is appended to it, if
 this hasn't already been done. A `.devN` suffix will stay until the next
 release, though its _N_ need not be bumped unless the developer feels the
-need.
+need. Notes marked "API" indicate breaking API changes.
 
 Releases are usually tagged with `vN.N.N`. Potentially not all releases
 will be tagged, but specific releases can also be fetched via the Git
