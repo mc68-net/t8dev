@@ -26,6 +26,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- Fixed: t8setup.bash no longer adds `[all]` to local `t8dev` install
 
 ### 0.1.1 (2024-10-24)
 - Changed: No more need for `t8dev[all]`; all optional req's now standard.

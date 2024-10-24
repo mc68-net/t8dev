@@ -105,8 +105,6 @@ except KeyError:
 _____
 )
         [[ -n $pkgname ]] || return 1
-        local extras=
-        [[ $pkgname == t8dev ]] && extras='[all]'
 
         #   XXX The `pip inspect` is slowish (almost a second), but not as slow
         #   as doing the `pip install -e` when it's already been done. Can we
@@ -115,9 +113,9 @@ _____
         #   Also, note that we do not use `grep -q` as this stops reading
         #   on the first match and can thus produce Errno 32 Broken pipe.
         if ! pip inspect | grep >/dev/null ".url.: .file://$dir"; then
-            echo "----- Installing package $pkgname$extras from submodule $sm" \
+            echo "----- Installing package $pkgname from submodule $sm" \
                 'as editable into virtual environment.'
-            pip install -q -e "$dir$extras" || {
+            pip install -q -e "$dir" || {
                 echo 1>&2 'Package install failed.'; return 3; }
         fi
     done
