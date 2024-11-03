@@ -86,7 +86,7 @@ def jp_nf(m, flag):     jp(m, not getattr(m, flag))
 
 def jp_hl(m):           m.pc = m.hl
 
-def rst(m, addr):       m.pc = addr
+def rst(m, addr):       pushword(m, m.pc); m.pc = addr
 
 ####################################################################
 #   Instructions affecting the stack
