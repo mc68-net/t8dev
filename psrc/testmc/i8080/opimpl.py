@@ -181,17 +181,17 @@ def parity(byte):
     p = p ^ (p>>4)
     return not (p&1)
 
-def logicF(m, val, H=False):
+def logicF(m, val, H=False, preserveC=False):
     ''' Flag updates for logic operations (mainly):
         • Update sign, zero and parity flags based on `val`.
-        • Always clear carry.
+        • Always clear carry, unless preserveC is set.
         • Clear half carry unless `H` is supplied and is `True`.
     '''
     m.S = isneg(val)
     m.Z = iszero(val)
     m.P = parity(val)
     m.H = H
-    m.C = False
+    if not preserveC: m.C = False
     return val
 
 def scf(m):         m.C = True
@@ -244,11 +244,11 @@ def rra(m):
 
 def inc_r(m, reg):
     val = incbyte(getattr(m, reg), 1)
-    setattr(m, reg, logicF(m, val, H=(val & 0xF) == 0x0))
+    setattr(m, reg, logicF(m, val, H=(val & 0xF) == 0x0, preserveC=True))
 
 def inc_m(m):
     val = incbyte(m.mem[m.hl], 1)
-    m.mem[m.hl] = logicF(m, val, H=(val & 0xF) == 0x0)
+    m.mem[m.hl] = logicF(m, val, H=(val & 0xF) == 0x0, preserveC=True)
 
 #   XXX For DCR, half-carry flag is not-half-borrow! This has been tested
 #   by cjs only on an 8085, but that always sets the half-carry flag on a
@@ -256,11 +256,11 @@ def inc_m(m):
 
 def dec_r(m, reg):
     val = incbyte(getattr(m, reg), -1)
-    setattr(m, reg, logicF(m, val, H=(val & 0xF) != 0xF))
+    setattr(m, reg, logicF(m, val, H=(val & 0xF) != 0xF, preserveC=True))
 
 def dec_m(m):
     val = incbyte(m.mem[m.hl], -1)
-    m.mem[m.hl] = logicF(m, val, H=(val & 0xF) != 0xF)
+    m.mem[m.hl] = logicF(m, val, H=(val & 0xF) != 0xF, preserveC=True)
 
 def inx_r(m, reg):
     setattr(m, reg, incword(getattr(m, reg),  1))

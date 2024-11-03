@@ -26,6 +26,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- Fixed: testmc.i8080 INC r/DEC r now correctly preserves CY flag instead
+  of clearing it. (Only the logic ops, AND etc., should clear that flag.)
 
 ### 0.1.2. (2024-10-24)
 - Fixed: t8setup.bash no longer adds `[all]` to local `t8dev` install

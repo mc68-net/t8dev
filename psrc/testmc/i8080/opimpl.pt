@@ -226,15 +226,18 @@ def test_inx():
     #   On entry, all flags set except those explicitly overridden.
     #   Output flags are expected to unchanged unless explicitly set otherwise.
 
-    (I.INCc, R(bc=0x00FF, Z=0,H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1,C=0)),
-    (I.INCc, R(bc=0x000F,     H=0    ), R(bc=0x0010, S=0,Z=0,H=1,P=0,C=0)),
+    (I.INCc, R(bc=0x00FF, Z=0,H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1)),
+    (I.INCc, R(bc=0x00FF, Z=0,H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1)),
+    (I.INCc, R(bc=0x000F,     H=0    ), R(bc=0x0010, S=0,Z=0,H=1,P=0)),
+    #   Check to confirm C=0 is also preserved
+    (I.INCc, R(bc=0x00FF, Z=0,H=0,P=0,C=0), R(bc=0x0000, S=0,Z=1,H=1,P=1)),
 
     #   For DEC, the half-carry bit is a half-not-borrow bit, at least on 8085.
-    (I.DECc, R(bc=0x0000, S=1,H=1,P=0), R(bc=0x00FF, S=1,Z=0,H=0,P=1,C=0)),
-    (I.DECc, R(bc=0x0010,     H=1    ), R(bc=0x000F, S=0,Z=0,H=0,P=1,C=0)),
-    (I.DECc, R(bc=0x0001,     H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1,C=0)),
-    (I.DECc, R(bc=0x0002,     H=0    ), R(bc=0x0001, S=0,Z=0,H=1,P=0,C=0)),
-    (I.DECc, R(bc=0x007F,     H=0    ), R(bc=0x007E, S=0,Z=0,H=1,P=1,C=0)),
+    (I.DECc, R(bc=0x0000, S=1,H=1,P=0), R(bc=0x00FF, S=1,Z=0,H=0,P=1)),
+    (I.DECc, R(bc=0x0010,     H=1    ), R(bc=0x000F, S=0,Z=0,H=0,P=1)),
+    (I.DECc, R(bc=0x0001,     H=0,P=0), R(bc=0x0000, S=0,Z=1,H=1,P=1)),
+    (I.DECc, R(bc=0x0002,     H=0    ), R(bc=0x0001, S=0,Z=0,H=1,P=0)),
+    (I.DECc, R(bc=0x007F,     H=0    ), R(bc=0x007E, S=0,Z=0,H=1,P=1)),
 
     #   No flags affected on 16-bit increment/decrement.
     (I.INXbc, R(bc=0xFFFF, Z=0),        R(bc=0x0000, Z=0)),
