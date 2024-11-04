@@ -26,6 +26,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+
+### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
   stopping on them. This should not affect most users, but it can be a
   breaking API change for certain kinds of tests.
