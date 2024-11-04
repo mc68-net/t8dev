@@ -26,6 +26,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+
+### 0.1.3 (2024-11-04)
 - Fixed: testmc.i8080 INC r/DEC r now correctly preserves CY flag instead
   of clearing it. (Only the logic ops, AND etc., should clear that flag.)
 - Fixed: testmc.i8080: RST now pushes return address on stack.
