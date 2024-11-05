@@ -26,6 +26,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 
 ### dev
+- Added: `t8dev buildtoolset ctools` for Commodore 64/128 CP/M disk images.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
