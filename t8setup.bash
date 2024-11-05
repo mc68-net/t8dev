@@ -24,7 +24,10 @@
 #     version in the head commit.
 #   • Parses any known command line options at the front of $@, removing
 #     them and performing their corresponding actions. (All remaining
-#     command line options are left in $@.)
+#     command line options are left in $@.) Parsing stops at a `--`
+#     option which will be left in place in case the caller needs to
+#     see it to separate its own options from those to be passed to
+#     e.g. pytest. (It's safe to pass the `--` straight on to pytest.)
 #   • Installs the Python virtual environment and packages (if necessary)
 #     and activates it.
 #   • Confirms that the r8format dependency is present.
@@ -145,7 +148,7 @@ export T8_PROJDIR BUILDDIR
 #   • -c: clean rebuild of only this repo's source (test/toolchain output)
 #   All args after these are left for the calling script.
 while [[ ${#@} -gt 0 ]]; do case "$1" in
-    --)     shift; break;;
+    --)     break;;     # NOTE: no shift here so caller can see the --
     -C)     shift; rm -rf "$BUILDDIR" ${T8_CLEAN_C-};;
     -c)     shift;
             rm -rf "$BUILDDIR"/{obj,ptobj,pytest,virtualenv} ${T8_CLEAN_c-} ;;
