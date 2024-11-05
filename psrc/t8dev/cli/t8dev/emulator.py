@@ -3,12 +3,12 @@
     e help              help function for emulation commands
     e list              lists all of the suites available e.g. cscp, vice etc
     e cscp list         lists all available emulators within suite
-    e cscp tk85
+    e cscp tk85         specific emulator from cscp suite
     e cscp pc8001
     e vice x64
-    e openmsx
+    e openmsx           suite should have multiple MSX machine in it?
     e linapple
-    e runcpm
+    e runcpm            probably no suite here, because just the one
 '''
 
 from    pathlib  import Path
@@ -22,6 +22,7 @@ from    binary.romimage  import RomImage
 from    t8dev.cli  import exits
 from    t8dev.cli.t8dev.util  import err, cwd, runtool
 import  t8dev.path  as path
+import  t8dev.run  as run
 
 
 ####################################################################
@@ -205,16 +206,14 @@ class RunCPM(Suite):
     def run(self):
         emudir = path.build('emulator', self.suitename())
         emu = emudir.joinpath('RunCPM')
-        with cwd(emudir):  self.setup_emudir(emu)
-        runtool(emu)
+        with cwd(emudir):
+            self.setup_emudir(emu)
+            run.tool('RunCPM')
 
     def setup_emudir(self, emu):
-        emu.unlink(missing_ok=True)
-        #   XXX link instead of copy? This doesn't run on Windows, so....
-        emu.symlink_to(f'../../tool/bin/{emu.name}')
-
         Path('./A/0').mkdir(exist_ok=True, parents=True)
         Path('./B/0').mkdir(exist_ok=True, parents=True)
+
 
 ####################################################################
 
