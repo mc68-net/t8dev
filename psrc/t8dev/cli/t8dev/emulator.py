@@ -213,7 +213,11 @@ class RunCPM(Suite):
     def run(self):
         self.emudir = path.build('emulator', self.suitename())
         self.setup_emudir()
-        with cwd(self.emudir): run.tool('RunCPM')
+        with cwd(self.emudir):
+            #   RunCPM clears the screen on start, as well as doing other
+            #   less annoying bits termios terminal manipulation. Set the
+            #   terminal type to `dumb` so that it doesn't do this.
+            run.tool('RunCPM', envupdate={ 'TERM': 'dumb' })
 
     def setup_emudir(self):
         A0 = Path('./A/0'); B0 = Path('./B/0'); C0 = Path('./C/0')

@@ -1,0 +1,12 @@
+from    os  import environ
+from    t8dev.run  import newenv
+
+def test_newenv_none():
+    e = newenv(None)
+    print(e)
+    assert e['HOME'] == environ['HOME']
+
+def test_newenv_changed():
+    oldhome = environ['HOME']
+    e = newenv({ 'HOME': '/xyz' })
+    assert ('/xyz', oldhome) == (e['HOME'], environ['HOME'])

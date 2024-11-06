@@ -3,7 +3,8 @@
 import  os, subprocess
 from    t8dev  import path
 
-def tool(toolbin, *args, input=None, stdout_path=None, is32bit=False):
+def tool(toolbin, *args, input=None, stdout_path=None,
+    envupdate=None, is32bit=False):
     ''' Run `toolbin` with the given `args`. On success this simply
         returns; on failure it prints the command line and the exit code
         and then exits this program. (This makes error output more readable
@@ -15,6 +16,10 @@ def tool(toolbin, *args, input=None, stdout_path=None, is32bit=False):
         If `stdout_path` is given, that file will be opened in binary mode
         (creating it if necessary) and the standard output of the program
         will be written to it. (No output will produce an empty file.)
+
+        If `envupdate` is set, it must be a mapping of names to values.
+        The process will be run with an enivronment modified to have
+        the given names set to the values.
 
         For tools that under Linux are 32-bit binaries, set `is32bit` to
         `True` to have a helpful message printed when the exit code is 127,
@@ -30,10 +35,11 @@ def tool(toolbin, *args, input=None, stdout_path=None, is32bit=False):
     runargs = (str(toolbin),) + tuple(map(str, args))
     try:
         if stdout_path is None:
-            ret = subprocess.run(runargs, input=input)
+            ret = subprocess.run(runargs, input=input, env=newenv(envupdate))
         else:
             with open(str(stdout_path), 'wb') as f:
-                ret = subprocess.run(runargs, input=input, stdout=f)
+                ret = subprocess.run(runargs, input=input, stdout=f,
+                    env=newenv(envupdate))
         exitcode = ret.returncode
     except FileNotFoundError:
         print(f'FAILED: Executable {toolbin} not found for: {cmdline}')
@@ -44,3 +50,13 @@ def tool(toolbin, *args, input=None, stdout_path=None, is32bit=False):
     if is32bit and exitcode == 127:
         print('(Do you support 32-bit executables?)', file=sys.stderr)
     exit(exitcode)
+
+def newenv(updates):
+    ''' Return a copy of the environment mapping updated with all key/value
+        pairs from the mapping `updates`. If `updates` is `None` an
+        unmodified copy of the environment is returned.
+    '''
+    env = os.environ.copy()
+    if updates is None:  return env
+    for k, v in updates.items():  env[k] = v
+    return env
