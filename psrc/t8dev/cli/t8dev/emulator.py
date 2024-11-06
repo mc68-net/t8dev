@@ -62,6 +62,11 @@ class Suite:
 
 class CSCP(Suite):
 
+    #   XXX This requires that wine be installed (on Linux) and the
+    #   emulators be extracted to .build/tool/bin/cscp/, which is
+    #   done by `t8dev buildtoolset cscp`. We should give a hint
+    #   about doing that if the emulators are not present.
+
     #   VENDOR_ROM entries may be for an actual CSCP emulator name, or may
     #   be alternate configurations that load a different set of ROMs
     #   (e.g., `tk80` below). The alternate ROM configurations include an
