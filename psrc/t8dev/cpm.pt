@@ -1,0 +1,13 @@
+from    t8dev.cpm  import compile_submit
+import  pytest
+
+def test_compile_submit():
+    assert b'' == compile_submit([])
+
+    data = b'\x03abc' + b'\x00'*(128-4)
+    assert (128, data) == (len(data), compile_submit(['abc']))
+
+    data = b'\x05cdefg' + b'\x00'*(128-6) \
+           + b'\x00'*128 \
+           + b'\x02$1' + b'\x00'*(128-3)
+    assert (128*3, data) == (len(data), compile_submit(['$1', '', 'cdefg']))
