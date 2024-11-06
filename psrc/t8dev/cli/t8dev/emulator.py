@@ -22,6 +22,7 @@ import  textwrap
 from    binary.romimage  import RomImage
 from    t8dev.cli  import exits
 from    t8dev.cli.t8dev.util  import err, cwd, runtool, vprint
+from    t8dev.cpm  import compile_submit
 import  t8dev.path  as path
 import  t8dev.run  as run
 
@@ -212,31 +213,52 @@ class RunCPM(Suite):
     #   and suggest `t8dev buildtoolset RunCPM` if it's not present.
 
     def run(self):
+        #   XXX We use `=X` to specify option X, because `-X' will be
+        #   consumed by the t8dev options parser. We need to get that
+        #   options parser to use subcommands that can have their own
+        #   separate options.
+        autorun = False
+        if self.args and self.args[0] == '=a':
+            autorun = True
+            self.args = self.args[1:]
+
         self.emudir = path.build('emulator', self.suitename())
-        self.setup_emudir()
+        self.setup_emudir(autorun)
         with cwd(self.emudir):
             #   RunCPM clears the screen on start, as well as doing other
             #   less annoying bits termios terminal manipulation. Set the
             #   terminal type to `dumb` so that it doesn't do this.
             run.tool('RunCPM', envupdate={ 'TERM': 'dumb' })
 
-    def setup_emudir(self):
+    def setup_emudir(self, autorun=False):
+        #   Set up drives.
         A0, B0, C0, D0 = drives = tuple( Path(f'./{d}/0') for d in 'ABCD' )
         with cwd(self.emudir):
             for drive in drives:  drive.mkdir(exist_ok=True, parents=True)
+
         #   Copy specified files to drive A.
         for file in map(Path, self.args):
            self.copycpmfile(file, A0)
+
         #   Copy standard CP/M commands to drive C, if they are present.
         #   These can be installed with `t8dev buildtoolset osimg`.
         for file in path.tool('src/osimg/cpm/2.2/').glob('*'):
            self.copycpmfile(file, C0)
+
         #   Copy RunCPM-supplied commands to drive D, if present.
         #   Note that this would be _required_ in order to get EXIT.COM
         #   if we were buildiing with a different CCP, which we might
         #   well want to do at some point.
         file = path.tool('src/RunCPM/DISK/A0.ZIP')
         if file.exists(): self.copycpmzip(file, D0, subdir='A/0/')
+
+        #   Build `$$$.SUB` file if we're auto-running the first argument.
+        if autorun:
+            commands = [Path(self.args[0]).name.upper(), 'EXIT']
+            vprint(1, 'RunCPM', f'autorun: {commands}')
+            subdata = compile_submit(commands)
+            with open(self.emudir.joinpath(A0, '$$$.SUB'), 'wb') as f:
+                f.write(subdata)
 
     def copycpmfile(self, src:Path, dir:Path):
         ''' Copy `src` to the `dir` directory under `self.emudir`.
