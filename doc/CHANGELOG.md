@@ -30,6 +30,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Changed: `t8setup.bash` now leaves the first `--` option in `$@` so that
   the caller can see it, if it needs the separator for its own purposes.
 - Changed: new toolset.bm2 download location
+- Added: `t8dev emulate runcpm` now copies files to the "disks."
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather

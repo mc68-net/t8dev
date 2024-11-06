@@ -12,7 +12,7 @@
 '''
 
 from    pathlib  import Path
-from    shutil  import  copyfile, copyfileobj, get_terminal_size
+from    shutil  import  copy, copyfile, get_terminal_size
 from    sys  import exit, stderr
 from    urllib.request  import HTTPError, urlopen
 import  os
@@ -20,7 +20,7 @@ import  textwrap
 
 from    binary.romimage  import RomImage
 from    t8dev.cli  import exits
-from    t8dev.cli.t8dev.util  import err, cwd, runtool
+from    t8dev.cli.t8dev.util  import err, cwd, runtool, vprint
 import  t8dev.path  as path
 import  t8dev.run  as run
 
@@ -207,17 +207,43 @@ class Linapple(Suite):
     pass
 
 class RunCPM(Suite):
+    #   XXX This requires that RunCPM be in the path. We should check this
+    #   and suggest `t8dev buildtoolset RunCPM` if it's not present.
 
     def run(self):
-        emudir = path.build('emulator', self.suitename())
-        emu = emudir.joinpath('RunCPM')
-        with cwd(emudir):
-            self.setup_emudir(emu)
-            run.tool('RunCPM')
+        self.emudir = path.build('emulator', self.suitename())
+        self.setup_emudir()
+        with cwd(self.emudir): run.tool('RunCPM')
 
-    def setup_emudir(self, emu):
-        Path('./A/0').mkdir(exist_ok=True, parents=True)
-        Path('./B/0').mkdir(exist_ok=True, parents=True)
+    def setup_emudir(self):
+        A0 = Path('./A/0'); B0 = Path('./B/0'); C0 = Path('./C/0')
+        with cwd(self.emudir):
+            for drive in (A0, B0, C0):
+                drive.mkdir(exist_ok=True, parents=True)
+        #   Copy specified files to drive A.
+        for file in map(Path, self.args):
+           self.copycpmfile(file, A0)
+        #   Copy standard CP/M commands to drive C, if they are present.
+        #   These can be installed with `t8dev buildtoolset osimg`.
+        for file in path.tool('src/osimg/cpm/2.2/').glob('*'):
+           self.copycpmfile(file, C0)
+
+    def copycpmfile(self, src:Path, dir:Path):
+        ''' Copy `src` to the `dir` directory under emudir.
+
+            This converts filenames to all upper-case because, while RunCPM
+            will show lower-case filenames (as upper case) in a directory
+            listing, it will not find them if you try to run them as
+            commands. This will blindly overwrite existing files, which can
+            cause a different file to be overwritten if you run this with
+            filenames differing only in case.
+
+            We copy instead of creating a symlink so that files modified in
+            the emulator can be compared with the originals.
+        '''
+        dest = Path(dir, src.name.upper())
+        vprint(1, 'RunCPM', f'{str(dest):>16} ← {path.pretty(src)}')
+        copyfile(src, self.emudir.joinpath(dest))
 
 
 ####################################################################
