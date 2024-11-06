@@ -15,6 +15,7 @@ from    pathlib  import Path
 from    shutil  import  copy, copyfile, get_terminal_size
 from    sys  import exit, stderr
 from    urllib.request  import HTTPError, urlopen
+from    zipfile  import ZipFile
 import  os
 import  textwrap
 
@@ -220,10 +221,9 @@ class RunCPM(Suite):
             run.tool('RunCPM', envupdate={ 'TERM': 'dumb' })
 
     def setup_emudir(self):
-        A0 = Path('./A/0'); B0 = Path('./B/0'); C0 = Path('./C/0')
+        A0, B0, C0, D0 = drives = tuple( Path(f'./{d}/0') for d in 'ABCD' )
         with cwd(self.emudir):
-            for drive in (A0, B0, C0):
-                drive.mkdir(exist_ok=True, parents=True)
+            for drive in drives:  drive.mkdir(exist_ok=True, parents=True)
         #   Copy specified files to drive A.
         for file in map(Path, self.args):
            self.copycpmfile(file, A0)
@@ -231,9 +231,15 @@ class RunCPM(Suite):
         #   These can be installed with `t8dev buildtoolset osimg`.
         for file in path.tool('src/osimg/cpm/2.2/').glob('*'):
            self.copycpmfile(file, C0)
+        #   Copy RunCPM-supplied commands to drive D, if present.
+        #   Note that this would be _required_ in order to get EXIT.COM
+        #   if we were buildiing with a different CCP, which we might
+        #   well want to do at some point.
+        file = path.tool('src/RunCPM/DISK/A0.ZIP')
+        if file.exists(): self.copycpmzip(file, D0, subdir='A/0/')
 
     def copycpmfile(self, src:Path, dir:Path):
-        ''' Copy `src` to the `dir` directory under emudir.
+        ''' Copy `src` to the `dir` directory under `self.emudir`.
 
             This converts filenames to all upper-case because, while RunCPM
             will show lower-case filenames (as upper case) in a directory
@@ -248,6 +254,28 @@ class RunCPM(Suite):
         dest = Path(dir, src.name.upper())
         vprint(1, 'RunCPM', f'{str(dest):>16} ← {path.pretty(src)}')
         copyfile(src, self.emudir.joinpath(dest))
+
+    def copycpmzip(self, src:Path, dir:Path, subdir:str=''):
+        ''' Copy all files from the ZIP file `src` to the `dir` directory
+            under `self.emudir`. This upper-cases the filenames in
+            the same way that `copycpmfile` does.
+
+            If `subdir` is given, only files underneath that directory in
+            the ZIP file will be extracted, and that directory prefix will
+            be removed from the extracted file. (Note that this is a `str`,
+            not a `Path`, and you must include a trailing slash.)
+        '''
+        if subdir.startswith('/'): subdir = subdir[1:]
+        assert subdir.endswith('/')
+        vprint(1, 'RunCPM', f'{str(dir):>15}/ ← {path.pretty(src)}')
+        with ZipFile(src) as zf:
+            for entry in zf.infolist():
+                if len(entry.filename) <= len(subdir): continue
+                if not entry.filename.startswith(subdir): continue
+                exfname = entry.filename[len(subdir):]
+                vprint(2, 'RunCPM', f'extracting [{subdir}]{exfname}')
+                with open(self.emudir.joinpath(dir, exfname), 'wb') as f:
+                    f.write(zf.read(entry))
 
 
 ####################################################################
