@@ -6,12 +6,12 @@
 
 ;   XXX We should not attempt to redefine these if they're already defined.
 BDOS        equ  $0005
-CONIN       equ  1
-CONOUT      equ  2
+BCONOUT     equ  2          ; BDOS console output
+BCONDIR     equ  6          ; BDOS direct console I/O
 
-prchar      push bc         ;    ♡* send char in A to output
+prchar      push bc         ; ♡* send char in A to output
             push de
-            ld   c,CONOUT
+            ld   c,BCONOUT
             ld   e,a
             ; fallthrough
 
@@ -19,32 +19,33 @@ prchar      push bc         ;    ♡* send char in A to output
 ;   This expects BC already to have been saved on the stack, and C to
 ;   contain the BDOS function.
 bdosP       push hl
-            call BDOS
-            pop  hl
-            pop  de
+.call       call BDOS
+.ret        pop  hl             ; jumping here saves a byte over doing
+            pop  de             ;   the pops and ret yourself
             pop  bc
             ret
 
-;   We must use direct console I/O for this, because CONIN (2) will echo
+;   We must use direct console I/O for this, because BCONIN (1) will echo
 ;   the character that was typed, as well as intercepting ^S, ^P etc.
 rdchar      push bc             ; ♠A ♡* blocking read of char from input
             push de
-            ld   c,CONIN
-            ld   e,a
-            jp   bdosP          ; ret (TCO)
+            push hl
+-           ld   c,BCONDIR
+            ld   e,$FF          ; request input
+            call BDOS
+            or   a,a            ; char was ready (a ≠ 0)?
+            jp   Z,-            ; no, keep trying until we get one
+            jp   bdosP.ret
 
 prnl        push bc             ; ♣A ♡* print platform-appropriate newline
             push de
             push hl
-            ld   c,CONOUT
+            ld   c,BCONOUT
             ld   e,CR
             call BDOS
-            ld   c,CONOUT
+            ld   c,BCONOUT
             ld   e,LF
-            call BDOS
-            pop hl
-            pop de
-            pop bc
+            jp   bdosP.call     ; ret (TCO)
 
 errbeep     ld   a,$07          ; ♣A ♡* sound the console bell
             jp   prchar         ; ret (TCO)
