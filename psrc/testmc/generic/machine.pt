@@ -295,6 +295,25 @@ def test_stepto_stopat(TM, R, initpc, steps, finalpc, stopat):
     stepsret = m.stepto(stopat=stopat, stopon=(0xFF,), trace=0)
     assert (steps, stepsret, finalpc) == (m._steps_taken, m._steps_taken, m.pc)
 
+def test_stepto_nstop_stopon(TM):
+    m = TM(); m.B = False
+    steps = m.stepto(8, stopon=[0x00], nstop=3)
+    assert (3, 11) == (steps, m.pc)
+
+def test_stepto_nstop_stopat(TM):
+    ''' Becuase we have no jump instruction, we test looping through a stop
+        location by simply walking through all of memory and wrapping around.
+    '''
+    m = TM(); m.B = False
+    m.mem = [0] * 0x10000       # we need a complete memory for this test
+    steps = m.stepto(0xFFF0, stopat=[0x10], nstop=2)
+    assert (0x20 + 0x10000, 0x10) == (steps, m.pc)
+
+def test_call_nstop():
+    ''' `call(nstop=2) is tested in the `mc6800.machine` tests because we
+        need a slightly more sophisticated machine than our TM here.
+    '''
+
 ####################################################################
 #   Execution - call()
 #

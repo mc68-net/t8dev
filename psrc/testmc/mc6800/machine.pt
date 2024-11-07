@@ -247,6 +247,19 @@ def test_call_maxsteps(m, maxsteps, a):
     assert R(a=a) == m.regs
     assert ex.match('Timeout after {} opcodes: .* opcode=.*'.format(maxsteps))
 
+def test_call_stopat_nstop_at(m):
+    p = 0x100
+    m.deposit(p, [ I.INCA, I.BRA, 0x100-3 ])
+    m.call(p, R(a=0), stopat=[p], nstop=3, maxsteps=10, trace=1)
+    assert R(a=2, pc=p) == m.regs
+
+def test_call_stopat_nstop_on(m):
+    p = 0x100
+    m.deposit(p, [ I.INCA, I.BRA, 0x100-3 ])
+    with pytest.raises(m.Abort):
+        m.call(p, R(a=0), stopon=[I.INCA], nstop=4)
+    assert R(a=3, pc=p) == m.regs
+
 ####################################################################
 #   Tracing and similar information
 

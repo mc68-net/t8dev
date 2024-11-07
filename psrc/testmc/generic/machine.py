@@ -252,13 +252,18 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             if trace: print(self.traceline())
             self._step()
 
-    def stepto(self, addr=None, *, stopat=set(), stopon=set(), trace=False,
-        maxsteps=MAXSTEPS, raisetimeout=True):
+    def stepto(self, addr=None, *, stopat=set(), stopon=set(), nstop=1,
+        trace=False, maxsteps=MAXSTEPS, raisetimeout=True):
         ''' Starting at `addr` (default: current PC), step an opcode and
             then continue until an address in `stopat` or an opcode in
-            `stopon` is reached, or until we have done `maxsteps`. (At
-            least one opcode is always executed.) Return the number of
-            steps executed.
+            `stopon` is reached, or until we have done `maxsteps`.
+
+            If `nstop` (default 1) is specified, we must see a seen a
+            `stopat` address or `stopon` opcode `nstop` times before
+            returning.
+
+            At least one opcode is always executed, and the nubmer of
+            steps executed is returned.
 
             An attempt to exceed `maxsteps` will raise a `Timeout`
             exception unless `raisetimeout` is `False`. (Any other stop
@@ -282,7 +287,8 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             self.step(trace=trace)
             pc = self._getpc()
             if pc in stopat or self.byte(pc) in stopon:
-                break
+                nstop -= 1
+                if nstop == 0: break
             if remaining <= 0:
                 if raisetimeout:
                     self._raiseTimeout(maxsteps)
@@ -299,7 +305,7 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
     CALL_DEFAULT_RETADDR = 0xFFFD
 
     def call(self, addr, regs=None, *, retaddr=CALL_DEFAULT_RETADDR,
-            stopat=None, stopon=None, maxsteps=MAXSTEPS, trace=False):
+            stopat=None, stopon=None, nstop=1, maxsteps=MAXSTEPS, trace=False):
         ''' Set the given registers, push `retaddr` on the stack, and start
             execution at `addr`. Execution stops when:
             - we are about to execute an address in `stopat`
@@ -347,8 +353,9 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
         initsp = self._getsp()
         self.pushretaddr(retaddr)
         while True:
+            nstop -= 1
             pc = self._getpc()
-            if pc in stopat:  return
+            if pc in stopat and nstop <= 0:  return
             if pc == retaddr and self._getsp() == initsp:
                 #   We're about to execute at the return address we pushed
                 #   on the stack, and the stack is empty, so this means
@@ -357,10 +364,11 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             if maxremain <= 0:
                 self._raiseTimeout(maxsteps)
             opcode = self.byte(pc)
-            if opcode in stopon:
+            if opcode in stopon and nstop <= 0:
                 raise self.Abort('Abort on opcode=${:02X}: {}' \
                     .format(self.byte(pc), self.regs))
-            maxremain -= self.stepto(stopat=stopat, stopon=allstopon,
+            maxremain -= self.stepto(
+                stopat=stopat, stopon=allstopon,
                 maxsteps=maxremain, raisetimeout=False, trace=trace)
 
     ####################################################################
