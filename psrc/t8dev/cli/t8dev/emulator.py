@@ -254,7 +254,10 @@ class RunCPM(Suite):
 
         #   Build `$$$.SUB` file if we're auto-running the first argument.
         if autorun:
-            commands = [Path(self.args[0]).name.upper(), 'EXIT']
+            #   Using XXX.COM to run a program in RunCPM often works, but
+            #   not always; e.g. `TMON100.COM` can't seem to find that
+            #   file, while `TMON100` works. So make sure we drop `.COM`.
+            commands = [Path(self.args[0]).stem.upper(), 'EXIT']
             vprint(1, 'RunCPM', f'autorun: {commands}')
             subdata = compile_submit(commands)
             with open(self.emudir.joinpath(A0, '$$$.SUB'), 'wb') as f:
