@@ -1,4 +1,4 @@
-from    testmc.mos65  import Machine
+from    testmc.i8080  import Machine
 from    inspect  import currentframe
 
 def test_prchar(m, S, R, loadbios):
