@@ -1,0 +1,51 @@
+;   i8080/bios/cpmcode.i80: emulate "standard" tmc BIOS
+;
+;   CP/M has a different calling convention for printing characters
+;   and the like; this provides `prchar` etc. routines that match
+;   the tmc BIOS, and preserve the registers that the tmc BIOS does.
+
+;   XXX We should not attempt to redefine these if they're already defined.
+BDOS        equ  $0005
+CONIN       equ  1
+CONOUT      equ  2
+
+prchar      push bc         ;    ♡* send char in A to output
+            push de
+            ld   c,CONOUT
+            ld   e,a
+            ; fallthrough
+
+;   Common part of BDOS calls done in a way that preserves registers.
+;   This expects BC already to have been saved on the stack, and C to
+;   contain the BDOS function.
+bdosP       push hl
+            call BDOS
+            pop  hl
+            pop  de
+            pop  bc
+            ret
+
+;   We must use direct console I/O for this, because CONIN (2) will echo
+;   the character that was typed, as well as intercepting ^S, ^P etc.
+rdchar      push bc             ; ♠A ♡* blocking read of char from input
+            push de
+            ld   c,CONIN
+            ld   e,a
+            jp   bdosP          ; ret (TCO)
+
+prnl        push bc             ; ♣A ♡* print platform-appropriate newline
+            push de
+            push hl
+            ld   c,CONOUT
+            ld   e,CR
+            call BDOS
+            ld   c,CONOUT
+            ld   e,LF
+            call BDOS
+            pop hl
+            pop de
+            pop bc
+
+errbeep     ld   a,$07          ; ♣A ♡* sound the console bell
+            jp   prchar         ; ret (TCO)
+
