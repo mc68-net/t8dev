@@ -244,6 +244,19 @@ def test_stepto_maxsteps_noexception(TM):
     stepsret = m.stepto(maxsteps=3, raisetimeout=False, trace=True)
     assert (3, 3, 3) == (m._steps_taken, stepsret, m.pc)
 
+def test_stepto_addr_specified(TM):
+    m = TM(); m.B = False
+    assert m.pc == 0
+    m.stepto(5, maxsteps=1, raisetimeout=False, trace=True)
+    assert m.pc == 6
+
+def test_stepto_addr_default(TM, R):
+    '   When no address is provided, the existing PC is assumed. '
+    m = TM(); m.B = False
+    m.setregs(R(pc=8)); assert m.pc == 8
+    m.stepto(maxsteps=1, raisetimeout=False, trace=True)
+    assert m.pc == 9
+
 @pytest.mark.parametrize('stopon, steps, pc', (
     (                      [0xFD],  2, 3),
     (    [0x02, 0xFE, 0xFD, 0xFC],  2, 3),

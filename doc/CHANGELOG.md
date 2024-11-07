@@ -32,6 +32,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Changed: new toolset.bm2 download location
 - Added: `t8dev emulate runcpm` now copies files to the "disks" and can
   optionally auto-run the first file given.
+- Added: Optional `addr` param for `testmc.generic.machine.stepto()`.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather

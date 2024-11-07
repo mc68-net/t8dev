@@ -252,16 +252,19 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             if trace: print(self.traceline())
             self._step()
 
-    def stepto(self, *, stopat=set(), stopon=set(), trace=False,
+    def stepto(self, addr=None, *, stopat=set(), stopon=set(), trace=False,
         maxsteps=MAXSTEPS, raisetimeout=True):
-        ''' Step an opcode and then continue until an address in `stopat`
-            or an opcode in `stopon` is reached, or until we have done
-            `maxsteps`. (At least one opcode is always executed.) Return
-            the number of steps executed.
+        ''' Starting at `addr` (default: current PC), step an opcode and
+            then continue until an address in `stopat` or an opcode in
+            `stopon` is reached, or until we have done `maxsteps`. (At
+            least one opcode is always executed.) Return the number of
+            steps executed.
 
             An attempt to exceed `maxsteps` will raise a `Timeout`
-            exception; if you want to run just a specific number of steps
-            use `step()` instead. Any other stop condition simply returns.
+            exception unless `raisetimeout` is `False`. (Any other stop
+            condition simply returns.) If you want to run just a specific
+            number of steps consider `step()` unless you need alternate
+            exits from the other parameters here.
 
             `stopat` and `stopon` are checked to ensure that they are
             `collections.abc.Container` instances.
@@ -270,6 +273,9 @@ class GenericMachine(MemoryAccess): # MemoryAccess is already an ABC
             "'stopat' must be a collections.abc.Container"
         assert isinstance(stopon, Container), \
             "'stopon' must be a collections.abc.Container"
+
+        if addr is not None:
+            self.setregs(self.Registers(pc=addr))
 
         remaining = maxsteps - 1
         while True:
