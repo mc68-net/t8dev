@@ -39,6 +39,7 @@ _ad_lastaddr    set 0
 
             org prchar
 prchar      sta charoutport
+            eor #$FF            ; ensure A is destroyed to help find bugs
             rts
             assertdef prchar
 

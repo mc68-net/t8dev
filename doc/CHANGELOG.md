@@ -35,6 +35,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Added: In `testmc.generic.machine`, `stepto()` now has an optional `addr`
   (start address) parameter, and `stepto()` and `call()` have an optional
   `nstop` (number of times to see a stop point before returning) parameter.
+- API: tmc BIOS docs now clarify that `prchar` may destroy A, and the
+  implementation deliberately changes A to aid in detecting client bugs.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather

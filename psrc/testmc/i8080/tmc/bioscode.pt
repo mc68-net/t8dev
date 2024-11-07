@@ -3,7 +3,10 @@ from    inspect  import currentframe
 
 def test_prchar(m, S, R, loadbios):
     _, output = loadbios()
-    m.call(S.prchar, R(a=ord('_')))
+    m.call(S.prchar, R(a=ord('_')), trace=1)
+    #   The tmc BIOS deliberately changes the value in A to help
+    #   detect code that assumes it's preserved.
+    assert R(a=ord('_')) != m.regs
     m.call(S.prchar, R(a=ord('\r')))
     assert b'_\r' == output.getvalue()
 
@@ -17,3 +20,4 @@ def test_prnl(m, S, R, loadbios):
     _, output = loadbios()
     m.call(S.prnl)
     assert b'\n' == output.getvalue()
+    assert R(a=ord('\n')) != m.regs

@@ -41,6 +41,7 @@ _ad_lastaddr    set 0
 
             org  prchar
 prchar      ld   (charoutport),a
+            dec  a              ; ensure A is destroyed to help find bugs
             ret
             assertdef prchar
 
@@ -52,12 +53,12 @@ rdchar      ld   a,(charinport)
 ;   Print a platform-appropriate newline.
 ;   For Unix this is just an LF because output is not raw mode.
             org  prnl
-prnl        ld   a,$0A               ; LF
+prnl        ld   a,$0A          ; LF
             jp   prchar
             assertdef prnl
 
             org  errbeep
-errbeep     ld   a,$07              ; BEL
+errbeep     ld   a,$07          ; BEL
             jp   prchar
             assertdef errbeep
 
