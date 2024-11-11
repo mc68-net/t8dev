@@ -2,6 +2,23 @@
 #   `requests`, which package should be optional for those not using
 #   the toolset download/install/build part of t8dev.
 from    t8dev  import path
+from    t8dev.cli.t8dev.util  import vprint
+from    t8dev.cli import exits
+
+def setargs_toolset(subparser):
+    p = subparser.add_parser('toolset', aliases=['tool', 'ts'],
+        help='confirm or build development toolsets',
+        description='Confirm or build a development toolset. '
+            ' This will first see if the toolset is already available by'
+            ' attempting to to run the tool or otherwise confirm its presence.'
+            ' If not present, it will download, build and isntall the toolset'
+            ' under the $BUILD/tool/ directory.'
+        )
+    p.set_defaults(func=buildtoolset)
+    a = p.add_argument
+    a('-f', '--force-build', action='store_true',
+        help='build toolset even if already available')
+    a('name', nargs='+', help='name of toolsets confirm/build')
 
 def buildtoolsets(args):
     ''' This should check the configuration of the project and build
@@ -22,9 +39,14 @@ def buildtoolset(args):
         XXX There should really be an option to force building a
         project-local toolset even when the system provides one.
     '''
-    assert len(args) == 1, "buildtool() requires an argument"
-    tsname = args.pop(0)
-    from t8dev  import toolset
-    tool_class = toolset.TOOLSETS[tsname]
-    tool_class().main()
-
+    from t8dev.toolset import TOOLSETS
+    if args.name[0] == 'list':
+        print(f'Toolsets: ', ' '.join(TOOLSETS))
+        exit(0)
+    for ts in args.name:
+        vprint(1, '━━━━━━━━ toolset', ts)
+        tool_class = TOOLSETS.get(ts)
+        if tool_class is None:
+            exits.err(1, f"Cannot find toolset '{ts}'."
+                " Use toolset 'list' to see available toolsets.")
+        tool_class().main()

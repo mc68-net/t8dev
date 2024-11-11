@@ -43,7 +43,7 @@ def cwd(target):
         target = Path(target)
     oldcwd = Path.cwd()
     target.mkdir(parents=True, exist_ok=True)
-    vprint(2, 'chdir', str(target))
+    vprint(2, 'chdir', str(path.pretty(target)))
     os.chdir(str(target))
     try:
         yield
@@ -57,7 +57,7 @@ def cwd(target):
         os.chdir(str(oldcwd))
 
 def runtool(toolbin, *args, **kwargs):
-    vprint(2, 'exec', ' '.join(chain([str(toolbin)], args)))
+    vprint(2, 'exec', ' '.join(map(path.pretty, (chain([str(toolbin)], args)))))
     run.tool(toolbin, *args, **kwargs)
 
 SANDBOX_MODULES = {}

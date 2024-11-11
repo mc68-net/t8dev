@@ -37,6 +37,9 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
   `nstop` (number of times to see a stop point before returning) parameter.
 - API: tmc BIOS docs now clarify that `prchar` may destroy A, and the
   implementation deliberately changes A to aid in detecting client bugs.
+- API: t8dev subcommands reworked
+- Fixed: Path specified with `-P`/`--project-dir` option now exported to
+  environment as `T8_PROJDIR`.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather

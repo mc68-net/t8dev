@@ -1,4 +1,13 @@
+#   XXX During the refactoring from emulator.py to emulator/__init__.py
+#   this test suite developed a problem with pytest rasising
+#   "ModuleNotFoundError: No module named 't8dev.emulator'" when this is
+#   emulator/__init__.pt, even when just test_nothing() is in it.
+
 from    t8dev.cli.t8dev.emulator  import *
+import  pytest
+
+def test_nothing():
+    pass
 
 def test_suitename():
     t = RunCPM([])
