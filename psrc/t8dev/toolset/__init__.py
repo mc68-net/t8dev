@@ -13,7 +13,7 @@
 TOOLSETS = {}
 TOOLSET_NAMES = [
     'asl', 'asxxxx', 'bm2', 'cscp', 'ctools', 'dos33fs',
-    'linapple', 'osimg', 'RunCPM',
+    'linapple', 'osimg', 'RunCPM', 'VirtualT',
 ]
 
 from importlib import import_module
