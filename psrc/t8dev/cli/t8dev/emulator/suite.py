@@ -1,6 +1,8 @@
 ' Superclass for an emulator suite. '
 
-class Suite:
+from    abc  import ABC, abstractmethod
+
+class Suite(ABC):
 
     @classmethod
     def suitename(cls):
@@ -15,6 +17,5 @@ class Suite:
     def __init__(self, args):
         self.args = args
 
-    def run(self):
-        exits.arg(f'{self}: unimplemented (args={self.args})')
-
+    @abstractmethod
+    def run(self): ...
