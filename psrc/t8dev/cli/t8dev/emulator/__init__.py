@@ -4,7 +4,7 @@ from    importlib  import import_module
 
 ####################################################################
 
-suitenames = [ 'CSCP', 'Linapple', 'OpenMSX', 'RunCPM', 'VICE', ]
+suitenames = [ 'CSCP', 'Linapple', 'OpenMSX', 'RunCPM', 'VICE', 'VirtualT', ]
 
 __all__ = ['setargs_emulator', 'SUITES'] + suitenames
 
