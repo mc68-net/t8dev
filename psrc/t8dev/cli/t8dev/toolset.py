@@ -40,6 +40,9 @@ def buildtoolset(args):
         XXX There should really be an option to force building a
         project-local toolset even when the system provides one.
     '''
+    if args.force_build:
+        exits.err(11, 't8dev toolset: --force-build not yet implmented')
+
     from t8dev.toolset import TOOLSETS
     if args.name[0] == 'list':
         print(f'Toolsets: ', ' '.join(TOOLSETS))
@@ -50,4 +53,7 @@ def buildtoolset(args):
         if tool_class is None:
             exits.err(1, f"Cannot find toolset '{ts}'."
                 " Use toolset 'list' to see available toolsets.")
+        #   XXX toolset.Setup probably wants to drop main() and just use setup()
+        #   XXX It's not clear if we want `force_build=True` to be an argument
+        #   to __init__() or setup().
         tool_class().main()
