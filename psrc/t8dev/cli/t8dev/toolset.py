@@ -18,7 +18,8 @@ def setargs_toolset(subparser):
     a = p.add_argument
     a('-f', '--force-build', action='store_true',
         help='build toolset even if already available')
-    a('name', nargs='+', help='name of toolsets confirm/build')
+    a('name', nargs='+',
+        help="name of toolsets confirm/build, or 'list' available toolsets")
 
 def buildtoolsets(args):
     ''' This should check the configuration of the project and build
