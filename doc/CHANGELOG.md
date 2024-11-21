@@ -42,6 +42,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
   environment as `T8_PROJDIR`.
 - Added: `Test` script to run pytest tests for this repo, using a "parent"
   T8_PROJDIR or as a stand-alone test. This needs further development.
+- Added: VirtualT (Tandy Model 100 and family) emulator.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
