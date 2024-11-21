@@ -1,5 +1,5 @@
 [project]
-version = '0.3.0.dev8'
+version = '0.3.0.dev9'
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
 authors = [

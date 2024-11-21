@@ -1,0 +1,4 @@
+#   This is not used unless we're testing "stand-alone," with $T8_PROJDIR
+#   set to this dir, rather than, in a project using t8dev.
+-e ./
+r8format

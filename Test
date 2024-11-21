@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+#   Test - test only t8dev stuff (and not all of it)
+#
+#   This is usually expected to be run in a "parent" environment (i.e.,
+#   where on entry T8_PROJDIR points to a developer's repo) that includes
+#   this as a submodule, and it will run the t8dev pytest tests in that
+#   parent environment. (Developers may also simply chose to add
+#   t8dev/psrc/ to their own pytest runs.)
+#
+#   It may also be run stand-alone (i.e., where T8_PROJDIR is not set on
+#   entry) which will instead do a minimal install and build of t8dev
+#   software and run pytest.
+#
+set -Eeuo pipefail
+trap 'ec=$?; echo 1>&2 "INTERNAL ERROR: ec=$ec line=$LINENO cmd=$BASH_COMMAND";
+      exit $ec;' ERR
+
+#   We build/test using the existing project's virtualenv etc. if present.
+[[ -n ${T8_PROJDIR:-} ]] || {
+    echo "WARNING: \$T8_PROJDIR not set; building local copy."
+    export T8_PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
+    . "$T8_PROJDIR"/t8setup.bash
+}
+
+#   The following is the bare mininum to run the pytest tests. We should be
+#   testing builds of all of the toolsets and emulator startups, though for
+#   the latter we should not actually be starting emulators we can't run
+#   non-interactively, but just doing our best to make sure that they're
+#   there.
+
+t8dev toolset asl
+t8dev asl t8dev
+pytest "$@"
