@@ -26,15 +26,14 @@ class CSCP(Suite):
 
     def run(self):
         self.set_bindir()
-        self.emulator = emulator = self.args.emulator
-        if emulator == 'list':
+        if self.emulator == 'list':
             self.print_emulators()
             return
-        elif emulator not in (self.emulator_exes() + list(self.VENDOR_ROM)):
-            exits.arg(f"Bad emulator name '{emulator}'."
+        elif self.emulator not in (self.emulator_exes() + list(self.VENDOR_ROM)):
+            exits.arg(f"Bad emulator name '{self.emulator}'."
                 " Use 'list' for list of emulators.")
         else:
-            emuexe = self.setup_emudir(emulator)
+            emuexe = self.setup_emudir()
             cmd = [str(self.emudir(emuexe))]
             if os.name != 'nt':  cmd = ['wine'] + cmd
             runtool(*cmd)
@@ -62,21 +61,13 @@ class CSCP(Suite):
         print(textwrap.fill(' '.join(l), width=cols,
             initial_indent='  ', subsequent_indent='  '))
 
-    def emudir(self, *components):
-        ' Return a `Path` in the directory for this emulation run. '
-        emudir = path.build('emulator', self.emulator)
-        emudir.mkdir(exist_ok=True, parents=True)
-        return emudir.joinpath(*components)
-
-    def setup_emudir(self, emulator):
-        ' Called with CWD set to the dir for this emulation run. '
-
+    def setup_emudir(self):
         # This may be overridden by VENDOR_ROM '_emulator' entry.
-        emuexe = emulator + '.exe'
+        emuexe = self.emulator + '.exe'
 
-        roms = self.VENDOR_ROM.get(emulator, {})
+        roms = self.VENDOR_ROM.get(self.emulator, {})
         if not roms:  exits.warn(
-            f'WARNING: CSCP emulator {emulator} has no ROM configuration.')
+            f'WARNING: CSCP emulator {self.emulator} has no ROM configuration.')
         for filename, loadspec in roms.items():
             if filename == '_emulator':
                 emuexe = loadspec + '.exe'
@@ -102,6 +93,10 @@ class CSCP(Suite):
         return emuexe
 
     def set_bindir(self):
+        ''' This sets `self.bindir` to the directory with the CSCP
+            executables. This is not the standard bin/ directory because
+            they are Windows .EXE files (and there's a lot of them).
+        '''
         import t8dev.toolset.cscp
         toolset = t8dev.toolset.cscp.CSCP()
         toolset.setbuilddir()           # XXX toolset.__init__()

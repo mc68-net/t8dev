@@ -3,12 +3,26 @@
 #   "ModuleNotFoundError: No module named 't8dev.emulator'" when this is
 #   emulator/__init__.pt, even when just test_nothing() is in it.
 
+#   XXX Due to some interesting issues with pytest being unable handle
+#   having any tests under emulator/ (it throws up an error from
+#   import_module() not when collecting but when trying to run a test,
+#   trying to load modules we see no reason for it to be loading), all of
+#   the emulator/* tests are currently here. We could resolve this by just
+#   adding __init__.py files for the namespace modules, but let's have a
+#   closer look and understand that problem, first.
+
 from    t8dev.cli.t8dev.emulator  import *
+from    argparse  import Namespace
 import  pytest
 
-def test_nothing():
-    pass
+def test_emulator_suite_one():
+    ' Test a suite that does not allow specification of the emulator. '
+    t = RunCPM(Namespace())
+    assert ('runcpm', None) == (t.suitename(), t.emulator)
+    assert str(t.emudir()).endswith('.build/emulator/runcpm')
 
-def test_suitename():
-    t = RunCPM([])
-    assert 'runcpm' == t.suitename()
+def test_emulator_suite_many():
+    ' Test a suite that does allow specification of the emulator. '
+    t = CSCP(Namespace(emulator='pc8001'))
+    assert ('cscp', 'pc8001') == (t.suitename(), t.emulator)
+    assert str(t.emudir()).endswith('.build/emulator/cscp/pc8001')
