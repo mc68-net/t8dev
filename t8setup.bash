@@ -51,7 +51,9 @@
 __t8_submodules_list() {
     #   Return a list of all submodule paths relative to $T8_PROJDIR.
     #   XXX This should set an array so we can handle spaces in the paths.
-    git config -f "$T8_PROJDIR"/.gitmodules -l \
+    local gitmodules="$T8_PROJDIR"/.gitmodules
+    [[ -r $gitmodules ]] || return 0        # no file = no modules
+    git config -f "$gitmodules" -l \
         | sed -n -e 's/^submodule\.//' -e 's/.*\.path=//p'
 }
 
@@ -61,6 +63,7 @@ __t8_submodules_warn_modified() {
     #   commit it before commiting her project) or the developer is testing
     #   an update to new versions of submodules.
     local sms="$(__t8_submodules_list)"
+    [[ -n $sms ]] || return 0               # no modules
     git -C "$T8_PROJDIR" diff-index --quiet @ $sms || {
         echo 1>&2 '----- WARNING: submodules are modified:' \
             "$(git -C "$T8_PROJDIR" status -s $sms | tr -d '\n')"
