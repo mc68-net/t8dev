@@ -5,13 +5,14 @@
     in the `testmc.*.tmc` modules.
 '''
 
-from    importlib.resources  import files as resfiles
 from    functools  import partial
+from    importlib.resources  import files as resfiles
 from    os  import isatty
 from    pathlib  import Path
 from    sys  import stdin, stdout
 from    traceback  import print_exception
 from    types  import ModuleType as module
+from    typing import Optional
 import  argparse
 import  termios, tty
 
@@ -46,7 +47,7 @@ class ListSimulators(argparse.Action):
         print('tmc simulators:', ', '.join(testmc.SIMULATORS.keys()))
         exit(0)
 
-def matchcpu(cpustr) -> tuple[str,module]|None:
+def matchcpu(cpustr) -> Optional[tuple[str,module]]:
     ''' Find a simulator name and module whose name matches `cpustr`, which may
         be any substring of the module name as listed in `testmc.SIMULATORS`.
         Returns `None` if not found.

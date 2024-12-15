@@ -43,6 +43,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Added: `Test` script to run pytest tests for this repo, using a "parent"
   T8_PROJDIR or as a stand-alone test. This needs further development.
 - Added: VirtualT (Tandy Model 100 and family) emulator.
+- Fixed: Two instances of Python 3.9 incompatibility in t8dev and testmc.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
