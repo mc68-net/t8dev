@@ -11,7 +11,7 @@
 '''
 
 from    os.path  import abspath, dirname
-import  shutil, sys
+import  os, shutil, sys
 
 from    t8dev.toolset.setup  import *
 
@@ -70,16 +70,11 @@ class ASL(Setup):
         with open(str(dot_gitignore), 'wt') as f:
             f.write(self.GITIGNORE)
 
-        mfdef_template = self.srcdir().joinpath(
-                'Makefile.def-samples', 'Makefile.def-x86_64-unknown-linux')
         mfdef = self.srcdir().joinpath('Makefile.def')
-        shutil.copyfile(str(mfdef_template), str(mfdef))
-        with mfdef.open('at') as fd:
-            print('\n\n#', '-'*73, file=fd)
-            print('# tool/asl/Setup additional configuration\n', file=fd)
-            #   These are the two dirs defined when compiling.
-            print('LIBDIR =', self.pdir('lib', 'asl'), file=fd)
-            print('INCDIR =', self.pdir('include', 'asl'), file=fd)
+        with open(str(mfdef), 'wt') as out:
+            out.write(f'__INSTDIR = {self.pdir()}\n\n')
+            inp = os.popen(f'git -C {self.srcdir()} show main:Makefile.def')
+            out.write(inp.read())
 
     def build(self):
         #   Note we avoid building the documentation here.
