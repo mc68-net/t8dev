@@ -167,4 +167,4 @@ unset \
     __t8_submodules_list __t8_submodules_warn_modified \
     __t8_submodules_init_empty __t8_submodules_pip_install_e \
     __t8_check_r8format_dependency \
-    :
+    #
