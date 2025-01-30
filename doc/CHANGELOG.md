@@ -24,7 +24,6 @@ commit ID.
 
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
-
 ### dev
 - Added: `t8dev buildtoolset ctools` for Commodore 64/128 CP/M disk images.
 - Changed: `t8setup.bash` now leaves the first `--` option in `$@` so that
@@ -44,6 +43,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
   T8_PROJDIR or as a stand-alone test. This needs further development.
 - Added: VirtualT (Tandy Model 100 and family) emulator.
 - Fixed: Two instances of Python 3.9 incompatibility in t8dev and testmc.
+- Fixed: t8dev.toolset.asl now uses `main` branch Makefile.def, which
+  has been fixed to work on ARM (Mac) CPUs.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
