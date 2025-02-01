@@ -45,6 +45,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Fixed: Two instances of Python 3.9 incompatibility in t8dev and testmc.
 - Fixed: t8dev.toolset.asl now uses `main` branch Makefile.def, which
   has been fixed to work on ARM (Mac) CPUs.
+- Fixed: Various fixes for better Bash 3/MacOS compatibility.
 
 ### 0.2.0 (2024-11-04)
 - API: `testmc.*.Machine.call()` now executes return instructions, rather
