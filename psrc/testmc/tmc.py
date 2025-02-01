@@ -114,13 +114,13 @@ def getchar():
     '''
     fd = stdin.fileno()
     if not isatty(fd):
-        return stdin.buffer.read(1)[0]
+        bs = stdin.buffer.read(1)
     else:
         prevattrs = termios.tcgetattr(fd)
         try:
             tty.setraw(fd, termios.TCSADRAIN)
-            c = stdin.buffer.read(1)[0]
+            bs = stdin.buffer.read(1)
         finally:
             termios.tcsetattr(fd, termios.TCSANOW, prevattrs)
-        return c
-
+    if bs == b'':  raise EOFError('no more input')
+    return bs[0]
