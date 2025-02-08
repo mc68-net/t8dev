@@ -163,7 +163,7 @@ esac; done
 
 __t8_submodules_init_empty
 __t8_submodules_warn_modified
-. "$(dirname "${BASH_SOURCE[0]}")"/pactivate -B "$T8_PROJDIR" -q
+. "$(dirname "${BASH_SOURCE[0]}")"/../pactivate -B "$T8_PROJDIR" -q
 __t8_check_r8format_dependency || return $?
 
 unset \

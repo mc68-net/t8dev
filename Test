@@ -20,7 +20,7 @@ trap 'ec=$?; echo 1>&2 "INTERNAL ERROR: ec=$ec line=$LINENO cmd=$BASH_COMMAND";
 [[ -n ${T8_PROJDIR:-} ]] || {
     echo "WARNING: \$T8_PROJDIR not set; building local copy."
     export T8_PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
-    . "$T8_PROJDIR"/t8setup.bash
+    . "$T8_PROJDIR"/t8dev/t8setup.bash
 }
 
 #   The following is the bare mininum to run the pytest tests. We should be
