@@ -31,4 +31,4 @@ trap 'ec=$?; echo 1>&2 "INTERNAL ERROR: ec=$ec line=$LINENO cmd=$BASH_COMMAND";
 
 t8dev toolset asl
 t8dev asl t8dev
-pytest "$@"
+pytest -q "$@"
