@@ -25,6 +25,8 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+
+### 0.3.0 (2025-02-16)
 - Added: `t8dev buildtoolset ctools` for Commodore 64/128 CP/M disk images.
 - Changed: `t8setup.bash` now leaves the first `--` option in `$@` so that
   the caller can see it, if it needs the separator for its own purposes.
@@ -36,7 +38,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
   `nstop` (number of times to see a stop point before returning) parameter.
 - API: tmc BIOS docs now clarify that `prchar` may destroy A, and the
   implementation deliberately changes A to aid in detecting client bugs.
-- API: t8dev subcommands reworked
+- API: t8dev subcommands reworked (use `-h` to see new formats)
 - Fixed: Path specified with `-P`/`--project-dir` option now exported to
   environment as `T8_PROJDIR`.
 - Added: `Test` script to run pytest tests for this repo, using a "parent"
