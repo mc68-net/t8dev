@@ -1,8 +1,11 @@
 #
 #   t8setup.bash - common setup/startup for projects using t8dev
 #
-#   This file sets up the environment for a t8dev build/test/run
-#   session. See the list below for more details.
+#   This file, which is available in the source repo only (it is not
+#   distributed as part of the `t8dev` Python package) is useful for
+#   setting up the environment for a t8dev build/test/run session when you
+#   have t8dev source available. (Typically t8dev developers have the t8dev
+#   repo as a submodule of their 8-bit development repo.)
 #
 #   This file should be sourced (`source` or `.`) by the top-level
 #   `Test` script in projects using t8dev. Before sourcing it, the
