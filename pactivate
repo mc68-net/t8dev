@@ -1,9 +1,31 @@
-#   pactivate version 0.5.4   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.7   https://github.com/cynic-net/pactivate
 
-[ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
+#   This test works only with Bash, not sh, ksh or zsh, which do not
+#   check for this `return` error. ksh and zsh users who run this will
+#   (perhaps mysteriously) find their virtualenv not activated.
+#   (Virtualenv's bin/activate script has the same issue.)
 (return 0 2>/dev/null) \
-    || { echo 1>&2 "source (.) pactivate with Bash."; exit 9; }
+    || { echo 1>&2 "don't run pactivate, source (.) it."; exit 9; }
+
+#   This uses various Bashisms, such as `[[`, and so requires a reasonably
+#   Bash-compatible shell. As far as we know, these are just ksh and zsh,
+#   so fail immediately if we're not running on Bash or one of those.
+[ -n "${BASH_VERSION-}""${KSH_VERSION-}""${ZSH_VERSION-}" ] || {
+    echo 1>&2 "source (.) this with bash, ksh or zsh."
+    #   Here we don't know if the "being sourced" check above succeeded, so
+    #   we first do a `return` which will exit if we're being sourced, and
+    #   then an `exit` which will exit if the return failed because we're
+    #   not being sourced.
+    return 9
+    exit 9
+}
+
+#   This has seen very limited testing under ksh or zsh (the test framework
+#   doesn't test under these shells at all), so print a warning to help
+#   with debugging issues reported by users.
+[ -n "$BASH_VERSION" ] || { echo 1>&2 \
+    "WARNING: You're not using Bash. Let's hope you're compatible!"; }
 
 __pa_cleanup() {
     unset __pa_cleanup __pa_echo \
@@ -127,22 +149,32 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
     #      do this quietly and display the new version after. (The old
     #      version is displayed in the virtualenv creation output.)
     #   3. If we have a requirements file, install its contents.
+    #   Note that we _must_ use `python -m pip` because, on Windows due to
+    #   file locking, pip is unable to replace itself if you run it as pip.exe.
     PYTHONPATH="$__pa_bootdir" "$__pa_python_deref" -s -m virtualenv \
         $__pa_quiet --prompt $(basename "$__pa_basedir") \
         "$__pa_builddir/virtualenv/" \
-    && "$__pa_builddir"/virtualenv/[bS]*/pip install -q -U pip \
+    && "$__pa_builddir"/virtualenv/[bS]*/python -m pip install -q -U pip \
     && "$__pa_builddir"/virtualenv/[bS]*/pip --version \
     && [[ -f "$__pa_requirements" ]] \
     && "$__pa_builddir"/virtualenv/[bS]*/pip \
         install $__pa_quiet -r "$__pa_requirements"
 }
 
-cmp -s $(type -p "$__pa_python") "$__pa_builddir"/virtualenv/[bS]*/python || (
-    echo 1>&2 "WARNING:" \
-        "${__pa_builddir#$__pa_basedir/}"/virtualenv/[bS]*/python \
-        "($("$__pa_builddir"/virtualenv/[bS]*/python --version 2>&1))" \
-        "is not $__pa_python" \
-        "($("$__pa_python" --version 2>&1))" \
+#   On Windows when we're using the default `py` "interpreter," we're
+#   actually using a program that selects a Python interpreter. The
+#   selected interpreter will be the binary installed into Scripts/python
+#   in the virtualenv, but that's obviously not the py program, so the
+#   following check would always fail.
+[[ $__pa_python == py ]] \
+    || cmp -s "$(type -p "$__pa_python")" \
+        "$__pa_builddir"/virtualenv/[bS]*/python \
+    || (
+        echo 1>&2 "WARNING:" \
+            "${__pa_builddir#$__pa_basedir/}"/virtualenv/[bS]*/python \
+            "($("$__pa_builddir"/virtualenv/[bS]*/python --version 2>&1))" \
+            "is not $__pa_python" \
+            "($("$__pa_python" --version 2>&1))" \
     )
 
 . "$__pa_builddir"/virtualenv/[bS]*/activate

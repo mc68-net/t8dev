@@ -25,6 +25,7 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+- Fixed: Updated `pactivate` to 0.5.7 for zsh support when sourced standalone.
 
 ### 0.3.0 (2025-02-16)
 - Added: `t8dev buildtoolset ctools` for Commodore 64/128 CP/M disk images.
