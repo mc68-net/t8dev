@@ -11,6 +11,3 @@
 #   developer stuff
 /tmp/
 /tags
-
-#   Temporary until we fully merge test framework.
-/r8format/.build/

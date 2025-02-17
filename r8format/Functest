@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
+#
+#   This is expected to be called from ../Test.
+#   It assumes that the virtualenv with r8format is activated.
+#
 set -eu -o pipefail
+trap 'ec=$?; echo 1>&2 "INTERNAL ERROR: ec=$ec line=$LINENO cmd=$BASH_COMMAND";
+      exit $ec;' ERR
 
 PASSED=false
 trap 'ec=$?; $PASSED || { echo 1>&2 "*** FAILED (exitcode=$ec)"; }' 0
@@ -16,34 +22,25 @@ hexdiff() {
         <(xxd -c8 -g1 "$1") <(xxd -c8 -g1 "$2")
 }
 
+####################################################################
+
+[[ -d ${T8_PROJDIR:-} ]] || { echo 2>&1 \
+    '$T8_PROJDIR not set; not called from top-level Test?'; exit 7; }
 basedir=$(cd "$(dirname "$0")" && pwd -P)
 cd "$basedir"
 
-#   -C/-c (clean) must be first argument if present
-[[ ${#@} -gt 0 && $1 == -C ]] && { shift; rm -rf .build/; }
-[[ ${#@} -gt 0 && $1 == -c ]] && { shift; rm -rf .build/; }
 #   -q anywhere in the command line (even with -v!) sets functests quiet.
 quiet=
 for arg in "$@"; do [[ $arg == -q ]] && quiet=-q; done
 
-. ./pactivate -q
-pip show r8format 2>/dev/null \
-    | grep -s 'Editable project location:' >/dev/null \
-|| {
-    echo "Installing editable r8format..."
-    pip install -q -e .
-}
-
 
 ####################################################################
-#   Unit Tests
-
-pytest -q "$@"      # use pyproject.toml for configuration
+#   Unit tests have already been done by ../Test.
 
 ####################################################################
 #   Functional Tests
 
-ftdata=.build/programs/
+ftdata=$T8_PROJDIR/.build/programs/
 mkdir -p $ftdata/detok
 
 echo "====== bastok"

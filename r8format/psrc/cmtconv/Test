@@ -9,9 +9,16 @@
 #   That output is often just the exit code; you need to test that to
 #   see if it passed or failed. E.g., `./cmt-test; echo EXITCODE $?`
 #
-
-set -eu -o pipefail
+set -Eeuo pipefail
 ulimit -v $((3*1024*1024))
+
+#   We're now expected to be called with an already-set-up T8_PROJDIR and
+#   virtualenv. Eventually this should all be moved up into the top-level
+#   test framework, perhaps as pytest tests.
+[[ -d ${T8_PROJDIR:-} ]] || { echo 2>&1 \
+    '$T8_PROJDIR not set; not called from top-level Test?'; exit 7; }
+cmtconv -h >/dev/null || {
+    echo 1>&2 'cmtconv not found; virtualenv activated?'; exit 7; }
 
 die() { echo 2>&1 FAILURE: "$@"; exit 1; }
 qecho() { [[ -n $quiet ]] && return; echo "$@"; }
@@ -159,9 +166,7 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
     *)      die "Bad arg to Test: $1";;
 esac; done
 
-. "$projdir"/pactivate -q -B "$projdir"
-
-ttdir="$projdir/.build/cmtconv-test"
+ttdir="$T8_PROJDIR/.build/cmtconv-test"
 #   We remove all temporary files and results from previous runs to avoid
 #   potentially false test results or developer confusion when debugging.
 rm -rf "$ttdir"; mkdir -p "$ttdir"
