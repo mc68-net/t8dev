@@ -1,4 +1,5 @@
-__pycache__/
+#   If you are looking for a __pycache__/ ignore, it's not here.
+#   You should set $PYTHONPYCACHEPREFIX not to use source dirs for caching.
 
 /.build/
 /tmp/
