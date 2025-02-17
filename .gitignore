@@ -5,6 +5,11 @@ __pycache__/
 
 #   setuptools output files.
 /t8dev/psrc/t8dev.egg-info/
+/r8format/psrc/r8format.egg-info/
 
 #   developer stuff
 /tmp/
+/tags
+
+#   Temporary until we fully merge test framework.
+/r8format/.build/
