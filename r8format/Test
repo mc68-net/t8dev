@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+PASSED=false
+trap 'ec=$?; $PASSED || { echo 1>&2 "*** FAILED (exitcode=$ec)"; }' 0
+
+qecho() {
+    [[ -n $quiet ]] && return
+    echo "$@"
+}
+
+hexdiff() {
+    cmp "$1" "$2" && return 0
+    diff -U 0 \
+        --label   "$1"  --label   "$2" \
+        <(xxd -c8 -g1 "$1") <(xxd -c8 -g1 "$2")
+}
+
+basedir=$(cd "$(dirname "$0")" && pwd -P)
+cd "$basedir"
+
+#   -C/-c (clean) must be first argument if present
+[[ ${#@} -gt 0 && $1 == -C ]] && { shift; rm -rf .build/; }
+[[ ${#@} -gt 0 && $1 == -c ]] && { shift; rm -rf .build/; }
+#   -q anywhere in the command line (even with -v!) sets functests quiet.
+quiet=
+for arg in "$@"; do [[ $arg == -q ]] && quiet=-q; done
+
+. ./pactivate -q
+pip show r8format 2>/dev/null \
+    | grep -s 'Editable project location:' >/dev/null \
+|| {
+    echo "Installing editable r8format..."
+    pip install -q -e .
+}
+
+
+####################################################################
+#   Unit Tests
+
+pytest -q "$@"      # use pyproject.toml for configuration
+
+####################################################################
+#   Functional Tests
+
+ftdata=.build/programs/
+mkdir -p $ftdata/detok
+
+echo "====== bastok"
+
+qecho "------ basdump  basdump.bas"
+basdump  programs/basdump.bas | diff - programs/basdump.dump
+
+qecho "------ detok    simple.bas"
+detok    programs/simple.bas >$ftdata/detok/simple.ba0
+diff -u {$ftdata/detok,programs}/simple.ba0
+
+qecho "------ detok -e simple.bas"
+detok -e programs/simple.bas >$ftdata/detok/simple.ba1
+diff -u {$ftdata/detok,programs}/simple.ba1
+
+{
+    f="binchars"
+    qecho "------ detok --binary $f.bas"
+    detok --binary programs/$f.bas >$ftdata/detok/$f.baa
+    hexdiff {$ftdata/detok,programs}/$f.baa
+}
+
+echo "====== cmtconv"
+psrc/cmtconv/Test "$@"
+
+PASSED=true

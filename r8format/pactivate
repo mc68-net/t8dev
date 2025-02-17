@@ -1,0 +1,149 @@
+#   pactivate version 0.5.4   https://github.com/cynic-net/pactivate
+
+[ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
+#   https://stackoverflow.com/a/28776166/107294
+(return 0 2>/dev/null) \
+    || { echo 1>&2 "source (.) pactivate with Bash."; exit 9; }
+
+__pa_cleanup() {
+    unset __pa_cleanup __pa_echo \
+        __pa_builddir __pa_quiet __pa_python __pa_python_deref __pa_pyver \
+        __pa_bootdir __pa_basedir __pa_requirements
+}
+__pa_echo() { [[ -n $__pa_quiet ]] || echo "$@"; }
+
+__pa_basedir=$(cd "$(dirname "$BASH_SOURCE")" && pwd -P)
+__pa_builddir=
+__pa_quiet=
+while [[ $# -gt 0 ]]; do case "$1" in
+    -b) shift; __pa_builddir="$1"; shift;;
+    -B) shift; __pa_basedir="$1"; shift;;
+    -q) shift; __pa_quiet=-q;;
+    *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
+esac; done;
+
+if [[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]]; then
+    #   Even if it's a dangling link (-e fails) we use it so that the
+    #   user sees the error.
+    __pa_python=$__pa_basedir/.python
+else
+    #   We test `py` only in Windows/MINGW because the Unix `py` program
+    #   (from the pythonpy package) is a different thing we never want to use.
+    for __pa_python in ${MSYSTEM:+py} python3 python PYTHON_NOT_FOUND; do
+        "$__pa_python" --version >/dev/null 2>&1 && break
+    done
+fi
+"$__pa_python" --version >/dev/null 2>&1 || {
+    [[ -L $__pa_python ]] \
+        && echo "$__pa_python -> $(readlink "$__pa_python")"
+    $__pa_python --version || true      # Display the suppressed error message
+    echo 1>&2 "pactivate: bad python interpreter"
+    __pa_cleanup; return 3
+}
+#   $__pa_pyver is empty for "modern" versions of Python (i.e., those that
+#   can use the current get-pip.py, 3.8 and above) and otherwise is the
+#   major.minor revision number, suitable for use in the URL to download
+#   an alternate version of get-pip.py.
+__pa_pyver=$("$__pa_python" -c '
+#   Reminder: this script must be compatible with Python 2 syntax.
+import sys
+M, m = sys.version_info[0], sys.version_info[1]     # Major, minor
+if (M < 3 or (M == 3 and m < 8)):
+    print("{}.{}".format(M, m))
+')
+
+__pa_requirements="$__pa_basedir/requirements.txt"
+
+[[ -z $__pa_builddir ]] && __pa_builddir=$(cd "$__pa_basedir" && pwd -P)/.build
+
+__pa_bootdir="$__pa_builddir/bootstrap/pactivate${__pa_pyver}"
+mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
+
+#   Unlike virtualenv, pip -t does not change the bin/ directory to
+#   Scripts/ on Windows, so we can hardcode our bootstrap/bin/pip path.
+[[ -x $__pa_bootdir/bin/pip ]] || {
+    echo "----- Installing bootstrap pip (ver=${__pa_pyver:-latest})"
+    #   Debian-based systems do not incude distutils in the standard
+    #   python3 package; check that it's available and, if not, print a
+    #   more informative message than the ModuleNotFoundError.
+    "$__pa_python" -c '
+import sys
+M, m = sys.version_info[0], sys.version_info[1]         # Major, minor
+if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
+        ' || {
+        echo 1>&2 \
+            "Cannot import 'distuils.cmd'; apt-get install python3-distutils?"
+        return 3
+    }
+    #   • get-pip.py produces spurious upgrade notices on older Python versions
+    #   such as 3.6 or 2.7; --disable-pip-version-check suppresses these.
+    #   • curl sometimes seems to resolve only an IPv6 for bootstrap.pypa.io;
+    #   on failure try again forcing IPv4.
+    curl '-#' ${__pa_quiet:+--silent} \
+        "https://bootstrap.pypa.io/pip/$__pa_pyver/get-pip.py" \
+        | "$__pa_python" - \
+            $__pa_quiet -t "$__pa_bootdir" --disable-pip-version-check \
+    || curl --ipv4 '-#' ${__pa_quiet:+--silent} \
+        "https://bootstrap.pypa.io/pip/$__pa_pyver/get-pip.py" \
+        | "$__pa_python" - \
+            $__pa_quiet -t "$__pa_bootdir" --disable-pip-version-check \
+    || return $?
+    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" --version
+}
+
+[[ -d $__pa_bootdir/virtualenv/ ]] || {
+    echo '----- Installing bootstrap virtualenv'
+    #   This install produces spurious "bootstrap/.../bin already exists"
+    #   messages; --upgrade suppresses these. However, --upgrade also seems
+    #   to entirely remove the bin/ directory, so we "re-install" pip
+    #   (which will not re-download it) to restore bin/pip as well.
+    #   Note that we _must_ use `python -m pip` because, on Windows due to
+    #   file locking, pip is unable to replace itself if you run it as pip.exe.
+    PYTHONPATH="$__pa_bootdir" "$__pa_python" -m pip \
+        $__pa_quiet install --upgrade -t "$__pa_bootdir" pip virtualenv
+}
+
+[[ -d $__pa_builddir/virtualenv/ ]] || {
+    echo '----- Building virtualenv'
+    echo -n "Using $__pa_python"
+    if [[ -L $__pa_python ]]; then
+        #   MacOS readlink has no -f option, so we must do this the hard
+        #   way. Fortunately we already know that the binary exists and is
+        #   a Python interpreter.
+        __pa_python_deref=$(readlink "$__pa_python")
+        __pa_python_deref=$(cd "$__pa_basedir" \
+            && cd $(dirname "$__pa_python_deref") \
+            && pwd -P)/$(basename "$__pa_python_deref")
+        echo " -> $__pa_python_deref"
+    else
+        __pa_python_deref="$__pa_python"
+        echo
+    fi
+    echo -n "Version: " && "$__pa_python" --version
+    #   1. Use virtualenv to create the new virtualenv.
+    #   2. Upgrade pip to the latest version, because often the get_pip.py
+    #      version is old enough that we'll get annoying upgrade messages
+    #      with every use if we don't do this. To reduce output size, we
+    #      do this quietly and display the new version after. (The old
+    #      version is displayed in the virtualenv creation output.)
+    #   3. If we have a requirements file, install its contents.
+    PYTHONPATH="$__pa_bootdir" "$__pa_python_deref" -s -m virtualenv \
+        $__pa_quiet --prompt $(basename "$__pa_basedir") \
+        "$__pa_builddir/virtualenv/" \
+    && "$__pa_builddir"/virtualenv/[bS]*/pip install -q -U pip \
+    && "$__pa_builddir"/virtualenv/[bS]*/pip --version \
+    && [[ -f "$__pa_requirements" ]] \
+    && "$__pa_builddir"/virtualenv/[bS]*/pip \
+        install $__pa_quiet -r "$__pa_requirements"
+}
+
+cmp -s $(type -p "$__pa_python") "$__pa_builddir"/virtualenv/[bS]*/python || (
+    echo 1>&2 "WARNING:" \
+        "${__pa_builddir#$__pa_basedir/}"/virtualenv/[bS]*/python \
+        "($("$__pa_builddir"/virtualenv/[bS]*/python --version 2>&1))" \
+        "is not $__pa_python" \
+        "($("$__pa_python" --version 2>&1))" \
+    )
+
+. "$__pa_builddir"/virtualenv/[bS]*/activate
+__pa_cleanup
