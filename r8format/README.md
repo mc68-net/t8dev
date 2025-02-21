@@ -1,5 +1,5 @@
-r8format - Tools for Manipulating and Converting Retro-8-bit File Formats
-=========================================================================
+r8format - Retrocomputing 8-bit file format manipulation tools
+==============================================================
 
 This repository contains tools (mainly written in Python) and Python
 libraries for manipulating and converting some common file formats
