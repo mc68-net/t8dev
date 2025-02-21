@@ -70,6 +70,27 @@ described in the comments at the head of [`t8setup.bash`], but can also be
 used directly from the command line (but remember to export `T8_PROJDIR`
 first).
 
+### Upgrading Old Clients
+
+If you are currently using separate `r8format/` and `t8dev/` Git
+submodules, you should:
+- `git rm r8format/`;
+- Update `t8dev/` to the head of `main`;
+- Clean up any old directory trees lying around, such as `t8dev/psrc/`
+  (which moved to `t8dev/t8dev/psrc/`);
+- Update your `requirements.txt` per the §"Development Usage" above;
+- Rebuild and test, using `-C` (or any other equivalant to `rm -rf
+  .build/`); and
+- Commit your changes.
+
+
+Support
+-------
+
+Support information depends on the particular package with which you're
+having issues or have questions. See the `*/README.md` files in the
+subdirectories for further information.
+
 
 
 <!-------------------------------------------------------------------->
