@@ -7,9 +7,9 @@ authors = [
     { name = 'Stuart Croy', email = 'stuartcroy@mac.com' },
 ]
 readme = 'README.md'
-urls.homepage = 'https://github.com/mc68-net/r8format'
-urls.source = 'https://github.com/mc68-net/r8format'
-urls.tracker = 'https://github.com/mc68-net/r8format/issues'
+urls.homepage = 'https://github.com/mc68-net/t8dev/tree/main/r8format'
+urls.source = 'https://github.com/mc68-net/t8dev'
+urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
 requires-python = '>=3.6'
 dependencies = []

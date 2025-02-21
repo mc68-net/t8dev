@@ -6,7 +6,7 @@ authors = [
     { name = 'Curt J. Sampson', email = 'cjs@cynic.net' },
 ]
 readme = 'README.md'
-urls.homepage = 'https://github.com/mc68-net/t8dev'
+urls.homepage = 'https://github.com/mc68-net/t8dev/tree/main/t8dev'
 urls.source = 'https://github.com/mc68-net/t8dev'
 urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
