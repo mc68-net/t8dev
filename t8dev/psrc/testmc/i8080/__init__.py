@@ -5,9 +5,8 @@
 '''
 
 from    testmc.i8080.machine  import Machine
-#from    testmc.i8080.opcodes  import Instructions
+from    testmc.i8080.opcodes  import Instructions
 
-#I = Instructions
+I = Instructions
 
-#__all__ = ['Machine', 'Instructions', 'I']
-__all__ = ['Machine']
+__all__ = ['Machine', 'Instructions', 'I']
