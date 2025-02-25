@@ -31,5 +31,18 @@ trap 'ec=$?; echo 1>&2 "INTERNAL ERROR: ec=$ec line=$LINENO cmd=$BASH_COMMAND";
 
 t8dev toolset asl
 t8dev asl t8dev
-pytest -q "$@"
+
+#   When pytest is run from _this_ script, as opposed to a Test script in a
+#   parent directory or when using a parent virtualenv from a development
+#   repo that includes this as a Git submodule (even if CWD is in or under
+#   this directory, but T8_PROJDIR is set to the parent dir), we want to
+#   act as if we are a standalone `t8dev` repo to test.
+#
+#   Thus here we set rootdir explicitly to T8_PROJDIR (using either the
+#   actual preset T8_PROJDIR or the default of this dir that we set above)
+#   and set our config file to /dev/null because we do not want pytest
+#   searching for config files above us that may not be applicable to
+#   this "standalone" test configuration.
+#
+pytest --rootdir="$T8_PROJDIR" --config-file=/dev/null -q "$@"
 "$(dirname "$0")/r8format/Functest"
