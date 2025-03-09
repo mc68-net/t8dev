@@ -1,7 +1,9 @@
-''' A memory with (mock) I/O devices.
-'''
+' A memory with (mock) I/O devices. '
+
 from    collections.abc  import Container, Sequence
-from    io  import BytesIO
+from    testmc.generic.mbytesio  import MBytesIO
+
+####################################################################
 
 class IOMem(bytearray):
     ''' This is a memory and I/O device simulator. Typically it would be
@@ -44,12 +46,12 @@ class IOMem(bytearray):
             streams.
 
             If not provided, `input` and `output` default to a freshly
-            instantiated (separate) `BytesIO` for each.
+            instantiated (separate) `MBytesIO` for each.
 
             If `input` has a `read` method it will be used as the source of
             data for reads from `addr`; ``read(1)`` must return a `bytes`
             (or similar) of length 1. Otherwise `input` will be passed to
-            `BytesIO()` to be used as the initial value.
+            `MBytesIO()` to be used as the initial value.
 
             If `output` has a `write` method it will be used as the
             destination of data for writes to `addr`; ``write()`` will be
@@ -59,14 +61,14 @@ class IOMem(bytearray):
             raise TypeError('setiostreams does not yet support Containers')
 
         if input is None:
-            istream = BytesIO()
+            istream = MBytesIO()
         elif callable(getattr(input, 'read', None)):
             istream = input
         else:
-            istream = BytesIO(input)
+            istream = MBytesIO(input)
 
         if output is None:
-            ostream = BytesIO()
+            ostream = MBytesIO()
         elif callable(getattr(output, 'write', None)):
             ostream = output
         else:

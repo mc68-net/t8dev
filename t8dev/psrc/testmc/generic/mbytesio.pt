@@ -1,0 +1,42 @@
+from    testmc.generic.mbytesio  import *
+
+
+def test_MBytesIO_written():
+    ' Methods related to data written to the `BytesIO`. '
+    b = MBytesIO();     assert b''   == b.written()
+    b.write(b'0');      assert b'0'  == b.written()
+    b.write(b'1');      assert b'01' == b.written()
+    b.clear();          assert b''   == b.written()
+    b.write(b'2');      assert b'2'  == b.written()
+
+    b.write(b'\x00\x80\xFF')
+    b.written(print=True)
+   #assert 0    # uncommit to see that the output was written to stdout
+
+def test_MBytesIO_written_from0():
+    ''' It's possible to pre-fill the buffer we're using for output, but
+        this does not change that the initial position is at 0 and so will
+        overwrite anything already there. (Nor do we want to change this,
+        since this should work just like `BytesIO`.)
+
+        We never instantiate an output stream with anything but an empty
+        buffer, so this test just serves as documentation that we shouldn't
+        try that.
+    '''
+    b = MBytesIO(b'012');   assert b'012'  == b.written()
+    b.write(b'A');          assert b'A12' == b.written()
+
+def test_MBytesIO_read():
+    ' Methods related to data read from the `BytesIO`. '
+    b = MBytesIO(b'0123')
+    assert b'0123'  == b.unread()
+    assert b'01'    == b.read(2)
+    assert b'23'    == b.unread()
+
+    b.clear()
+    assert b''      == b.unread()
+
+    b.setinput(b'4567')
+    assert b'4567'  == b.unread()
+    assert b'45'    == b.read(2)
+    assert b'67'    == b.unread()

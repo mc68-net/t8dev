@@ -2,6 +2,9 @@ from    io  import BytesIO
 from    testmc.generic.iomem  import *
 import  pytest
 
+####################################################################
+#   IOMem
+
 @pytest.fixture
 def mem():
     return IOMem(8)
@@ -66,6 +69,9 @@ def test_no_length_changes(mem):
     with pytest.raises(ValueError) as ex:  mem[3:5] = b'123'
     assert ex.match(msg.format(2, 3))
 
+####################################################################
+#   setio and friends
+
 def test_setio_badargs(mem):
     with pytest.raises(ValueError) as ex:
         mem.setio(0, 42)
@@ -114,11 +120,11 @@ def test_setiostreams(mem):
         mem[4]
 
     #   device writes
-    assert b'' == out4.getvalue()
+    assert b'' == out4.written()
     mem[4] = 0x80
-    assert b'\x80' == out4.getvalue()
+    assert b'\x80' == out4.written()
     mem[4] = 0x81
-    assert b'\x80\x81' == out4.getvalue()
+    assert b'\x80\x81' == out4.written()
 
     #   deletion of io functions
     mem.setio(4, None)
