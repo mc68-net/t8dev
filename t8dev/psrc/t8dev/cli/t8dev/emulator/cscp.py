@@ -111,6 +111,23 @@ class CSCP(Suite):
     #   name of the emulator to use (e.g., `tk80bs` for the `tk80` entry
     #   below).
     VENDOR_ROM = {
+        'mz700': {
+            'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/j700/cgrom-jp.bin',
+            #   XXX This is the EU/PAL IPL ROM.
+            'IPL.ROM':              # $0000-$0FFF
+                'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/e700/1Z-013A.bin',
+            'EXT.ROM':  None,       # $E800-$FFFF
+            #   This also reads the following given certain "dipswitch" settings:
+            #   s4: `MZ1R12.ROM`    # $E800 len  $800
+            #   s3: `MZ1E14.ROM`    # $E800 len  $800
+            #   s2: `MZ1E05.ROM`    # $F000 len $1000
+        },
+        'mz700pal': {
+            'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/e700/cgrom-int.bin',
+            'IPL.ROM':              # $0000-$0FFF
+                'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/e700/1Z-013A.bin',
+            'EXT.ROM': None,        # $E800-$FFFF
+        },
         'pc8001': {
             'N80.ROM': 'https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/N80_11.bin',
             'KANJI1.ROM': '@1000:https://gitlab.com/retroabandon/pc8001-re/-/raw/main/rom/80/FONT80.bin',
