@@ -115,7 +115,7 @@ class CSCP(Suite):
             'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/j700/cgrom-jp.bin',
             #   XXX This is the EU/PAL IPL ROM.
             'IPL.ROM':              # $0000-$0FFF
-                'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/e700/1Z-013A.bin',
+                'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/j700/1Z-009A.bin',
             'EXT.ROM':  None,       # $E800-$FFFF
             #   This also reads the following given certain "dipswitch" settings:
             #   s4: `MZ1R12.ROM`    # $E800 len  $800
