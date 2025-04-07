@@ -29,6 +29,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Added: `MBytesIO` object in `testmc.generic` with additional API
   convenience methods that improve how our tests read.
 - Added: ROM sources for CSCP Sharp MZ-700 emulators.
+- Fixed: `p2a2bin` now handles files that load above $7FFF.
 
 ### 0.3.0 (2025-02-16)
 - Added: `t8dev buildtoolset ctools` for Commodore 64/128 CP/M disk images.

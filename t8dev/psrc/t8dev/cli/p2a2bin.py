@@ -31,8 +31,8 @@ def print_a2bin(mi):
         raise ValueError('Length {:04X} > $7FFF'.format(mi.contiglen()))
 
     output = fdopen(stdout.fileno(), 'wb')  # reopen stdout as binary
-    output.write(pack('<h', mi.startaddr))
-    output.write(pack('<h', mi.contiglen()))
+    output.write(pack('<H', mi.startaddr))
+    output.write(pack('<H', mi.contiglen()))
     output.write(mi.contigbytes())
 
 def main():
