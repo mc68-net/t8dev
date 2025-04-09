@@ -105,7 +105,7 @@ __Simulators and Emulators__:
 
 Versions 1.42 builds 205 through at least 218 are broken for t8dev due to
 the "Symbols in Segment NOTHING" section disappearing from the map file.
-See [`t8dev.toolset.asl`](psrc/t8dev/toolset/asl.py) for more
+See [`t8dev.toolset.asl`](src/t8dev/toolset/asl.py) for more
 details.
 
 #### ASxxxx Notes

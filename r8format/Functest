@@ -64,6 +64,6 @@ diff -u {$ftdata/detok,programs}/simple.ba1
 }
 
 echo "====== cmtconv"
-psrc/cmtconv/Test "$@"
+src/cmtconv/Test "$@"
 
 PASSED=true

@@ -6,7 +6,7 @@
 #   where on entry T8_PROJDIR points to a developer's repo) that includes
 #   this as a submodule, and it will run the t8dev pytest tests in that
 #   parent environment. (Developers may also simply chose to add
-#   t8dev/psrc/ to their own pytest runs.)
+#   t8dev/src/ to their own pytest runs.)
 #
 #   It may also be run stand-alone (i.e., where T8_PROJDIR is not set on
 #   entry) which will instead do a minimal install and build of t8dev

@@ -77,7 +77,7 @@ submodules, you should:
 - `git rm r8format/`;
 - Update `t8dev/` to the head of `main`;
 - Clean up any old directory trees lying around, such as `t8dev/psrc/`
-  (which moved to `t8dev/t8dev/psrc/`);
+  (which moved to `t8dev/t8dev/src/`);
 - Update your `requirements.txt` per the §"Development Usage" above;
 - Rebuild and test, using `-C` (or any other equivalant to `rm -rf
   .build/`); and

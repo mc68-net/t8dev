@@ -5,8 +5,8 @@
 /tmp/
 
 #   setuptools output files.
-/t8dev/psrc/t8dev.egg-info/
-/r8format/psrc/r8format.egg-info/
+/t8dev/src/t8dev.egg-info/
+/r8format/src/r8format.egg-info/
 
 #   developer stuff
 /tmp/
