@@ -1,4 +1,5 @@
 from    pytest  import main as pytest_main
+from    pathlib  import Path
 import  argparse
 
 from    t8dev  import path
@@ -40,31 +41,31 @@ def pytest(args):
     vprint(1, '━━━━━━━━ pytest')
     vprint(3, 'pytest subcommand', args)
 
-    #   XXX Thoughts on improvements to this:
-    #   1. If there's a top-level pyproject.toml, use the config from that
-    #      instead of defaulting to src/ etc.
-    #   2. Look for pyproject.toml files below and just do src/ and psrc/
-    #      subdirs of those.
+    #   Discovery works slightly differently from default pytest in that by
+    #   default we search from $T8_PROJDIR downward for tests, rather than
+    #   the CWD, if no test files are supplied on the command line. (This
+    #   is specified as a command line argument, and thus overrides
+    #   configuration files.) Thus, specify `.` on the command line if you
+    #   want the default pytest behaviour.
     #
-    #   As well as using src/ as a default directory in which to discover
-    #   tests, we also want to discover tests in our submodules such as
-    #   t8dev and r8format. Ideally this should be done by extracting the
-    #   test paths from tool.pytest.ini_options.testpaths in any
-    #   pyproject.toml files in this working copy, but that's a bit
-    #   difficult. So for the moment we rely on the fact that t8dev and
-    #   r8format put their code under a psrc/ or (deprecated) pylib/
-    #   subdir, and we just add any of those we find.
-    default_discovery_dirs = list(map(str, [
-        *path.proj().glob('**/psrc/'),
-        *path.proj().glob('**/pylib/'),
-        path.proj('src/'),
-        ]))
+    #   We determine if we've been given a path or file to search by
+    #   checking for every argument to see if it exists in the filesystem
+    #   (relative to CWD). This is an imperfect heuristic, but generally
+    #   good enough.
+    #
+    #   If there's a top level pyproject.toml or similar config file, it
+    #   would be nice to use the default configuration from that (as pytest
+    #   uses it if CWD is the root dir), but that's a fair amount of extra
+    #   work and it's not clear we would gain much from it. (And it still
+    #   runs into the issue about what to do with subdirectory/submodule
+    #   config files.
 
-    non_opt_args = [ a for a in args.ptarg if not a.startswith('-') ]
+    path_args = [ arg for arg in args.ptarg if Path(arg).exists() ]
     allargs = [
         '--rootdir=' + str(path.proj()),
         '--override-ini=cache_dir=' + str(path.build('pytest/cache')),
         '-q',    # quiet by default; user undoes this with first -v
-    ] + args.ptarg + ( [] if non_opt_args else default_discovery_dirs )
+    ] + args.ptarg
+    if not path_args: allargs.append(str(path.proj()))
     vprint(2, 'pytest args', allargs)
     return(pytest_main(allargs))

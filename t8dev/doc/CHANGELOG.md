@@ -30,6 +30,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
   convenience methods that improve how our tests read.
 - Added: ROM sources for CSCP Sharp MZ-700 emulators.
 - Fixed: `p2a2bin` now handles files that load above $7FFF.
+- Fixed: `t8dev pytest` now tests everything under $T8_PROJDIR when given
+  no file/dir args, and better checks for file/dir args.
 
 ### 0.3.0 (2025-02-16)
 - Added: `t8dev buildtoolset ctools` for Commodore 64/128 CP/M disk images.
