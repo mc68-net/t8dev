@@ -5,7 +5,9 @@ __WARNING:__ This documentation is not currently up to date. Currently
 it's best to [contact cjs](#contact-infomation) and get him to help
 you set up the t8dev submodule for your development project.
 
-Contents:
+#### Contents
+
+- Introduction
 - File and Directory Organization
   - ASL (The Macroassembler AS) Notes
   - ASxxxx Notes
@@ -19,13 +21,22 @@ Contents:
   - Playing CMT (Cassette Tape) Images
   - The py65 Monitor
 
-This repo supports development of programs in 8-bit assembly languages (for
-a variety of platforms) and tools to aid this development. It includes a
-Python framework under `psrc/` and build tool `bin/t8dev` that builds and
-tests the assembly code.
 
-Unit tests are written in [pytest] and use Python-based CPU simulators
-such as [py65] for MOS 6502 and `testmc.mc6800` for Motorola 6800.
+Introduction
+------------
+
+The `t8dev` package (and it's associated `r8format` package) supports
+development of programs in 8-bit assembly languages (for a variety of
+platforms) and tools to aid this development. The `t8dev` build tool does
+most of the heavy lifting, but there are various other tools included as
+well.
+
+See [`doc/setup.md`] for details on setting up a project to use t8dev.
+
+Unit tests are written in [pytest] and use Python-based CPU simulators to
+run the assembled code and check the results. (These include `testmc.i8080`
+for Intel 8080,  `testmc.mc6800` for Motorola 6800, and [py65] for
+MOS 6502.)
 
 The `t8dev.toolset` packages build and install various development tools
 such as [Macroassembler AS][asl], other assemblers, binary file and disk
@@ -231,6 +242,7 @@ The author of this tool is Curt Sampson; the best ways to contact him are:
 [`README.md`]: README.md
 [`Test`]: Test
 [`bin/`]: bin/
+[`doc/setup.md`]: ./doc/setup.md
 [`exe/`]: exe/
 [`lib/testmc/`]: lib/testmc/
 [`pactivate`]: https://github.com/0cjs/pactivate
