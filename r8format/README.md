@@ -75,10 +75,10 @@ Additional command-line programs include:
 Python Libraries
 ----------------
 
-The following top-level modules are under `pylib`:
+The following top-level modules are under `src/`:
 - `binary`: Object file and assembler symbol file formats.
 - `bastok`: MS-BASIC de- and re-tokenisation.
-- `cmtconv`: Microcomputer CMT (cassette tape) image handling.
+- `cmtconv`: Microcomputer CMT (audio cassette tape) image handling.
 
 
 Support
