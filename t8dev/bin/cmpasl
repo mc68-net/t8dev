@@ -64,10 +64,12 @@ disassmble_z80dasm() {
         [[ -r $asmdir/common.header ]] \
             && cat "$asmdir/common.header" \
             || echo '            relaxed on'
-        [[ -r $asmdir/$fname.header ]] \
-            && cat "$asmdir/$fname.header" \
-            || echo -e "            cpu $cpu\n" \
-                        '           z80syntax exclusive'
+        if [[ -r $asmdir/$fname.header ]]; then
+            cat "$asmdir/$fname.header"
+        else
+            echo -e "            cpu $cpu\n"
+            [[ $cpu == z80 ]] || echo -e '            z80syntax exclusive'
+        fi
 
         blockfile=$(ifexists "$asmdir/$fname.block")
         comsym=$(   ifexists "$asmdir/common.sym")
