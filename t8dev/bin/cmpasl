@@ -33,31 +33,6 @@ find_asl() {
     asl -version >/dev/null || die 3 "asl not found in path"
 }
 
-z80dasm_clean() {
-    local addsed=/dev/null
-    [[ $# -gt 0 ]] && addsed="$1"
-    sed -E -e '
-            /^[^\t;].*:$/{N;s/\n//}     # join labels to next line
-            s/l([0-9a-f]{4})h/unk\U\1/g # more readable label format
-            s/sub_([0-9a-f]{4})h/sub_\U\1/g
-            s/0x([0-9a-f]{4})/$\U\1/    # number format 0xnnnn → $NNNN
-            s/0([0-9a-f]{4})h/$\U\1/    # number format 0nnnnh → $NNNN
-            s/0([0-9a-f]{2})h/$\U\1/    # number format 0nnh → $NN
-            s/\t[a-z][a-z] /&  /        # indent operand after 2-letter mnemonic
-            s/\t[a-z]{3} /& /           # indent operand after 3-letter mnemonic
-            s/^\t/\t    /               # indent non-label lines
-            s/:\t/\t    /               # indent menmonic on label lines, remove :
-            s/ defb / db    /           # ASL syntax
-            s/ defw / dw    /           # ASL syntax
-            ' -f "$addsed" \
-        | sed -E -e 's/[ \t]+$//  # remove any trailing whitesapce' \
-        | expand
-    #   Notes:
-    #   • Trailing whitespace removal is done as a separate command because
-    #     when incuded at the end of the original sed script it will not affect
-    #     lines that were split (e.g., to add a blank line after another).
-}
-
 disassmble_z80dasm() {
     local outsed=$(ifexists "$asmdir/fname.sed")
     (
@@ -77,7 +52,7 @@ disassmble_z80dasm() {
         z80dasm -a -l -g "$start_addr" \
             -b $blockfile -S <(cat "$comsym" "$symfile") \
             "$binfile" "$@"
-    ) | z80dasm_clean "$(ifexists "$asmdir/$fname.sed")" >"$asmfile" || fail
+    ) | z80dasm-clean "$(ifexists "$asmdir/$fname.sed")" >"$asmfile" || fail
 }
 
 assemble_asl() {
