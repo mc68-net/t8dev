@@ -1,6 +1,6 @@
 from    binary.tool.asl   import *
-from    binary  import pylib
 
+from    importlib_resources  import files as resfiles
 from    io   import BytesIO, StringIO
 from    pathlib import Path
 import  pytest
@@ -9,14 +9,11 @@ import  re
 ####################################################################
 #   Test support
 
-TESTDATA_DIR = pylib('binary/tool/testfiles')
-
 def tdatafile(filename):
     ''' Return a ByteStream reading from the given test file.
         This returns a context manager and so can be used with ``with``.
     '''
-    path = Path(TESTDATA_DIR, filename)
-    return open(str(path), 'rb')
+    return resfiles().joinpath('testfiles', filename).open('rb')
 
 ####################################################################
 #   Object file parsing.
@@ -248,8 +245,8 @@ def test_parse_symtab_ParseError():
 #   Tests for full-file parsing
 
 def test_parse_symtab_fromfile():
-    path = Path(TESTDATA_DIR, 'asl/program.map')
-    with open(str(path), 'rt', encoding='ascii') as f:
+    path = resfiles().joinpath('testfiles/asl/program.map')
+    with path.open('rt', encoding='ascii') as f:
         stab = parse_symtab(f)
         assert '' == f.read()   # consumed all input
 

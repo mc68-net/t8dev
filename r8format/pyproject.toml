@@ -1,5 +1,5 @@
 [project]
-version = '0.0.8.dev3'
+version = '0.0.8.dev4'
 name = 'r8format'
 description = 'Retrocomputing 8-bit file format manipulation tools'
 authors = [
@@ -11,8 +11,10 @@ urls.homepage = 'https://github.com/mc68-net/t8dev/tree/main/r8format'
 urls.source = 'https://github.com/mc68-net/t8dev'
 urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
-requires-python = '>=3.6'
-dependencies = []
+requires-python = '>=3.7'
+dependencies = [
+    'importlib_resources',
+]
 
 [project.scripts]
 #   bastok

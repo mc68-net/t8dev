@@ -1,6 +1,6 @@
 from    binary.tool.asxxxx import *
-from    binary  import pylib
 
+from    importlib_resources  import files as resfiles, as_file as res_as_file
 from    io import BytesIO, StringIO
 from    pathlib import Path
 import  pytest
@@ -76,8 +76,14 @@ def tdatafile(filename):
     ''' Return a ByteStream reading from the given test file.
         This returns a context manager and so can be used with ``with``.
     '''
-    dir = 'binary/tool/testfiles/asxxxx'
-    return open(str(pylib(dir, filename)), 'r')
+    f = resfiles().joinpath('testfiles/asxxxx', filename)
+    #   XXX Though AxSymTab.symtab_lines(f) says it wants a file opened
+    #   in binary mode, it's not clear that should be the case, and the
+    #   previous version of this function (as this one) was actually using
+    #   mode 'r'. And, in fact, symtab_lines() etc. don't work with mode
+    #   'rb'; they cause the function to wedge. This problem needs to
+    #   be worked out at some point.
+    return f.open('r')
 
 @pytest.mark.parametrize('filename',
     ['wide.sym', 'wide.lst', 'wide.rst' ])
@@ -132,8 +138,9 @@ def test_AxSymTab_readsymtabpath_nonexistent_file():
         AxSymTab.readsymtabpath('/dev/null')
 
 def test_AxSymTab_readsymtabpath():
-    assert AxSymTab.readsymtabpath(pylib('binary/tool/testfiles/asxxxx/wide.rst'))
-    assert AxSymTab.readsymtabpath(pylib('binary/tool/testfiles/asxxxx/wide'))
+    with res_as_file(resfiles().joinpath('testfiles/asxxxx')) as fs:
+        assert AxSymTab.readsymtabpath(fs.joinpath('wide.rst'))
+        assert AxSymTab.readsymtabpath(fs.joinpath('wide'))
 
 def test_AxSymTab_readsymtabstream():
     #   Here we deliberately use a file that does not list the areas
