@@ -123,7 +123,7 @@ class CSCP(Suite):
             #   s2: `MZ1E05.ROM`    # $F000 len $1000
         },
         'mz700pal': {
-            'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/e700/cgrom-int.bin',
+            'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/e700/cgrom-eu.bin',
             'IPL.ROM':              # $0000-$0FFF
                 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/e700/1Z-013A.bin',
             'EXT.ROM': None,        # $E800-$FFFF
