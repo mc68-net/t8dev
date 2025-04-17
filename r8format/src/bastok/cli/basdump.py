@@ -91,19 +91,12 @@ def printbasline(i_addr, bf):
 
     return i_addr + linelen
 
-def parseargs():
-    p = ArgumentParser(description='MS-BASIC hexdump')
-    arg = p.add_argument
-    arg('input', help='input file (required); use `-` for stdin')
-    return p.parse_args()
-
-def main():
-    args = parseargs()
-
-    if args.input == '-':   f = sys.stdin.buffer
-    else:                   f = open(args.input, 'rb')
-    bf = BASFile(f.read(), 'MSX')
-    f.close()
+def basdump(data, filetype):
+    ''' Given `data` as the contents of a tokenized BASIC file, parse it
+        with `BASFile` using `filetype` as the type argument and print a
+        hexdump of it.
+    '''
+    bf = BASFile(data, 'MSX')
 
     eprint('HEAD:')
     hprint(bf.header())
@@ -125,3 +118,16 @@ def main():
             break
         else:
             i_addr = i_nextaddr
+
+def parseargs():
+    p = ArgumentParser(description='MS-BASIC hexdump')
+    arg = p.add_argument
+    arg('input', help='input file (required); use `-` for stdin')
+    return p.parse_args()
+
+def main():
+    args = parseargs()
+    if args.input == '-':   f = sys.stdin.buffer
+    else:                   f = open(args.input, 'rb')
+    data = f.read(); f.close()
+    basdump(data, 'MSX')
