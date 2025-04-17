@@ -1,9 +1,9 @@
-Sample Programs for bastok
-==========================
+MSX-BASIC Sample Programs for bastok
+====================================
 
-These programs are used for `bastok` functional tests (in the [top-level
-`/Test`](../Test) script) and manual testing. This directory can be read
-and written in openMSX by starting it with the `-diska programs` option.
+These programs are used for `bastok` "functional" tests and manual testing.
+This directory can be read and written in openMSX by starting it with the
+`-diska …/bastok/programs/msx` option.
 
 File names are always in 8.3 format¹ and lower case.
 - Always stick to 8.3 format; use lower-case.
