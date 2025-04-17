@@ -1,0 +1,64 @@
+''' "Functional" tests that read and process MSX-BASIC program files.
+
+    XXX TODO:
+    1. Keep a copy of the program-under-test output (probably in
+       ``$T8_PROJDIR/.build/testoutput/…/detok/`` or similar) so
+       that we can do comparisions "by hand," w/`meld`, etc.
+    2. For line-by-line comparisons, we should break up the expected
+       and actual strings into lines to let pytest display errors more
+       easily.
+'''
+
+from    bastok.cli.basdump  import basdump
+from    bastok.cli.detok  import main as detok_main
+
+from    importlib_resources  import files as resfiles
+
+
+def progfile(path):
+    #   This module is in the test files dir,
+    #   so no extra path elements are necessary.
+    return resfiles().joinpath(path)
+
+def linesdiff(expected, capture):
+    ''' Assert that the stderr of the capture is empty, and that the
+        expected is equal to the stdout of the capture, line by line,
+        letting pytest (with sufficient verbosity enabled) give a nice diff
+        on failure (assuming that the expected/actual output is actually
+        line-based).
+
+        This is carefully designed so that it works with both
+        `str`/`capsys` and `bytes`/`capsysbinary` inputs.
+
+        XXX This might also be extended to keep a copy of the output under
+        ``.build/`` for manual examination.
+    '''
+    actual, err = capture.readouterr()
+    assert len(err) == 0
+    assert expected.splitlines() == actual.splitlines()
+
+####################################################################
+
+def test_basdump(capsys):
+    input    = progfile('basdump.bas').read_bytes()
+    expected = progfile('basdump.dump').read_text()
+    basdump(input, 'MSX')
+    linesdiff(expected, capsys)
+
+def test_detok_no_expand(capsys):
+    expected = progfile('simple.ba0').read_text()
+    detok_main(argv1=['simple.bas'],
+        input_override=progfile('simple.bas').open('rb'))
+    linesdiff(expected, capsys)
+
+def test_detok_with_expand(capsys):
+    expected = progfile('simple.ba1').read_text()
+    detok_main(argv1=['-e', 'simple.bas'],
+        input_override=progfile('simple.bas').open('rb'))
+    linesdiff(expected, capsys)
+
+def test_detok_binary(capsysbinary):
+    expected = progfile('binchars.baa').read_bytes()
+    detok_main(argv1=['--binary', 'binchars.bas'],
+        input_override=progfile('binchars.bas').open('rb'))
+    linesdiff(expected, capsysbinary)
