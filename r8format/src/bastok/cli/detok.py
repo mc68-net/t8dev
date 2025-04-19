@@ -12,7 +12,7 @@ def die(exitcode, *msglines):
         print(l, file=sys.stderr)
     exit(exitcode)
 
-def parseargs():
+def parseargs(argv1):   # `None` to use `sys.argv[1:]`
     p = ArgumentParser(description='MSX-BASIC detokenizer')
     arg = p.add_argument
 
@@ -26,10 +26,10 @@ def parseargs():
         help='Use DOS textfile format (CR+LF EOL, ^Z at EOF)')
     arg('input', help='input file (required); use `-` for stdin')
 
-    return p.parse_args()
+    return p.parse_args(argv1)
 
-def main():
-    args = parseargs()
+def main(*, argv1=None, input_override=None):
+    args = parseargs(argv1)
 
     if args.expand and args.binary:
         die(2, '--binary and --expand are incompatible')
@@ -46,10 +46,16 @@ def main():
                    for k, v in sorted(CHARMAP.items()) ]
                 )
 
-    if args.input == '-':
+    if input_override is not None:
+        f = input_override
+    elif args.input == '-':
         f = sys.stdin.buffer
     else:
-        f = open(args.input, 'rb')
+        try:
+            f = open(args.input, 'rb')
+        except FileNotFoundError as ex:
+            print(str(ex))
+            sys.exit(1)
 
     type = f.read(1)[0]
     if type != 0xFF:
