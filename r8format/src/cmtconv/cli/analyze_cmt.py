@@ -20,6 +20,39 @@ import  cmtconv.audio as au, cmtconv.logging as lg
 
 parseint = partial(int, base=0)     # Parse an int recognizing 0xNN etc.
 
+def main():
+    args = parse_args()
+    print(args)
+    if args.from_pulses:
+        pulses = load_pulses(args)
+        sample_dur = 1.0 / 44100.0
+    else:
+        w = wave.open(args.input, 'rb')
+        if w.getnchannels() != 1 or w.getsampwidth() != 1:
+            raise ValueError('Only mono 8-bit wav files are supported')
+        rate = w.getframerate()
+        n_samples = w.getnframes()
+        samples = w.readframes(n_samples)
+        sample_dur = 1.0 / rate
+        #pulses = au.samples_to_pulses(samples, sample_dur)
+        pulses = au.samples_to_pulses_via_edge_detection(
+            samples, sample_dur, args.gradient_factor)
+        pulses = au.filter_clicks(pulses, sample_dur)
+        if args.to_pulses:
+            save_pulses(args, pulses, sample_dur)
+    if args.report_bauds:
+        report_bauds(args, pulses)
+    if args.dump_pulses:
+        dump_pulses(args, pulses)
+    if args.pulse_length_stats:
+        dump_pulse_length_stats(args, pulses)
+    if args.bitstream:
+        dump_bitstream(args, pulses)
+    if args.bytes:
+        dump_bytes(args, pulses)
+    if args.save_wav:
+        save_wav(args, pulses, sample_dur)
+
 def parse_args():
     p = ArgumentParser(description='''
             Analyse tape format audio''',
@@ -334,36 +367,3 @@ def save_wav(args, pulses, sample_dur):
     w.setsampwidth(1)
     w.setframerate(44100)
     w.writeframes(bytes(samples))
-
-def main():
-    args = parse_args()
-    print(args)
-    if args.from_pulses:
-        pulses = load_pulses(args)
-        sample_dur = 1.0 / 44100.0
-    else:
-        w = wave.open(args.input, 'rb')
-        if w.getnchannels() != 1 or w.getsampwidth() != 1:
-            raise ValueError('Only mono 8-bit wav files are supported')
-        rate = w.getframerate()
-        n_samples = w.getnframes()
-        samples = w.readframes(n_samples)
-        sample_dur = 1.0 / rate
-        #pulses = au.samples_to_pulses(samples, sample_dur)
-        pulses = au.samples_to_pulses_via_edge_detection(
-            samples, sample_dur, args.gradient_factor)
-        pulses = au.filter_clicks(pulses, sample_dur)
-        if args.to_pulses:
-            save_pulses(args, pulses, sample_dur)
-    if args.report_bauds:
-        report_bauds(args, pulses)
-    if args.dump_pulses:
-        dump_pulses(args, pulses)
-    if args.pulse_length_stats:
-        dump_pulse_length_stats(args, pulses)
-    if args.bitstream:
-        dump_bitstream(args, pulses)
-    if args.bytes:
-        dump_bytes(args, pulses)
-    if args.save_wav:
-        save_wav(args, pulses, sample_dur)

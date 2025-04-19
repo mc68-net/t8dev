@@ -10,6 +10,16 @@ import  cmtconv.formats as fm, cmtconv.logging as lg
 
 parseint = partial(int, base=0)     # Parse an int recognizing 0xNN etc.
 
+def main():
+    args = parse_args()
+    reader = fm.FORMATS[args.input_format][0]
+    blocks = reader(args.platform, args.input, **args.reader_optargs)
+
+    if args.output is not None:
+        writer = fm.FORMATS[args.output_format][1]
+        writer(args.platform, blocks, args.output)
+        #   XXX relies on exit() to close files
+
 def parse_args():
     p = ArgumentParser(description='''
             Convert computer audio tape saves between various formats.''',
@@ -54,13 +64,3 @@ def parse_args():
     elif args.output is not None:       args.output = open(args.output, 'bw')
 
     return args
-
-def main():
-    args = parse_args()
-    reader = fm.FORMATS[args.input_format][0]
-    blocks = reader(args.platform, args.input, **args.reader_optargs)
-
-    if args.output is not None:
-        writer = fm.FORMATS[args.output_format][1]
-        writer(args.platform, blocks, args.output)
-        #   XXX relies on exit() to close files
