@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-#
-#   bashex - hexdump an MS-BASIC program
-#
-#   This understands the MS-BASIC binary file and in-memory format and
-#   splits the lines based on where the BASIC lines start, rather than
-#   at arbitrary 16-byte intervals.
-#
+''' bashex - hexdump an MS-BASIC program
+ 
+    This understands the MS-BASIC binary file and in-memory format and
+    splits the lines based on where the BASIC lines start, rather than
+    at arbitrary 16-byte intervals.
+'''
 
 from    argparse  import ArgumentParser
 from    itertools  import islice

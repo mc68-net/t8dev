@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 '''
     t8dev - build tool for retro 8-bit cross-development
 

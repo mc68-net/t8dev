@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 ''' blines - produce text BASIC lines from "expanded" BASIC source
 
     The "expand" option of the detokenizer generates a multiline (per

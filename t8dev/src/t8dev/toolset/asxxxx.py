@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-'''
-    The ASxxxx assembler suite.
+''' The ASxxxx assembler suite.
 
     This fetches the binaries and extracts them, if necessary. The binaries
     are for 32-bit Linux; on 64-bit systems these will error out with "No

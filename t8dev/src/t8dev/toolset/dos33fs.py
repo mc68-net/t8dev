@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-'''
-    Configure for use of dos33fs-utils used for manipulating
+''' Configure for use of dos33fs-utils used for manipulating
     Apple II files and DOS 3.3 disk images.
 
     This will fetch from `source_repo` and build the `source_ref`

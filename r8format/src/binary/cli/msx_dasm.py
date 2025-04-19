@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 ''' Disassemble the given file to stdout using z80dasm.
 
     The input file should be in MSX-BASIC BLOAD format, with an initial

@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-#
-#   p2a2bin - convert AS .p file to Apple II DOS 3.3 binary (`B`) file
-#
-#   Output to stdout; redirect it if you need.
-#
+''' p2a2bin - convert AS .p file to Apple II DOS 3.3 binary (`B`) file
+ 
+    Output to stdout; redirect it if you need.
+'''
 
 from    os  import fdopen
 from    struct  import pack

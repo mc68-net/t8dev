@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from    site  import addsitedir
 from    argparse import ArgumentParser
 from    functools import partial

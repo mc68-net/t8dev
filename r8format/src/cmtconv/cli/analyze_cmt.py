@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-#
-#   analyze-cmt - analysis of attempts to read CMT audio files
-#
-#   This has various options that attempt different interprations and analyses
-#   of CMT data at the various levels up to bytes: pulse widths/baud rates,
-#   mark/space, the bitstream, and then byte framing.
-#
+''' analyze-cmt - analysis of attempts to read CMT audio files
+ 
+    This has various options that attempt different interprations and analyses
+    of CMT data at the various levels up to bytes: pulse widths/baud rates,
+    mark/space, the bitstream, and then byte framing.
+'''
 
 from    argparse import ArgumentParser
 from    functools import partial

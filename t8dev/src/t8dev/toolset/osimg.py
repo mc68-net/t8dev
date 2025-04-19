@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-'''
-    Fetch disk images used for testing.
+''' Fetch disk images used for testing.
 
     See the module documentation for `setup` for more details.
 '''

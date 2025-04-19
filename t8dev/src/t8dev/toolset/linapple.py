@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-'''
-    Configure for use of the linapple Apple II simulator (emulator).
+''' Configure for use of the linapple Apple II simulator (emulator).
 
     This will fetch from `source_repo` and build the `source_ref`
     branch, if necessary.

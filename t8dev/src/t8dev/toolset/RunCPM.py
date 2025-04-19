@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-'''
-    Configure for use of the RunCPM command-line CP/M simulator.
+''' Configure for use of the RunCPM command-line CP/M simulator.
 
     This will fetch from `source_repo` and build the `source_ref`
     branch, if necessary.
