@@ -34,6 +34,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
   no file/dir args, and better checks for file/dir args.
 - Fixed: minor fixes to cmpasl.
 - Added: z80dasm-clean stand-alone script extracted from cmpasl.
+- Added: `disx` disassembler toolset
 
 ### 0.3.0 (2025-02-16)
 - Added: `t8dev buildtoolset ctools` for Commodore 64/128 CP/M disk images.
