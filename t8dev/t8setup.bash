@@ -156,8 +156,9 @@ export T8_PROJDIR BUILDDIR
 while [[ ${#@} -gt 0 ]]; do case "$1" in
     --)     break;;     # NOTE: no shift here so caller can see the --
     -C)     shift; rm -rf "$BUILDDIR" ${T8_CLEAN_C-};;
-    -c)     shift;
-            rm -rf "$BUILDDIR"/{obj,ptobj,pytest,virtualenv} ${T8_CLEAN_c-} ;;
+    -c)     shift; rm -rf ${T8_CLEAN_c-} \
+                "$BUILDDIR"/{emulator,obj,ptobj,pytest,release,virtualenv} \
+                ;;
     *)      break;;
 esac; done
 
