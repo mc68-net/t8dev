@@ -25,6 +25,8 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+
+### 0.3.1 (2025-04-28)
 - Fixed: Updated `pactivate` to 0.5.7 for zsh support when sourced standalone.
 - Added: `MBytesIO` object in `testmc.generic` with additional API
   convenience methods that improve how our tests read.
@@ -32,8 +34,8 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Fixed: `p2a2bin` now handles files that load above $7FFF.
 - Fixed: `t8dev pytest` now tests everything under $T8_PROJDIR when given
   no file/dir args, and better checks for file/dir args.
-- Fixed: minor fixes to cmpasl.
-- Added: z80dasm-clean stand-alone script extracted from cmpasl.
+- Fixed: minor fixes to `cmpasl`.
+- Added: `z80dasm-clean` stand-alone script extracted from `cmpasl`.
 - Added: `disx` disassembler toolset
 
 ### 0.3.0 (2025-02-16)

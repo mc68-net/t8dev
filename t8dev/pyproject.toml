@@ -1,5 +1,5 @@
 [project]
-version = '0.3.0.dev5'
+version = '0.3.1'
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
 authors = [
@@ -12,7 +12,7 @@ urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 
 requires-python = '>=3.9'
 dependencies = [
-    'r8format>=0.0.7',
+    'r8format>=0.0.8',
     'pytest', 'pytest_pt',
     'requests', 'patool',               #   toolset installation support
     'py65',                             #   external CPU simulators
