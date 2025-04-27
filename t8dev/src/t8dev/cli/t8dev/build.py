@@ -10,7 +10,8 @@ import  shutil
 
 from    t8dev  import path
 from    t8dev.cli.t8dev.asl   import asl1
-from    t8dev.cli.t8dev.util  import vprint, runtool
+from    t8dev.cli.t8dev.shared  import vprint
+from    t8dev.cli.t8dev.util  import runtool
 
 ####################################################################
 #   Object File Transformation Tools

@@ -8,26 +8,12 @@ from    pathlib  import Path
 from    sys import stderr
 import  importlib.util, importlib.machinery, os
 
+from    t8dev.cli.t8dev.shared  import vprint
 from    t8dev  import path, run
-import  t8dev.cli.t8dev.shared as shared
 
 def err(*msgs, exitcode=1):
     for msg in msgs:  print(msg, file=stderr)
     exit(exitcode)
-
-def vprint(verbosity, prefix, *args, **kwargs):
-    ''' Print for a given verbosity level.
-
-        The message will be emitted only if `shared.ARGS.verbose` is at
-        least as large as the `verbosity` argument.
-
-        `prefix` is printed right-justified in a fixed-width field,
-        followed by a colon and the message in `args`. This helps commands
-        and the like line up nicely to make scanning through the output
-        easier.
-    '''
-    if verbosity <= shared.ARGS.verbose:
-        print('{:>8}:'.format(prefix), *args, **kwargs)
 
 @contextmanager
 def cwd(target):

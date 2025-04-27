@@ -6,7 +6,7 @@ from    site  import addsitedir
 import  os, sys
 
 from    t8dev  import path
-from    t8dev.cli.t8dev.util  import vprint
+from    t8dev.cli.t8dev.shared  import vprint
 import  t8dev.cli.t8dev.shared as shared
 
 from    t8dev.cli.t8dev.toolset     import setargs_toolset

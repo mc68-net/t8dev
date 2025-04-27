@@ -3,7 +3,8 @@
 from    itertools  import chain
 from    pathlib  import Path
 from    t8dev  import path
-from    t8dev.cli.t8dev.util  import cwd, runtool, sandbox_loadmod, vprint
+from    t8dev.cli.t8dev.shared  import vprint
+from    t8dev.cli.t8dev.util  import cwd, runtool, sandbox_loadmod
 
 def setargs_asl(subparser):
     parser = subparser.add_parser('asl',

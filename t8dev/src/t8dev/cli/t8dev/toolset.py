@@ -2,7 +2,7 @@
 #   `requests`, which package should be optional for those not using
 #   the toolset download/install/build part of t8dev.
 from    t8dev  import path
-from    t8dev.cli.t8dev.util  import vprint
+from    t8dev.cli.t8dev.shared  import vprint
 from    t8dev.cli import exits
 
 def setargs_toolset(subparser):

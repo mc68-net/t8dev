@@ -5,7 +5,8 @@ from    shutil  import  copyfile
 from    zipfile  import ZipFile
 
 from    t8dev.cli.t8dev.emulator.suite  import Suite
-from    t8dev.cli.t8dev.util  import cwd, vprint
+from    t8dev.cli.t8dev.shared  import vprint
+from    t8dev.cli.t8dev.util  import cwd
 from    t8dev.cpm  import compile_submit
 import  t8dev.path  as path
 import  t8dev.run  as run

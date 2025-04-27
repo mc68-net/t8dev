@@ -3,7 +3,7 @@ from    pathlib  import Path
 import  argparse
 
 from    t8dev  import path
-from    t8dev.cli.t8dev.util  import vprint
+from    t8dev.cli.t8dev.shared  import vprint
 
 def setargs_pytest(subparser):
     ''' This generates a parser where all arguments, even options, are simply

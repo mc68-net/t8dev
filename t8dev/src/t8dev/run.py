@@ -1,7 +1,9 @@
 ' t8dev.run - Run and control subprocesses '
 
 import  os, subprocess
+from    itertools  import chain
 from    t8dev  import path
+from    t8dev.cli.t8dev.shared  import vprint
 
 def tool(toolbin, *args, input=None, stdout_path=None,
     envupdate=None, is32bit=False):
@@ -26,6 +28,9 @@ def tool(toolbin, *args, input=None, stdout_path=None,
         usually indicating that support for running 32-bit binaries is not
         installed.
     '''
+    vprint(2, 'run.tool',
+        ' '.join(map(path.pretty, (chain([str(toolbin)], args)))))
+
     #   Relative `toolbin` uses explict path to project tool, if available.
     t8dev = path.tool('bin', toolbin)
     if os.access(str(t8dev), os.X_OK):

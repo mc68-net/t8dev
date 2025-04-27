@@ -2,7 +2,8 @@
 
 from    pathlib  import Path
 from    t8dev  import path
-from    t8dev.cli.t8dev.util  import cwd, remove_formfeeds, runtool, vprint
+from    t8dev.cli.t8dev.shared  import vprint
+from    t8dev.cli.t8dev.util  import cwd, remove_formfeeds, runtool
 
 def setargs_asx(subparser):
     parser = subparser.add_parser('asx',
