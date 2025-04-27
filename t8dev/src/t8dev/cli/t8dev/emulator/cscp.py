@@ -7,9 +7,9 @@ import  textwrap
 
 from    binary.romimage  import RomImage
 from    t8dev.cli.t8dev.emulator.suite  import Suite
-from    t8dev.cli.t8dev.util  import runtool
 import  t8dev.cli.exits  as exits
 import  t8dev.path  as path
+import  t8dev.run as run
 
 class CSCP(Suite):
     #   XXX This requires that wine be installed (on Linux) and the
@@ -37,7 +37,7 @@ class CSCP(Suite):
             emuexe = self.setup_emudir()
             cmd = [str(self.emudir(emuexe))]
             if os.name != 'nt':  cmd = ['wine'] + cmd
-            runtool(*cmd)
+            run.tool(*cmd)
 
     def emulator_exes(self):
         return [ p.stem for p in sorted(self.bindir.glob('*.exe')) ]

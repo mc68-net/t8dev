@@ -3,7 +3,8 @@
 from    pathlib  import Path
 from    t8dev  import path
 from    t8dev.cli.t8dev.shared  import vprint
-from    t8dev.cli.t8dev.util  import cwd, remove_formfeeds, runtool
+from    t8dev.cli.t8dev.util  import cwd, remove_formfeeds, vprint
+import  t8dev.run as run
 
 def setargs_asx(subparser):
     parser = subparser.add_parser('asx',
@@ -53,7 +54,7 @@ def asxasm(args):
     objdir.mkdir(parents=True, exist_ok=True)
     command_line = ('as6500', asmopts, str(objfile), str(srcfile))
     vprint(2, 'command line:', *command_line)
-    runtool(*command_line)
+    run.tool(*command_line)
 
 def asxlink(args):
     ''' Link ASXXXX assembler output.
@@ -96,7 +97,7 @@ def asxlink(args):
     #   option parsing code.) The current behaviour isn't causing much
     #   pain, so this has not yet been fixed.
     with cwd(objdir):
-        runtool('aslink', linkopts, objstem, *args.addargs, is32bit=True)
+        run.tool('aslink', linkopts, objstem, *args.addargs, is32bit=True)
         remove_formfeeds(objstem + '.lst')
         remove_formfeeds(objstem + '.rst')
         remove_formfeeds(objstem + '.map')

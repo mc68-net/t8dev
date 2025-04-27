@@ -42,10 +42,6 @@ def cwd(target):
     finally:
         os.chdir(str(oldcwd))
 
-def runtool(toolbin, *args, **kwargs):
-    vprint(2, 'exec', ' '.join(map(path.pretty, (chain([str(toolbin)], args)))))
-    run.tool(toolbin, *args, **kwargs)
-
 SANDBOX_MODULES = {}
 def sandbox_loadmod(modpath):
     ''' Load `modpath` as a Python module and return it, but without

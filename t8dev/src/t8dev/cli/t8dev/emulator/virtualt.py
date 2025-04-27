@@ -4,8 +4,8 @@ from    shutil  import  copy, copytree
 import  os
 
 from    t8dev.cli.t8dev.emulator.suite  import Suite
-from    t8dev.cli.t8dev.util  import runtool
 import  t8dev.path  as path
+import  t8dev.run as run
 
 class VirtualT(Suite):
 
@@ -24,6 +24,6 @@ class VirtualT(Suite):
         oldcwd = os.getcwd()
         try:
             os.chdir(self.emudir())
-            runtool('virtualt')
+            run.tool('virtualt')
         finally:
             os.chdir(oldcwd)

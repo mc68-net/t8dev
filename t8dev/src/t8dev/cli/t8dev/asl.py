@@ -4,7 +4,8 @@ from    itertools  import chain
 from    pathlib  import Path
 from    t8dev  import path
 from    t8dev.cli.t8dev.shared  import vprint
-from    t8dev.cli.t8dev.util  import cwd, runtool, sandbox_loadmod
+from    t8dev.cli.t8dev.util  import cwd, sandbox_loadmod, vprint
+import  t8dev.run as run
 
 def setargs_asl(subparser):
     parser = subparser.add_parser('asl',
@@ -149,7 +150,7 @@ def runasl(objdir, name, sourcecode):
         with open(srcfile, 'w', newline='\n') as f:
             f.write('    page 0\n')                     # Disable pagination
             f.write(sourcecode)
-        runtool('asl', *opts, srcfile, *endopts)
+        run.tool('asl', *opts, srcfile, *endopts)
 
 def asl(args):
     ' Call `asl1()` on each file. '
