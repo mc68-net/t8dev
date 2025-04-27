@@ -109,9 +109,16 @@ def aslauto(args):
         vprint(2, 'build', 'asl_testrig {}'.format(path.pretty(pt)))
         asl_testrig_file(pt)
 
-def runasl(objdir, name, sourcecode):
-    ''' Create `objdir`, a source file in it called `name`.asm containing
-        `sourcecode`, and assemble it with Macroassembler AS (``asl``).
+def runasl(objdir, source:Path, sourcecode):
+    ''' Create `objdir` and a source file in it named based on `source`
+        contianing `sourcecode`, and assemble it with Macroassembler AS
+        (``asl``).
+
+        Only the `Path.stem` of source will be used (any path prefix and
+        extension will be ignored) to give a file with the base name plus
+        an ``.asm`` extension. however, if the assembly fails, the
+        full `source` will be printed to indicate whence the assembly
+        file used here was generated.
 
         ASL generates some output files (e.g., debug symbols) only to the
         current working directory, and only if the source file is in the
@@ -130,7 +137,8 @@ def runasl(objdir, name, sourcecode):
         things like test rig setup if the source code is assembling a test
         rig to be unit-tested.
     '''
-    vprint(1, 'runasl', f'name={name} objdir={path.pretty(objdir)}')
+    vprint(1, 'runasl',
+        f'source={path.pretty(source)} objdir={path.pretty(objdir)}')
 
     opts = [
         '-codepage', 'utf-8',
@@ -142,7 +150,7 @@ def runasl(objdir, name, sourcecode):
         ]
     endopts = [ '-L', '-s', '-g', ]
 
-    srcfile = name + '.asm'
+    srcfile = source.stem + '.asm'
     with cwd(objdir):
         #   We always use Unix newline format for consistency across platforms.
         #   (Every decent editor for programmers handles this, and many people
@@ -150,7 +158,10 @@ def runasl(objdir, name, sourcecode):
         with open(srcfile, 'w', newline='\n') as f:
             f.write('    page 0\n')                     # Disable pagination
             f.write(sourcecode)
-        run.tool('asl', *opts, srcfile, *endopts)
+        ec = run.tool('asl', *opts, srcfile, *endopts, errexit=False)
+        if ec != 0:
+            print(f'runasl assembly FAILED: {source}')
+            exit(ec)
 
 def asl(args):
     ' Call `asl1()` on each file. '
@@ -173,7 +184,7 @@ def asl1(src):
     vprint(3, 'rsrc', path.pretty(rsrc))
     vprint(3, 'objfile:', path.pretty(objfile))
 
-    runasl(objdir, rsrc.stem, '    include "{}"\n'.format(rsrc))
+    runasl(objdir, rsrc, '    include "{}"\n'.format(rsrc))
 
 def asltestrig(args):
     asl_testrig_file(args.file)
@@ -204,4 +215,4 @@ def asl_testrig_file(file):
     objdir      = path.ptobj(ptfile_rel.parent)
     objfile     = objdir.joinpath(ptfname).with_suffix('.p')
 
-    runasl(objdir, ptfname, sandbox_loadmod(ptfile).test_rig)
+    runasl(objdir, ptfile_rel, sandbox_loadmod(ptfile).test_rig)

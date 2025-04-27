@@ -5,7 +5,7 @@ from    itertools  import chain
 from    t8dev  import path
 from    t8dev.cli.t8dev.shared  import vprint
 
-def tool(toolbin, *args, input=None, stdout_path=None,
+def tool(toolbin, *args, errexit=True, input=None, stdout_path=None,
     envupdate=None, is32bit=False):
     ''' Run `toolbin` with the given `args`. On success this simply
         returns; on failure it prints the command line and the exit code
@@ -50,11 +50,12 @@ def tool(toolbin, *args, input=None, stdout_path=None,
         print(f'FAILED: Executable {toolbin} not found for: {cmdline}')
         exit(127)
 
-    if exitcode == 0:  return
+    if exitcode == 0:  return 0
     print(f'FAILED (exit={exitcode}): {cmdline}')
     if is32bit and exitcode == 127:
         print('(Do you support 32-bit executables?)', file=sys.stderr)
-    exit(exitcode)
+    if errexit:  exit(exitcode)
+    return exitcode
 
 def newenv(updates):
     ''' Return a copy of the environment mapping updated with all key/value
