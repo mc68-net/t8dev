@@ -73,7 +73,7 @@ def blocks_from_bin(platform, stream, **args):
     bm = get_block_module(platform)
     return bm.blocks_from_bin(stream, **args)
 
-def blocks_from_obj(platform, stream, filename=None):
+def blocks_from_asl(platform, stream, filename=None):
     '''Read an as object and create the corresponding blocks.'''
     bm = get_block_module(platform)
     if "blocks_from_obj" in dir(bm):

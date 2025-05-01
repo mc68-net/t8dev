@@ -25,6 +25,8 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+- Changed: cmtconv `obj` output format renamed to `asl` and guessed from
+  `.p` file extension.
 
 ### 0.0.8 (2025-04-28)
 - Changed: `MemImage` now automatically recalculates `startaddr` and

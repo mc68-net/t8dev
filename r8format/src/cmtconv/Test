@@ -26,7 +26,7 @@ qecho() { [[ -n $quiet ]] && return; echo "$@"; }
 #   This test's output file is also used by wavtodump().
 test_ptowav() {
     qecho '------ ptowav'
-    "$cmtconv" $verbose -p jr200 -f hello -i obj $libdir/_testfiles/jr200.p \
+    "$cmtconv" $verbose -p jr200 -f hello $libdir/_testfiles/jr200.p \
         $ttdir/jr200.wav \
         || die run jr-200-obj-to-audio
     file $ttdir/jr200.wav | grep -s 'mono 44100 Hz' \

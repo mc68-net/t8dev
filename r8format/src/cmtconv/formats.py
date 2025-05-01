@@ -18,7 +18,8 @@ FORMATS = {
     'wav': ( bs.blocks_from_audio,      # (platform, stream)
              bs.blocks_to_audio,        # (platform, blocks, stream)
         ),
-    'obj': ( bs.blocks_from_obj,        # (platform,stream, filename)
+    #   Macroassembler AS (ASL) object file format.
+    'asl': ( bs.blocks_from_asl,        # (platform, stream, filename)
              None,
         ),
 }
@@ -26,6 +27,7 @@ FORMATS = {
 #   Map of format alias to canonical format name.
 FORMAT_ALIASES = {
     'cjr': 'cas',
+    'p':   'asl',       # Macroassembler AS (ASL) object file
 }
 
 def guess_format(format, path, open=open):
