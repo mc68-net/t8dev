@@ -53,12 +53,26 @@ def parse_args():
 
     return args
 
+def get_rwfunc(format, io):
+    ''' Return reader or writer function for the given format, or print
+        an error message and exit. `io` must be ``input`` or ``output``
+    '''
+    if   io == 'input':   funcindex = 0
+    elif io == 'output':  funcindex = 1
+    else:                  raise ValueError(f"get_rwfunc: bad io param '{io}'")
+
+    rwfuncs = fm.FORMATS.get(format, None)
+    if rwfuncs is not None:
+        return rwfuncs[funcindex]
+    print(f'Unknown {io} format: {format}', file=sys.stderr)
+    exit(99)
+
 def main():
     args = parse_args()
-    reader = fm.FORMATS[args.input_format][0]
+    reader = get_rwfunc(args.input_format, 'input')
     blocks = reader(args.platform, args.input, **args.reader_optargs)
 
     if args.output is not None:
-        writer = fm.FORMATS[args.output_format][1]
+        writer = get_rwfunc(args.output_format, 'output')
         writer(args.platform, blocks, args.output)
         #   XXX relies on exit() to close files
