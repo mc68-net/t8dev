@@ -25,6 +25,8 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+- Fixed: toolsets that use pkg-config to check for dependencies now check
+  for `pkg-config` presence as well.
 
 ### 0.3.1 (2025-04-28)
 - Fixed: Updated `pactivate` to 0.5.7 for zsh support when sourced standalone.

@@ -27,6 +27,7 @@ class LinApple(Setup):
             b'show this help message')
 
     DEPENDENCIES = (
+        ('pkg-config',              ('pkg-config', '--version')),
         ('git',                     ('git', '--version')),
         ('imagemagick',             ('convert', '--version')),
         ('libzip-dev',              ('pkg-config', 'libzip')),

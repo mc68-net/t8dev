@@ -26,6 +26,7 @@ class VirtualT(Setup):
         return checkrun( ['vt_client'], 1, b'vt_client')
 
     DEPENDENCIES = (
+        ('pkg-config',            ('pkg-config', '--version')),
         ('libxft-dev',            ('pkg-config', 'xft')),
         ('libxinerama-dev',       ('pkg-config', 'xinerama')),
         ('libfontconfig-dev',     ('pkg-config', 'fontconfig')),

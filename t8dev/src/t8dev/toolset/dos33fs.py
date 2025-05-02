@@ -27,8 +27,9 @@ class DOS33FS(Setup):
             b'by Vince Weaver <vince@deater.net>')
 
     DEPENDENCIES = (
-         ('liblz4-dev', ('pkg-config', 'liblz4')),
-         ('libpng-dev', ('pkg-config', 'libpng')),
+        ('pkg-config',      ('pkg-config', '--version')),
+        ('liblz4-dev',      ('pkg-config', 'liblz4')),
+        ('libpng-dev',      ('pkg-config', 'libpng')),
     )
 
     def build(self):
