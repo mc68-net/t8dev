@@ -30,7 +30,10 @@ class disx(Setup):
         #   it will still print out a ton of errors, if it even exits at all.
         return self.pdir('bin').joinpath('disx').exists()
 
-    #DEPENDENCIES = ( none known )
+    DEPENDENCIES = (
+        ('pkg-config',          ('pkg-config', '--version')),
+        ('libncurses-dev',      ('pkg-config', 'ncurses')),
+    )
 
     def build(self):
         self.make_src()
