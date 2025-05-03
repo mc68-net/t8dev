@@ -111,6 +111,17 @@ class CSCP(Suite):
     #   name of the emulator to use (e.g., `tk80bs` for the `tk80` entry
     #   below).
     VENDOR_ROM = {
+        'mz80k': {
+            'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/80K/cgrom-jp.bin',
+            'IPL.ROM':              # $0000-$0FFF
+                'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/80K/SP-1002.bin',
+        },
+        'mz80k-eu': {
+            '_emulator': 'mz80k',
+            'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/80K/cgrom-eu.bin',
+            'IPL.ROM':              # $0000-$0FFF
+                'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/80K/SP-1002.bin',
+        },
         'mz700': {
             'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/j700/cgrom-jp.bin',
             #   XXX This is the EU/PAL IPL ROM.
