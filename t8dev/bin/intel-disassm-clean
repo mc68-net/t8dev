@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+#   intel-disassm-clean - clean up Intel/Zilog-style disassembler output
+#
+#   This takes on stdin the output from Z80 disassemblers that produce
+#   Intel/Zilog-style output (e.g., '0F123h' for numbers) and cleans it up
+#   to look nicer and be more usable with the t8dev assembly coding style.
+#   This assumes the assembler (typically ASL) is configured to use $nnnn
+#   hex number format, `db` and `dw` for defining words and bytes, and so on.
+#
+#   This was originally designed to be used with `z80dasm`, and has a
+#   number of special cases to deal with that, but has been extended to
+#   produce decent results with e.g. `disx`, which uses upper-case 'H'
+#   instead of lower-case 'h' at the end of numbers, and doesn't always use
+#   a leading '0'.
+#
+#   You may add an additional sed script to do further cleanup by giving it
+#   as an argument on a command line.
+#
+#   It requires GNU sed for things like word boundaries as well as comments
+#   on the same line as a command.
+#
+set -Eeuo pipefail
+
+addsed=/dev/null
+[[ $# -gt 0 ]] && { addsed="$1"; shift; }
+[[ $# -gt 0 ]] && { echo 1>&2 "Only one arg permitted"; exit 2; }
+
+sed -E -e '
+
+        #   All line joins must come first, so that later commands apply
+        #   also to the next line that was joined.
+        /^[^\t;].*:$/{N;s/\n//}     # z80dasm: join labels to next line
+
+        #   disx: Register names to lower case. We must do this before numbers
+        #   so that the numbers do not get converted to lower case, too.
+        #   This covers the common cases, but misses e.g. SP, IX, IY.
+        s/\t[ABCDEHL]{1,2},.*/\L&/
+        s/,[ABCDEHL]{1,2}\b/\L&/
+
+        #   Number formats: 0x and nH → $n
+        s/\b0x([0-9A-Fa-f]{4})/$\U\1/g      # number format 0xnnnn → $NNNN
+        s/\b0([0-9A-Fa-f]{4})[hH]\b/$\U\1/g # number format 0nnnnh → $NNNN
+        s/\b([0-9A-Fa-f]{4})[hH]\b/$\U\1/g  # number format  nnnnh → $NNNN
+        s/\b0([0-9A-Fa-f]{2})[hH]\b/$\U\1/g # number format   0nnh → $NN
+        s/\b([0-9A-Fa-f]{2})[hH]\b/$\U\1/g  # number format    nnh → $NN
+
+        #   z80dasm: more readable label formats
+        s/l([0-9a-f]{4})h/unk\U\1/g
+        s/sub_([0-9a-f]{4})h/sub_\U\1/g
+
+        #   Mnemonics to lower-case and indent operands after them.
+        s/(\t[A-Za-z]{2})[ \t]/\L\1   / # 2-letter mnemonic operand indent
+        s/(\t[A-Za-z]{3})[ \t]/\L\1  /  # 3-letter mnemonic operand indent
+        s/(\t[A-Za-z]{4})[ \t]/\L\1 /   # 3-letter mnemonic operand indent
+        s/(\t[A-Za-z]{2,4})$/\L\1/      # lower-case stand-alone mnemonics
+
+        s/^\t/\t    /       # +4 indent on non-label lines
+        s/:\t/\t    /       # +4 mnemonic indent menmonic on label lines, remove :
+
+        s/ defb / db    /   # ASL syntax
+        s/ defw / dw    /   # ASL syntax
+
+        ' -f "$addsed" \
+    | sed -E -e 's/[ \t]+$//  # remove any trailing whitesapce' \
+    | expand
+#   Notes:
+#   • Trailing whitespace removal is done as a separate command because
+#     when incuded at the end of the original sed script it will not affect
+#     lines that were split (e.g., to add a blank line after another).
