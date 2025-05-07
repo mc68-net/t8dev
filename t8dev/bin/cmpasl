@@ -71,7 +71,7 @@ assemble_asl() {
         #     useful (it just gives pass/line/etc. counts).
         #   • $aslsyms must be unquoted to pass `-D` and the symdef as
         #     separate args; this means symdefs cannot have spaces in them.
-        asl -q -L -i "$incpath" ${aslsyms[@]/#/-D } \
+        asl -q -U -L -i "$incpath" ${aslsyms[@]/#/-D } \
           -cpu 8080 \
           -o "$fname.p" -olist "$fname.lst" "$projdir/$asmfile" \
         && vecho "• p2bin:" \
