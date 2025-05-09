@@ -25,9 +25,11 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+
+### 0.3.2 (2025-05-10)
 - Fixed: Add some missing dependency checks for `toolset` modules.
 - Changed: Symbols now case-sensitive in `cmpasl` assembly.
-- Changed: Improved `z80dasm-clean` and renamed to `intel-disassm-clean`.
+- Changed: `z80dasm-clean` improved and renamed to `intel-disassm-clean`.
 
 ### 0.3.1 (2025-04-28)
 - Fixed: Updated `pactivate` to 0.5.7 for zsh support when sourced standalone.

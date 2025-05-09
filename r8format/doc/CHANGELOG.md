@@ -25,6 +25,8 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+
+### 0.0.9 (2025-05-10)
 - Changed: cmtconv `obj` output format renamed to `asl` and guessed from
   `.p` file extension.
 
