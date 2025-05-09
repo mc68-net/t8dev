@@ -52,7 +52,7 @@ disassmble_z80dasm() {
         z80dasm -a -l -g "$start_addr" \
             -b $blockfile -S <(cat "$comsym" "$symfile") \
             "$binfile" "$@"
-    ) | intel-disassm-clean "$(ifexists "$asmdir/$fname.sed")" >"$asmfile"
+    ) | intel-disassm-clean "$(ifexists "$asmdir/$fname.sed")" >"$asmfile" \
      || fail
 }
 

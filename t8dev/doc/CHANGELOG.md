@@ -26,6 +26,9 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
 
+### 0.3.3 (2025-05-10)
+- Fixed: Syntax error in `cmpasl`.
+
 ### 0.3.2 (2025-05-10)
 - Fixed: Add some missing dependency checks for `toolset` modules.
 - Changed: Symbols now case-sensitive in `cmpasl` assembly.
