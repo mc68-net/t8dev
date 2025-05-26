@@ -23,6 +23,7 @@ class disx(Setup):
     def __init__(self):
         super().__init__()
         self.source_repo = 'https://github.com/mc68-net/disx'
+        self.source_ref  = 'trunk'
 
     def check_installed(self):
         #   We can't try to run this because it requires a proper filesystem

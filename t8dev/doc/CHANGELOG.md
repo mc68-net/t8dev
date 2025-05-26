@@ -25,6 +25,7 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+- Fixed: Fetch proper branch for `disx` disassembler.
 
 ### 0.3.3 (2025-05-10)
 - Fixed: Syntax error in `cmpasl`.
