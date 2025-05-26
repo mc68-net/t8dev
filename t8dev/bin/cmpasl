@@ -27,7 +27,7 @@ find_asl() {
             /c/Program\ \
             Files*/asl/bin \
         ; do
-            [[ -x $bin/asl ]] && export PATH="$bin:$PATH"
+            [[ -x $bin/asl ]] && { export PATH="$bin:$PATH"; break; }
         done
     }
     asl -version >/dev/null || die 3 "asl not found in path"
