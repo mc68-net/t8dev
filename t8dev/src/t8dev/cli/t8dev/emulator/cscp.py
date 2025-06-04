@@ -122,6 +122,12 @@ class CSCP(Suite):
             'IPL.ROM':              # $0000-$0FFF
                 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/80K/SP-1002.bin',
         },
+        'mz80a-eu': {
+            '_emulator': 'mz80a',
+            'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/80A/cgrom-eu.bin',
+            'IPL.ROM':              # $0000-$0FFF
+                'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/80A/SA-1510.bin',
+        },
         'mz700': {
             'FONT.ROM': 'https://gitlab.com/retroabandon/sharp-mz-re/-/raw/main/rom/j700/cgrom-jp.bin',
             #   XXX This is the EU/PAL IPL ROM.
