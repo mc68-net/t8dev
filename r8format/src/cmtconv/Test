@@ -10,7 +10,6 @@
 #   see if it passed or failed. E.g., `./cmt-test; echo EXITCODE $?`
 #
 set -Eeuo pipefail
-ulimit -v $((3*1024*1024))
 
 #   We're now expected to be called with an already-set-up T8_PROJDIR and
 #   virtualenv. Eventually this should all be moved up into the top-level
