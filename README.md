@@ -29,6 +29,11 @@ If you're familiar with [`virtualenv`], it's usually easier to install
 this; simply drop the [pactivate script] into the root of your project
 directory, add `t8dev` to your `requirements.txt`, and add `source
 ./pactivate` to your test script (or just source it at the command line).
+If you want to use the latest development version of t8dev, use the
+following in `requirements.txt`:
+
+    git+https://github.com/mc68-net/t8dev@main#subdirectory=r8format
+    git+https://github.com/mc68-net/t8dev@main#subdirectory=t8dev
 
 Before running `t8dev` or other programs, you will need to set the
 `T8_PROJDIR` environment variable to point to the root directory of your
