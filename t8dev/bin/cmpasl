@@ -76,7 +76,7 @@ assemble_asl() {
           -cpu 8080 \
           -o "$fname.p" -olist "$fname.lst" "$projdir/$asmfile" \
         && vecho "• p2bin:" \
-        && p2bin $quiet -l 0x00 "$fname.p" "$fname.bin"
+        && p2bin $quiet -l "$fillbyte" "$fname.p" "$fname.bin"
         #   XXX Already starts at first addr w/code, so we're not using $start_addr.
         #   XXX need to start at start_addr above; use -r 0-$((start_addr-1) ???
     ) || die 1 "asl assembly error"
@@ -120,6 +120,8 @@ Usage: $(basename "$0") [OPTIONS] BINFILE [ASMPATH]
   • -D sym,sym=…        predefine symbols for ASL build
   • -d/--dasm DASM ADDR first disassemble binary with DASM disassembler,
                         starting at ADDR (0xNNNN for hexadecimal)
+  • -f/--fillbyte BYTE  fill byte for unused areas in generated ROM binary
+                        images (default 0x00)
   • -p/--projdir DIR  set project dir (all files must be under this)
   • -v/--verbose      verbose mode
 - Environment variables:
@@ -133,6 +135,7 @@ _____
 projdir=
 quiet=-q
 disassembler=
+fillbyte=0x00
 start_addr=
 cpu=8080
 aslsyms=()
@@ -141,6 +144,7 @@ while [[ $# -gt 0 ]]; do case "$1" in
     -c|--cpu)       shift; cpu="$1"; shift;;
     -D)             shift; aslsyms+=("$1"); shift;;
     -d|--dasm)      shift; disassembler="$1"; shift; start_addr="$1"; shift;;
+    -f|--fillbyte)  shift; fillbyte="$1"; shift;;
     -p|--projdir)   shift; projdir="$1"; shift;;
     -v|--verbose)   shift; quiet='';;
     -*)             die 2 "Bad option $1. Use '-h' for help.";;
