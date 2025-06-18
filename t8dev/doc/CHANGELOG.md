@@ -25,6 +25,7 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+- CHANGED: `dos33fs` toolset renamed to `dos33fsprogs` to match new repo name.
 - Fixed: Fetch proper branch for `disx` disassembler.
 - Fixed: `cmpasl` now uses first-found $bin/asl, not last.
 - Added: `cmpasl -f` option to change fill byte for regions without code.

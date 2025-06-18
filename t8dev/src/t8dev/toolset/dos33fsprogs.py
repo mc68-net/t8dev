@@ -12,7 +12,7 @@ import  sys
 
 from    t8dev.toolset.setup import *
 
-class DOS33FS(Setup):
+class DOS33FSPROGS(Setup):
 
     def __init__(self):
         super().__init__()
@@ -54,4 +54,4 @@ class DOS33FS(Setup):
         for subdir, file in bins:
             self.symlink_toolbin(self.srcdir(), subdir, file)
 
-TOOLSET_CLASS = DOS33FS
+TOOLSET_CLASS = DOS33FSPROGS

@@ -12,7 +12,7 @@
 
 TOOLSETS = {}
 TOOLSET_NAMES = [
-    'asl', 'asxxxx', 'bm2', 'cscp', 'ctools', 'disx', 'dos33fs',
+    'asl', 'asxxxx', 'bm2', 'cscp', 'ctools', 'disx', 'dos33fsprogs',
     'linapple', 'osimg', 'RunCPM', 'VirtualT',
 ]
 
