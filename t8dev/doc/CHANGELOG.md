@@ -29,6 +29,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Fixed: Fetch proper branch for `disx` disassembler.
 - Fixed: `cmpasl` now uses first-found $bin/asl, not last.
 - Added: `cmpasl -f` option to change fill byte for regions without code.
+- Added: `t8t` serial terminal/transfer program. See `doc/t8t.md`.
 
 ### 0.3.3 (2025-05-10)
 - Fixed: Syntax error in `cmpasl`.
