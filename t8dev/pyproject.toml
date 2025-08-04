@@ -14,8 +14,8 @@ requires-python = '>=3.9'
 dependencies = [
     'r8format>=0.0.8',
     'pytest', 'pytest_pt',
-    'requests', 'patool',               #   toolset installation support
-    'py65',                             #   external CPU simulators
+    'requests', 'patool',       # toolset installation support
+    'py65',                     # external CPU simulators
 ]
 #   `pytest` and `pytest_pt` are not strictly a runtime dependencies, since
 #   we need them only to run our tests, but it's usual for repos using this
