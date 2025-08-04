@@ -4,7 +4,7 @@ Changelog
 This file follows most, but not all, of the conventions described at
 [keepachangelog.com]. Especially we always use [ISO dates]. Subsections or
 notations for changes may include Added, Changed, Deprecated, Fixed,
-Removed, and Security.
+Removed, and Security. Notes marked "API" indicate breaking API changes.
 
 Release version numbers follow the [Python packaging
 specifications][pyver], which are generally consistent with [semantic
