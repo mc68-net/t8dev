@@ -1,6 +1,7 @@
 ''' binary.tool.asl - Support for Macro Assembler AS__ assembler output.
 
-    .. _AS: http://john.ccac.rwth-aachen.de:8000/as/
+    The file format of ASL code files (``.p`` files) is documented
+    in section 5.1__ of the manual.
 
     A word of warning here: a "section" is referred to as a
     "segment" in AS documentation, and AS documentation uses "section"
@@ -9,6 +10,9 @@
     prefer terminology that gives us consistency across toolchains
     rather than using terminology specific to a particular toolchain
     that would then be inconsistent with other toolchains.
+
+    .. _AS: http://john.ccac.rwth-aachen.de:8000/as/
+    .. _5.1: http://john.ccac.rwth-aachen.de:8000/as/as_EN.html#sect_5_1_
 '''
 
 from    binary.memimage import MemImage
@@ -47,6 +51,26 @@ class PFile(MemImage):
     class Record(ntup('Record', 'header section gran addr length data')):
         ''' A data record from a code file. This is used for both
             full/new ($81) and short/legacy ($01-$7F) records.
+
+            The fields are:
+            * header (byte): Record type/CPU family.
+              - $00: Creator record; always last in file. Remainder of file
+                is a string with information on the program that created
+                the file.
+              - $01-$7F (short/legacy format): Processor family for which
+                the code was generated. The family is the same as the
+                header byte, the section is `CODE` and `gran` is implicit
+                in the processor family.
+              - $80: Entry point record; `addr` is start address.
+              - $81: Generic data record including another header byte for
+                CPU family, after which is section and granularity.
+            * section (byte): Address space for the code ("segment" in ASL
+              terminology). See the ``SE_*`` definitions below.
+            * gran (byte): Granularity, or size of data items; end addr
+              will be `length`/`gran`. Rarely other than 1.
+            * addr (4 bytes): Start address of record.
+            * length (2 bytes): Length in bytes of _data._
+            * data (byte array): _length_ bytes with the actual data.
         '''
 
     #   Section (generic term) / segment (AS term) codes
