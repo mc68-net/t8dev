@@ -15,7 +15,11 @@ class MemImage(list):
         return the records ordered by address (assuming any records
         added via `append()` sort properly).
 
-        `startaddr` and `endaddr` are set 
+        `startaddr` and `endaddr` are set to the start address of the
+        lowest record in memory and the address after the highest-located
+        byte of all records. The difference between the two is not the
+        total size of all the data, but is what is returned by
+        `contiglen()`.
     '''
 
     def __init__(self, fill=0x00):
@@ -24,8 +28,7 @@ class MemImage(list):
         self.entrypoint = None
         self.fill = 0x00
 
-    class OverlapError(ValueError):
-        pass
+    class OverlapError(ValueError):  ...
 
     MemRecord = ntup('MemRecord', 'addr data')
     MemRecord.__docs__ = \
