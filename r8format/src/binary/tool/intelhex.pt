@@ -1,0 +1,75 @@
+#   Thomas Fischl's HEX file checksum calculator was helpful here.
+#   https://www.fischl.de/hex_checksum_calculator/
+
+from    binary.tool.intelhex  import intelhex, _intelhexrecs, _checksum
+from    binary.memimage  import MemImage
+import  pytest
+
+param = pytest.mark.parametrize
+
+def mapb(ss:[str]) -> [bytes]:
+    return list(bytes(s, encoding='ASCII') for s in ss)
+
+def makememimage(addr_data_seq):
+    mem = MemImage()
+    for addr, data in addr_data_seq:
+        print(addr, data)
+        mem.addrec(addr, data)
+    return mem
+
+def makerec(addr, data):
+    return MemImage.MemRecord(addr, data)
+
+####################################################################
+
+@param('cksum, values', [
+    (0x1E, '0300300002337A'),                   # Wikipedia "Intel HEX" example
+    (0xFF, '00000001'),                         # From ASL `p2bin`
+    (0x6A, '0B9000004061626364454647480D0A'),   # From ASL `p2bin`
+])
+def test__checksum(cksum, values):
+    data = [int(values[i:i+2], 16) for i in range(0,len(values),2)]
+    print(data)
+    assert cksum == _checksum(data)
+    assert 0 == _checksum(data + [cksum])   # the easy way of checking....
+
+@param('_num, memrec, expected', [  # num unsed; just for test identification
+    (0, makerec(0xE0E0, []),            []),
+    (1, makerec(0xFF01, [0xFF]),        [':01FF0100FF00']),
+    (4, makerec(0x0102, [3, 2, 1, 0]),  [':0401020003020100F3']),
+    (9, makerec(0xE003, range(0xA0,0xC2)), [
+        ':10E00300' + 'A0A1A2A3A4A5A6A7A8A9AAABACADAEAF' + '95',
+        ':10E01300' + 'B0B1B2B3B4B5B6B7B8B9BABBBCBDBEBF' + '85',
+        ':02E02300' + 'C0C1' + '7A',   ]
+    ),
+    (5, makerec(0x8228, range(0,0x10)),   # Should not print a an empty record.
+        [':10822800' + '000102030405060708090A0B0C0D0E0F' + 'CE']),
+])
+def test__intelhexrecs(_num, memrec, expected):
+    print(f'addr=${memrec.addr:04X} data={memrec.data!r}')
+    hexrecs = _intelhexrecs(memrec)
+    for r in map(bytes.decode, hexrecs):
+        print(r[0:3], r[3:7], r[7:9], r[9:-2], r[-2:])
+    assert [ bytes(s, encoding='ASCII') for s in expected ] == hexrecs
+
+@param('memrecs, hexrecs', [
+    #   Simple disjoint records.
+    (   [ (0x100, [3, 2, 1, 0])
+        , (0x120, [3, 2, 1, 0])
+        ],
+        [ ':04' + '0100' + '00' + '03020100' + 'F5'
+        , ':04' + '0120' + '00' + '03020100' + 'D5'
+        ]
+    ),
+    #   Overlapping records are in MemImage order (not sorted by address).
+    #   ASL's p2hex does the same (with an overlap warning).
+    (   [ (0x201, [0xC, 0xD])
+        , (0x200, [0xA, 0xB])
+        ],
+        [ ':02' + '0201' + '00' + '0C0D' + 'E2'
+        , ':02' + '0200' + '00' + '0A0B' + 'E7'
+        ]
+    ),
+])
+def test_intelhex(memrecs, hexrecs):
+    assert mapb(hexrecs) == intelhex(makememimage(memrecs))

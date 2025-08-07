@@ -25,6 +25,7 @@ commit ID.
 For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 ### dev
+- Added: binary.intelhex to generate [Intel HEX] records from MemImages.
 
 ### 0.0.9 (2025-05-10)
 - Changed: cmtconv `obj` output format renamed to `asl` and guessed from
@@ -68,6 +69,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 
 <!-------------------------------------------------------------------->
 [ISO dates]: https://xkcd.com/1179/
+[Intel HEX]: https://en.wikipedia.org/wiki/Intel_HEX
 [cynic-net/pypi-release]: https://github.com/cynic-net/pypi-release
 [keepachangelog.com]: https://keepachangelog.com/
 [pyver]: https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers
