@@ -44,7 +44,7 @@ class PFile(MemImage):
         already "linked.")
     '''
 
-    class Record(ntup('Record', 'header, section, gran, addr, length data')):
+    class Record(ntup('Record', 'header section gran addr length data')):
         ''' A data record from a code file. This is used for both
             full/new ($81) and short/legacy ($01-$7F) records.
         '''
