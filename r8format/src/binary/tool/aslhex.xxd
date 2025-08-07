@@ -1,0 +1,12 @@
+#   `xxd -r` will produce from this an ASL .p file with overlapping records:
+#       0201: 0C 0D
+#       0200: 0A 0B
+#   Running `p2bin -F Intel` on this shows that it produces Intel HEX
+#   output of the records in the order of the .p file (rather than sorted
+#   by address) that include the overlaps (which it warns about).
+
+00000000: 89 14 81 51 01 01 01 02 00 00 02 00 0c 0d 81 51  ...Q...........Q
+00000010: 01 01 00 02 00 00 02 00 0a 0b 00 41 53 20 31 2e  ...........AS 1.
+00000020: 34 32 20 42 65 74 61 20 5b 42 6c 64 20 32 38 37  42 Beta [Bld 287
+00000030: 5d 2f 78 38 36 5f 36 34 2d 75 6e 6b 6e 6f 77 6e  ]/x86_64-unknown
+00000040: 2d 6c 69 6e 75 78                                -linux
