@@ -1,0 +1,22 @@
+from    t8dev.cli.t8t  import Config
+import  pytest
+
+param = pytest.mark.parametrize
+
+conf = Config('aBoard', object())
+
+@param('s, expected', [
+    (r'',           b''),
+    (r'abc',        b'abc'),
+    (r'R\rN\n',     b'R\rN\n'),
+    (r'\xFF',       b'\xFF'),
+])
+def test__strbytes_good(s, expected):
+    bs = conf._strbytes(s)
+    print(list(map(ord, s)))
+    print(list(map(int, bs)))
+    assert expected == bs
+
+def test__strbytes_fail():
+    with pytest.raises(conf.ByteOutOfRange):
+        print(conf._strbytes('\u0100'))

@@ -38,6 +38,7 @@ subcommand-specific options must be given after _subcommand._
 
 These must appear before _subcommand._
 
+- `--verbose`, `-v`: Explain to stdout what is being sent and how.
 - `--device DEV`, `-d DEV`: Use _dev_ as the local serial device. This is
   typically a path such as `/dev/ttyUSB0` or `/dev/serial/by-id/…`. (No
   internal default.)
@@ -113,6 +114,8 @@ in the command line) are available:
   (use sufficient `--char-delay` instead).
 - `--char-delay MS`, `-c MS`: Wait for _ms_ milliseconds after sending each
   character.
+
+XXX The following does not work yet.
 
 If the filename does not exist and has no extension, it will be tried again
 after adding `.p` (the extension for ASL output files) to the end of the
