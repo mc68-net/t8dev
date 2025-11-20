@@ -37,8 +37,11 @@ class ASL(Setup):
        #self.source_ref  = 'dev/cjs/testing'
 
     def check_installed(self):
-        return checkrun(['asl', '-this-is-not-an-option'], 4,
-            b'Invalid option')
+        #   For rather old versions of ASL without the -version option,
+        #   we'd pass -this-is-not-an-option and expect exit code 4 and
+        #   'Invalid option'. That later changed to 'invalid parameter',
+        #   so probably time just to switch to -version.
+        return checkrun(['asl', '-version'], 0, b'Macro Assembler 1.42')
 
     GITIGNORE = '''\
 #   .o and .obj are the only two TARG_OBJEXTENSION in Makefile.def-samples/
