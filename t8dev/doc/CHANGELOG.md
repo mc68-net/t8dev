@@ -30,6 +30,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Fixed: ASL installed check now uses `-version`; fixes failed check
   w/newer verions of ASL but will no longer work on rather old versions.
 - Fixed: `cmpasl` now uses first-found $bin/asl, not last.
+- Fixed: `toolset bm2` update to 2026 version and fix compile error.
 - Added: `cmpasl -f` option to change fill byte for regions without code.
 - Added: `t8t` serial terminal/transfer program. See `doc/t8t.md`.
 

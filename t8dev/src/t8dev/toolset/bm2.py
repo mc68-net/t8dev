@@ -21,9 +21,9 @@ class BM2(Setup):
         self.source_url = 'http://ver0.sakura.ne.jp/pc/'
         #   See README in the bm2src repo for why we use it instead of above.
         self.source_url = 'https://github.com/mc68-net/bm2src/raw/refs/heads/main/archive/'
-        self.source_archive = 'bm2src_20240817.tgz'
+        self.source_archive = 'bm2src_20260125.tar'
         self.source_sha = \
-            '1eeec77742099a89c231d02c2bebf801ba6ba7b9476a194e20f8e76f9b7d50bc'
+            'f581a3a3745b93ebaa3b04b2624e58324ee544336eb8e9129168899bd9f20b9b'
         self.source_tar_strip = 1   # drop top-level `bm2/` in tarfile
 
     def check_installed(self):
@@ -41,7 +41,10 @@ class BM2(Setup):
     )
 
     def build(self):
-        self.make_src()
+        #   GCC 14 (included in Debian 13) upgraded several (obsolete in
+        #   C99) warnings to errors, including implicit-function-declaration.
+        #   bm2 doesn't handle that, so just disable the one error.
+        self.make_src('CC=gcc -Wno-implicit-function-declaration')
 
     def install(self):
         #   Cannot `make install` because it's `cp $(EXE) /usr/local/bin`.
