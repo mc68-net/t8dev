@@ -1,6 +1,7 @@
 ''' cli.t8dev argument parsing and top level '''
 
 from    argparse  import ArgumentParser
+from    importlib.metadata  import version
 from    pathlib  import Path
 from    site  import addsitedir
 import  os, sys
@@ -27,6 +28,9 @@ def parseargs():
         help='project directory; overrides T8_PROJDIR env var')
     a('-v', '--verbose', action='count', default=0,
         help='increase verbosity; may be used multiple times')
+    #   This is the version of the installed distribution's metadata, which
+    #   with an editable install may lag the source tree's pyproject.toml.
+    a('--version', action='version', version='%(prog)s ' + version('t8dev'))
 
     command_group = ptop.add_subparsers(dest='command',
         # We do not use required=True; see below
