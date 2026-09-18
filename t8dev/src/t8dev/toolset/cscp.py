@@ -53,7 +53,12 @@ class CSCP(Setup):
             interactive=False, verbosity=0)
         extract_root = extract_dir.joinpath('binary')
 
-        source_dir = extract_root.joinpath('binay_win10')
+        #   Older versions (in 2025) of this download had a `binay_win10/`
+        #   dir containing "PE32 executable for MS Windows 6.00 (GUI),
+        #   Intel i386" .exe files. Newer versions (in 2026) have switched
+        #   to a `binary_x64/` dir containing "PE32+ executable for MS
+        #   Windows 6.00 (GUI), x86-64" files.
+        source_dir = extract_root.joinpath('binary_x64')
         files = os.listdir(source_dir)
         for file in files:
             source_file = source_dir.joinpath(file)
