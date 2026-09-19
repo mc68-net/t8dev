@@ -1,5 +1,5 @@
 [project]
-version = '0.4.0.dev8'
+version = '0.4.0.dev9'
 name = 't8dev'
 description = 'Tools for 8-bit cross-development '
 authors = [
@@ -13,7 +13,7 @@ urls.tracker = 'https://github.com/mc68-net/t8dev/issues'
 requires-python = '>=3.9'
 dependencies = [
     'r8format>=0.0.8',
-    'pytest', 'pytest_pt',
+    'pytest', 'pytest_pt>=1.2.0',
     'requests', 'patool',       # toolset installation support
     'pyserial',                 # serial connectivity for `t8t`
     'pyserial', 'toml',         # `t8t` serial connectivity, config read/write

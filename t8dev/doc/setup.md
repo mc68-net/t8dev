@@ -16,8 +16,6 @@ paths given below are relative to this unless otherwise specified.
   used by your system. Often this is unused; the setup script (below) will
   install `t8dev[all]` which will bring in all the standard dependencies
   used by people developing with t8dev (`pytests`, `requests`, `py65`, etc.)
-- `conftest.py` should contain `from pytest_pt import *` to add the pytest
-  plugin that discovers unit-test `.pt` files in this repo.
 - `src/conftest.py` should contain `from testmc.conftest import *` to bring
   in the unit test framework for assembler code.
 
