@@ -34,6 +34,7 @@ For release instructions, see [cynic-net/pypi-release] on GitHub.
 - Added: `cmpasl -f` option to change fill byte for regions without code.
 - Added: `t8t` serial terminal/transfer program. See `doc/t8t.md`.
 - Added: `t8dev --version` option.
+- Added: `testmc.generic.MBytesIO.written_str()` convenience method.
 - Fixed: `toolset cscp` updated for `binay_win10/` → `binary_x64/` change.
 - Changed: Requires `pytest_pt` ≥1.2.0, which now autoloads itself. Remove
   any `from pytest_pt import *` from your `conftest.py` files to avoid

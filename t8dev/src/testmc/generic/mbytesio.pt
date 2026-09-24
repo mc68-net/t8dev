@@ -9,9 +9,14 @@ def test_MBytesIO_written():
     b.clear();          assert b''   == b.written()
     b.write(b'2');      assert b'2'  == b.written()
 
-    b.write(b'\x00\x80\xFF')
+    b.clear()
+    b.write(b'\x00 !@~ \x80\xFF \\xff') # last 4 chars show ambiguity
+    assert   '\x00 !@~ \\x80\\xff \\xff' == b.written_str()
+
+    b.clear()
+    b.write(b'\x00\a\x80\xFF')
     b.written(print=True)
-   #assert 0    # uncommit to see that the output was written to stdout
+   #assert 0    # uncomment to see that the output was written to stdout
 
 def test_MBytesIO_written_from0():
     ''' It's possible to pre-fill the buffer we're using for output, but
