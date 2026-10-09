@@ -66,6 +66,10 @@ The command line programs include:
 - `cmtconv`: Conversion program. Use `-h` for help.
 - `analyze-cmt`: Analysis of (usually unknown) CMT save formats in WAV files.
 
+Other tools with similar goals include:
+- [dwimsy]: retrocomputing media preservation, demodulation, restoration,
+  and preparation
+
 #### Other Programs
 
 Additional command-line programs include:
@@ -106,6 +110,7 @@ good places to get in touch, more or less in order of preference:
 <!-- Programs -->
 [bt]: ./doc/bastok.md
 [cc]: ./doc/cmtconv.md
+[dwimsy]: https://github.com/f-fix/dwimsy
 
 <!-- Support and Authors -->
 [0cjs]: https://github.com/0cjs
